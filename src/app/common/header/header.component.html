@@ -1,0 +1,58 @@
+<header class="mainSec">
+    <div class="navBar">
+        <div class="main-panel">
+            <div class="logo">
+                <a [routerLink]="['/dashboard']"><img src="assets/images/logo.svg"> </a>
+            </div>
+            <nav class="navbar">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse">
+                        <ul class="navBar-items">
+                            <!-- <li *ngIf="header_state">
+                                <a class="add-plus">+</a>
+                                <div class="add-plusDropdown">
+                                    <ul>
+                                        <li><a [routerLink]="['/invoices']">+ Invoice</a></li>
+                                        <li><a [routerLink]="['/payment-transfer']">+ Fund Transfer</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li *ngIf="header_state">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" name="" placeholder="search">
+                                </div>
+                            </li> -->
+                            <li *ngIf="header_state">
+                                <ul class="hns-placeholder">
+                                    <li>
+                                        <a href="https://help.bankopen.co" target="_blank" title="Help"><img src="assets/icons/help.svg" alt="help"></a>
+                                    </li>
+                                    <!-- <li>
+                                        <a title="Notifiactions"><img src="assets/icons/notifications.svg" alt="notifiactoions"></a>
+                                    </li>
+                                    <li>
+                                        <a title="Help"><img src="assets/icons/mail.svg" alt="mail"></a>
+                                    </li> -->
+                                    <li>
+                                        <a [routerLink]="['/profile-settings']" title="Settings" (click)="hrefClick('settings-menu-clicked')">
+                                                    <img src="assets/icons/settings.svg" alt="setting">
+                                                </a>
+                                    </li>
+
+
+                                </ul>
+                            </li>
+                            <li>
+                                <div class="user-detail">
+                                    <p>Hello {{fname}}</p>
+                                    <span class="userimg-section" style="text-align: center;">{{name}}</span>
+                                    <a [routerLink]="['/logout']" title="logout" (click)="hrefClick('logout-clicked')">Logout</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</header>

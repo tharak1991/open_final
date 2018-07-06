@@ -1,0 +1,343 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<article>
+  <section class="main-body" *ngIf="data.length==0 && page_show==true">
+    <div class="wraper">
+      <div class="m-t-20 c-place lollipopBiz">
+        <ul class="default-breadcrumb">
+          <li>
+            <a [routerLink]="['/receive']">Receive</a>
+          </li>
+          <li>Bulk Collect Request</li>
+        </ul>
+      </div>
+      <div class="receiveHeading">
+        <h2 class="pageTitle headingPadding">Bulk Collect Request</h2>
+      </div>
+      <div class="bulk-collect-main">
+
+        <div class="bulkBox">
+          <div class="b-image">
+            <img src="assets/images/download-template.svg" alt="">
+          </div>
+          <div class="b-text">
+            <h3>Download Template</h3>
+            <p>Start by downloading the template </p>
+            <a title="Download" class="bttn bttn-theme" (click)="downloadTemplate()">Download</a>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="bulkBox">
+          <div class="b-image">
+            <img src="assets/images/upload-data.svg" alt="">
+          </div>
+          <div class="b-text">
+            <h3>Upload Data Sheet</h3>
+            <p>Fill in the required data and upload the ﬁle for processing. Supported formats - Microsoft Excel/CSV
+            </p>
+            <a title="Upload" data-toggle="modal" data-target="#uploadFile" class="bttn bttn-theme">Upload</a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+  <section class="main-body paymentListBody" *ngIf="(data.length!=0 && page_show == true) || page_always_show == true">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="m-t-20 c-place lollipopBiz">
+            <ul class="default-breadcrumb">
+              <li>
+                <a [routerLink]="['/receive']">Receive</a>
+              </li>
+              <li>Bulk Collect Request</li>
+            </ul>
+          </div>
+
+          <div class="downloadUpload">
+            <div class="row">
+
+              <div class="col-sm-2"></div>
+
+              <div class="col-sm-4">
+                <div class="du-box">
+                  <div class="image">
+                    <img src="assets/images/download-template.svg" alt="">
+                  </div>
+                  <div class="text">
+                    <h3>Download Template</h3>
+                    <p>Start by downloading the template </p>
+                    <a title="Download" (click)="downloadTemplate()" class="bttn bttn-theme">Download</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-4">
+                <div class="du-box">
+                  <div class="image">
+                    <img src="assets/images/upload-data.svg" alt="">
+                  </div>
+                  <div class="text">
+                    <h3>Upload Data Sheet</h3>
+                    <p>Supported formats - Microsoft
+                      <span>Excel/CSV</span>
+                    </p>
+                    <a title="Upload" data-toggle="modal" data-target="#uploadFile" class="bttn bttn-theme">Upload</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-2"></div>
+
+            </div>
+          </div>
+
+
+          <div class="dashboardAccount border-bottom-0">
+            <h2 class="pageTitle headingPadding">Bulk Collect Request</h2>
+            <ul class="listTopButtonRight">
+              <li class="benecficaryList pull-left">
+                <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                  <input type="text" class="form-control" formControlName="beneficiary_name" placeholder="Search by Filename">
+                  <div (click)="clickedInside($event)">
+                    <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down">
+                      <img alt="" src="assets/icons/opencaret.svg">
+                    </a>
+                    <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                    <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable(type)"></button>
+                    <div class="boxBeneficiarSearch searchFilenameDropout new-box-shadow {{filter_toggle}}">
+                      <div class="boxBeneficiarSearchInner">
+                        <span class="clearAll">
+                          <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                        </span>
+                        <ul>
+                          <li>
+                            <h4>By Batch ID</h4>
+                            <div class="form-group">
+                              <input type="text" class="form-control" formControlName="batch_id">
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Status</h4>
+                            <div class="form-groupNew">
+                              <p-dropdown [options]="status" formControlName="status" [autoWidth]="false" placeholder="Status"></p-dropdown>
+
+                            </div>
+                          </li>
+
+                          <li>
+                            <h4>By Uploaded Date</h4>
+                            <div class="form-group half">
+                              <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                          </li>
+                          <li class="bytotalValue">
+                            <h4>By Total Value</h4>
+                            <div class="form-groupNew">
+                              <p-dropdown [options]="filter2" formControlName="total_value" [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="form-group half">
+                              <input type="text" formControlName="amount" placeholder="Amount" class="form-control" />
+                            </div>
+                          </li>
+                          <li class="formButtons">
+                            <input (click)="preventFn();submitName('2');" type="submit" [disabled]="!filter_form.valid" class="bttn bttn-theme btn-md"
+                              value="Submit Request">
+                            <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </li>
+            </ul>
+          </div>
+          <!-- <div class="pageTips-dropdown" id="panel">
+            <span title="page tips" (click)="toggleTips()">Page Tips</span>
+            <div class="white-Box {{toggle_class}}">
+              <h3>Page Tips</h3>
+              <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+              <div class="white-Box-Inner">
+                <ul class="pageTips-list">
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                  <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                  <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                    Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                  <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                </ul>
+              </div>
+            </div>
+          </div> -->
+          <div class="listTransferBox bulkCollectTable">
+            <div class="listTransferTable {{TableDataLoader}}">
+              <p-dataTable [value]="data" [responsive]="true">
+                <p-column field="batch_id" header="Batch ID" [style]="{'width':'10%'}">
+                </p-column>
+                <p-column field="file.data.original_file_name" header="File Name" [style]="{'width':'20%',  'padding-right': '35px'}">
+                  <ng-template let-adata="rowData" pTemplate="body">
+                    <a class="colorBlue" target="_blank" href="{{adata.file.data.url}}">{{adata.file.data.original_file_name}}</a>
+                  </ng-template>
+                </p-column>
+                <p-column field="created_at" header="Date" [style]="{'width':'17%', 'padding-right': '35px'}">
+                  <!-- <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.total_received| currency:'INR':true}}</span>
+                  </ng-template> -->
+                </p-column>
+                <p-column field="row_count" header="No. of Entries" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-col let-data="rowData" pTemplate="body">
+                    <span>{{(data[col.field]==0)?'-':data[col.field]}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="total_value" header="Total Value" [style]="{'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-col let-data="rowData" pTemplate="body">
+                    <span>{{(data[col.field]==0)?'-':data[col.field]| currency:'INR':true:'1.0-1'}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="status" header="Status"></p-column>
+                <p-column>
+                  <ng-template let-data="rowData" pTemplate="body">
+                    <span (click)="bulkCollectDownloadFailed(data.batch_id)" class="invoiceListToolTipOuter" *ngIf="data.row_count_failed!=0"><img src="assets/icons/file-failed.svg">{{data.row_count_failed}} Failed
+                      <span class="invoiceListToolTip">
+                        {{data.total_value_failed|currency:'INR':true:'1.0-1'}}
+                      </span>
+                    </span>
+                  </ng-template>
+                </p-column>
+
+                <!-- <p-column *ngIf="type!=1" styleClass="col-button">
+                  <ng-template pTemplate="header">
+                  </ng-template>
+                  <ng-template let-payment="rowData" pTemplate="body">
+                    <button class="iconoptionTable" type="button" pButton></button>
+                    <span class="invoiceListOption">
+                      <ul class="invoiceListOptionList">
+                        <li>
+                          <a (click)="paymentDetail(payment,1)" title="">
+                            <img src="assets/icons/greyeye-icon.svg" alt="">
+                            <span>View Details</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a (click)="paymentDetail(payment,2)" title="">
+                            <img src="assets/icons/greyedit-icon.svg" alt="">
+                            <span>Edit</span>
+                          </a>
+                        </li>
+                        <li *ngIf="type==2">
+                          <a (click)="paymentDetail(payment,3)" title="">
+                            <img src="assets/icons/greycancel-icon.svg" alt="">
+                            <span>Cancel Payment</span>
+                          </a>
+                        </li>
+                        <li *ngIf="type==3">
+                          <a (click)="paymentDetail(payment,4)" title="">
+                            <img src="assets/icons/greycancel-icon.svg" alt="">
+                            <span>Stop Recurring</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </span>
+                  </ng-template>
+                </p-column> -->
+
+                <ng-template pTemplate="emptymessage">
+                  <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                    <img src="assets/icons/no_payments.svg" alt="">
+                    <span>
+                      <em>Oops!</em> There's nothing 'ere yet!</span>
+                  </div>
+                </ng-template>
+
+              </p-dataTable>
+              <div class="showingPagination">
+                <span>showing page {{current_page}} of {{total_pages}}</span>
+                <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+                <button *ngIf="previous==''" disabled>Previous</button>
+                <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+                <button *ngIf="next==''" disabled>Next</button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<div id="uploadFile" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog uploadfile-popup">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="text">
+          <h1>Upload File</h1>
+          <label class="dropFiles">
+            <input type="file" (change)="onChangeUploadfile($event)">
+            <img src="assets/images/upload-icon.svg" alt="">
+            <p>Drop ﬁles here or browse
+              <span>Supported formats - Microsoft Excel/CSV</span>
+            </p>
+          </label>
+          <div class="fileNames border-top border-bottom" *ngIf="onChangeUploadedFiles.length> 0">
+            <ul>
+              <li *ngFor="let f of onChangeUploadedFiles">
+                <span>{{f.original_file_name}}
+                  <a>
+                    <img src="assets/images/upload-cancel.svg" alt="">
+                  </a>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div>
+          <input class="bttn bttn-theme" type="submit" value="Upload" (click)="UploadBulkCollect()">
+          <button type="button" class="bttn bttn-default" data-dismiss="modal" (click)="closeUploadModel()" #closeBtn>Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="uploadedFile" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog uploadfile-popup uploadSuccessPopup">
+    <span data-toggle="modal" data-target="#uploadedFile" #openMessageModel></span>
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="text">
+          <h1>Uploaded Successfully</h1>
+          <p>{{successmsg}}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div>
+          <button type="button" class="bttn bttn-theme" data-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

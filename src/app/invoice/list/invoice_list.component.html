@@ -1,0 +1,933 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<article>
+  <div class="warnMessageTop {{hideWarningClass}}">
+    <p>{{warning_message}}</p>
+    <a (click)="hideWarning()" title="close" class="closeWarn">
+      <img src="assets/icons/cancel_white.svg" alt="">
+    </a>
+  </div>
+  <div *ngIf="loader_status" class="topToast">
+    <span>
+      <em class="iconToast"></em>
+      <span class="toastMessage">{{http_message}}</span>
+    </span>
+  </div>
+  <section class="main-body invoiceListPage">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+            <div class="m-t-20 c-place lollipopBiz">
+                <ul class="default-breadcrumb">
+                  <li>
+                    <a [routerLink]="['/receive']">Receive</a>
+                  </li>
+                  <li>Invoices</li>
+                </ul>
+              </div>
+          <div class="dashboardAccount border-bottom-0">
+
+            <!-- <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/payments']">Payments</a></li>
+              <li>Invoices</li>
+            </ul> -->
+            <div class="pageTips-dropdown" id="panel">
+              <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()">
+                  <img src="assets/icons/close.png" alt="">
+                </span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a>
+                    </li>
+                    <li>
+                      <a href="#">Nam condimentum vitae ligula vel ornare?</a>
+                    </li>
+                    <li>
+                      <a href="#">Phasellus at semper turpis. Nunc eu tellus tortor. Etiam at condimentum nisl, vitae sagittis orci.Donec
+                        id dignissim nunc?</a>
+                    </li>
+                    <li>
+                      <a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix">
+
+              <!-- <h2 class="pageTitle">Invoices</h2> -->
+              <div class="receivablesDetails border-bottom">
+                <div class="row">
+                  <div class="col-sm-5 pad-left-0">
+                    <h2 class="r-title">Invoices</h2>
+                  </div>
+                  <div class="col-sm-7">
+                    <div class="row">
+                      <div class="col-sm-4">
+                        <span class="rupee-title">Total Billed (YTD)</span>
+                        <h4 class="number">{{meta.total_billed_amount| currency:'INR':true}}</h4>
+                      </div>
+                      <div class="col-sm-4">
+                        <span class="rupee-title">Total Received (YTD)</span>
+                        <h4 class="number">{{meta.total_received_amount| currency:'INR':true}}</h4>
+                      </div>
+                      <div class="col-sm-4">
+                        <span class="rupee-title">Outstanding (As on Today)</span>
+                        <h4 class="number">{{meta.total_outstanding_amount| currency:'INR':true}}</h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <ul class="invoicepage-stuff listTopButtonRight">
+                <li class="benecficaryList">
+                  <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                    <div class="form-group">
+                      <input type="text" class="form-control" formControlName="beneficiary_name" placeholder="Search by Customer Name" (keyup)="setRecepientName($event)">
+                    </div>
+                    <div (click)="clickedInside($event)">
+                      <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down">
+                        <img alt="" src="assets/icons/opencaret.svg">
+                      </a>
+                      <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                      <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable(type)"></button>
+                      <div class="boxBeneficiarSearch invoiceRecepientDropout new-box-shadow {{filter_toggle}}">
+                        <div class="boxBeneficiarSearchInner">
+                          <span class="clearAll">
+                            <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                          </span>
+                          <ul class="radioBtnTickUl">
+                            <li>
+                              <ul class="radioBtnTick">
+                                <li>
+                                  <h4>By</h4>
+                                </li>
+                                <li>
+                                  <p-radioButton (onClick)="check_email_mobile('1')" name="groupname" value="1" formControlName="email_phone" [(ngModel)]="is_email_mobile"></p-radioButton>
+                                  <span>Email</span>
+                                </li>
+                                <li>
+                                  <p-radioButton (onClick)="check_email_mobile('2')" name="groupname" value="2" formControlName="email_phone" [(ngModel)]="is_email_mobile"></p-radioButton>
+                                  <span>Mobile</span>
+                                </li>
+                                <li>
+                                  <p-radioButton (onClick)="check_email_mobile('3')" name="groupname" value="3" formControlName="email_phone" [(ngModel)]="is_email_mobile"></p-radioButton>
+                                  <span>Invoice ID</span>
+                                </li>
+                              </ul>
+                              <div class="form-group" *ngIf="is_email_mobile==1">
+                                <input type="text" class="form-control" formControlName="email_id">
+                                <div class="error" *ngIf="filter_form.controls['email_id'].hasError('email') && (filter_form.value.email_id!='')">
+                                  Invalid Email
+                                </div>
+                              </div>
+                              <div class="form-group" *ngIf="is_email_mobile==2">
+                                <input type="text" class="form-control" formControlName="mobile_number">
+                                <div *ngIf="filter_form.controls['mobile_number'].hasError('pattern')" class="error">
+                                  Invalid Mobile Number
+                                </div>
+                              </div>
+                              <div class="form-group" *ngIf="is_email_mobile==3">
+                                <input type="text" class="form-control" formControlName="invoice_id">
+                              </div>
+                            </li>
+
+                            <li class="byAmount ">
+                              <h4>By Amount</h4>
+                              <ul class="radioBtnTick byDate">
+                                <li>
+                                  <p-radioButton name="byamount" value="1" formControlName="byamount"></p-radioButton>
+                                  <span>Total Billed</span>
+                                </li>
+                                <li>
+                                  <p-radioButton name="byamount" value="2" formControlName="byamount"></p-radioButton>
+                                  <span>Outstanding</span>
+                                </li>
+                              </ul>
+                              <div class="form-group half">
+                                <p-dropdown [options]="filter2" formControlName="byamount_status" [autoWidth]="false"></p-dropdown>
+
+
+                              </div>
+                              <div class="form-group half pull-right">
+                                <input type="text" formControlName="amount" placeholder="Amount" class="form-control" />
+                              </div>
+                            </li>
+
+                            <li>
+                              <h4>By Status</h4>
+                              <div class="form-groupNew">
+                                <p-dropdown [options]="status" formControlName="status_id" [autoWidth]="false" placeholder="Status"></p-dropdown>
+                                <!-- <p-autoComplete field="name" (onSelect)="preventFn()" formControlName="status_id" [suggestions]="filteredStatusSingle" (completeMethod)="searchStatus($event)"
+                                  placeholder="Status">
+                                </p-autoComplete> -->
+                              </div>
+                            </li>
+                            <!-- <li>
+                              <h4>By Category</h4>
+                              <div class="form-group">
+                                <p-autoComplete field="name" (onSelect)="preventFn()" formControlName="category_name" [suggestions]="filteredCategorySingle"
+                                  field="category_name" (completeMethod)="searchCategory($event)" placeholder="Category">
+                                </p-autoComplete>
+                              </div>
+                            </li> -->
+
+                            <li class="byDate">
+                              <h4>By Date</h4>
+                              <ul class="radioBtnTick byDate">
+                                <li>
+                                  <p-radioButton name="date" value="2" formControlName="bydate"></p-radioButton>
+                                  <span>Due Date</span>
+                                </li>
+                                <li>
+                                  <p-radioButton name="date" value="1" formControlName="bydate"></p-radioButton>
+                                  <span>Invoice Date</span>
+                                </li>
+                              </ul>
+                              <div class="form-group half">
+                                <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                              <div class="form-group half pull-right">
+                                <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                            </li>
+
+                            <!-- <li>
+                              <h4>By Due Date</h4>
+                              <div class="form-group half">
+                                <p-calendar formControlName="start_due_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                              <div class="form-group half pull-right">
+                                <p-calendar formControlName="end_due_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                            </li>
+                            <li>
+                              <h4>By Invoice Date</h4>
+                              <div class="form-group half">
+                                <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                              <div class="form-group half pull-right">
+                                <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                                <a class="search_down">
+                                  <img alt="" src="assets/icons/opencaret.svg">
+                                </a>
+                              </div>
+                            </li> -->
+                            <li class="byOverdueDays">
+                              <h4>By Overdue Days</h4>
+                              <div class="form-groupNew">
+                                <p-dropdown [options]="filter2" formControlName="overdue_days" [autoWidth]="false"></p-dropdown>
+                              </div>
+                              <div class="form-group half">
+                                <input type="text" formControlName="no_of_days" placeholder="No of Days" class="form-control" />
+                              </div>
+                            </li>
+                            <li class="formButtons">
+                              <input (click)="preventFn();submitName('2');" type="submit" [disabled]="!filter_form.valid" class="bttn bttn-theme btn-md"
+                                value="Search">
+                              <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </li>
+                <li class="paymentAll">
+                  <p-dropdown [options]="filter" (onChange)="filter_By_Month($event)" [autoWidth]="false"></p-dropdown>
+                </li>
+                <li>
+                  <a (click)="download();hrefClick('invoice-listing-download-clicked')" class="bttn bttn-default btn-custom-sm">Download</a>
+                </li>
+                <li>
+                  <!-- <a class="bttn bttn-theme btn-custom-sm" [routerLink]="['/create-invoice']" (click)="hrefClick('create-invoice-btn-clicked')">Create Invoice</a> -->
+                  <p-dropdown [options]="routes" (onChange)="changeRoute($event)" [autoWidth]="false" class="purple-dropdown"></p-dropdown>
+
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="listTransferBox">
+            <!-- <ul class="listTransferTab">
+              <li>
+                <button (click)="getInvoices('all');hrefClick('invoice-listing-all-clicked')" [class]="(type=='all')?'bttn bttn-default active':'bttn bttn-default'">All</button>
+              </li>
+              <li>
+                <button (click)="getInvoices('1');hrefClick('invoice-listing-one-time-clicked')" [class]="(type=='1')?'bttn bttn-default active':'bttn bttn-default'">One time</button>
+              </li>
+              <li>
+                <button (click)="getInvoices('3');hrefClick('invoice-listing-recurring-clicked')" [class]="(type=='3')?'bttn bttn-default active':'bttn bttn-default'">Recurring</button>
+              </li>
+            </ul> -->
+            <div class="listTransferTable {{TableDataLoader}}">
+
+              <p-dataTable [value]="data" [expandableRows]="true">
+                <p-column field="invoice_sequence_id" header="Invoice #" sortable="custom" [style]="{'width':'11%'}" (sortFunction)="mysort($event)">
+                  <ng-template let-col let-invoice="rowData" pTemplate="body">
+                    <span class="recurringIcon">
+                      <span class="recurringIconArea" *ngIf="type=='all' && invoice.invoice_types_id==3">
+                        <img src="assets/icons/recurringsmall.svg">
+                      </span>
+                      <a class="shiftClass colorBlue" [routerLink]="['/invoice-detail/',invoice.id]">{{invoice.invoice_sequence_id}}</a>
+
+                    </span>
+
+                  </ng-template>
+                </p-column>
+                <p-column field="created_at" header="Invoice Date" sortable="custom" [style]="{'width':'13%'}" (sortFunction)="mysort($event)">
+                  <ng-template let-col let-payment="rowData" pTemplate="body">
+                    <span *ngIf="payment[col.field]!='0000-00-00 00:00:00'">{{payment[col.field]|date:'d/MM/y'}}</span>
+                    <span *ngIf="payment[col.field]=='0000-00-00 00:00:00' || payment[col.field]==null">-</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column field="contact.data.name" header="Recepient" sortable="custom" [style]="{'width':'15%'}">
+                  <ng-template let-col let-beneficiery="rowData" pTemplate="body">
+                    <span class="invoiceListToolTipOuter">{{beneficiery.contact.data.name}}
+                      <span class="invoiceListToolTip" style="left: -20px;">
+                        <p>
+                          <strong>{{beneficiery.contact.data.name}}</strong>
+                        </p>
+                        <p *ngIf="beneficiery.contact.data.email_id">{{beneficiery.contact.data.email_id}}</p>
+                        <p *ngIf="beneficiery.contact.data.mobile_number">+91 {{beneficiery.contact.data.mobile_number}}</p>
+                      </span>
+                    </span>
+                  </ng-template>
+                </p-column>
+
+                <!-- <p-column field="income_categories.data.category_name" header="Category" [style]="{'width':'13%'}"></p-column> -->
+
+                <p-column *ngIf="type=='3'" field="start_date" header="Start Date" sortable="custom" [style]="{'width':'12%'}" (sortFunction)="mysort($event)">
+                  <ng-template let-col let-payment="rowData" pTemplate="body">
+                    <span *ngIf="payment[col.field]!='0000-00-00 00:00:00'">{{payment[col.field]|date:'d/MM/y'}}</span>
+                    <span *ngIf="payment[col.field]=='0000-00-00 00:00:00' || payment[col.field]==null">-</span>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="type=='3'" field="recurrence_completed" header="Rec. Completed" sortable="custom" [style]="{'width':'15%', 'text-align': 'center'}"
+                  (sortFunction)="mysort($event)"></p-column>
+                <p-column *ngIf="type=='3'" field="recurrence_pending" header="Rec. Pending" sortable="custom" [style]="{'width':'13%', 'text-align':'center'}"
+                  (sortFunction)="mysort($event)"></p-column>
+                <p-column field="net_total_after_taxes" header="Amount" sortable="custom" [style]="{'width':'11%', 'text-align':'right', 'padding-right':'20px'}"
+                  (sortFunction)="mysort($event)">
+                  <ng-template let-col let-amount="rowData" pTemplate="body">
+                    <span class="p-r-12">{{amount[col.field]| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="type!='3'" field="due_date" header="Due Date" sortable="custom" (sortFunction)="mysort($event)" [style]="{'width':'13%'}">
+                  <ng-template let-col let-payment="rowData" pTemplate="body">
+                    <span *ngIf="payment[col.field]!='0000-00-00 00:00:00'">{{payment[col.field]|date:'d/MM/y'}}</span>
+                    <span *ngIf="payment[col.field]=='0000-00-00 00:00:00' || payment[col.field]==null">-</span>
+
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="type!='3'" field="invoice_statuses_id" header="Status" [style]="{'width':'11%'}">
+                  <ng-template let-col let-status="rowData" pTemplate="body">
+                    <span *ngIf="status[col.field]==1">Pending</span>
+                    <span *ngIf="status[col.field]==2" class="">Payment Due</span>
+                    <span *ngIf="status[col.field]==3" class="greenColor">Paid</span>
+                    <span *ngIf="status[col.field]==4" class="yellowColor">Partially Paid</span>
+                    <span *ngIf="status[col.field]==5" class="redColor">Overdue</span>
+                    <span *ngIf="status[col.field]==6" class="defaultColor">Cancelled</span>
+                    <span *ngIf="status[col.field]==7" class="defaultColor">Scheduled</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="over_due_days" header="Overdue">
+                  <ng-template let-col let-duedays="rowData" pTemplate="body">
+                    <span *ngIf="duedays[col.field]!=0">{{duedays[col.field]}} days</span>
+                    <span *ngIf="duedays[col.field]==0">{{duedays[col.field]}}</span>
+
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="type!='3'" field="total_amount_due" header="Outstanding" [style]="{'width':'13%', 'text-align':'right', 'padding-right':'35px'}"
+                  sortable="custom" (sortFunction)="mysort($event)">
+                  <ng-template let-col let-dueamount="rowData" pTemplate="body">
+                    <span class="p-r-12">{{dueamount[col.field]| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="type!='3'" styleClass="col-button" [style]="{'width':'5%'}">
+                  <ng-template let-col let-payment="rowData" pTemplate="body">
+                    <button class="iconoptionTable" type="button" pButton></button>
+                    <span class="invoiceListOption new-box-shadow border-radius-13">
+                      <ul class="invoiceListOptionList">
+                        <li *ngIf="payment.invoice_statuses_id!=4 && payment.invoice_statuses_id!=6 && payment.invoice_statuses_id!=3">
+                          <a [routerLink]="['/edit-invoice/',payment.id]" title="Edit">
+                            <span class="editIcons">
+                              <img src="assets/icons/greyedit-icon.svg" alt="icon">
+                            </span>
+                            <span>Edit Invoice</span>
+                          </a>
+                        </li>
+                        <li *ngIf="payment.invoice_statuses_id!=6 && payment.invoice_statuses_id!=3">
+                          <a (click)="OnClickSendReminder(payment)" title="Send Reminder">
+                            <span class="editIcons">
+                              <img src="assets/icons/mail.svg" alt="icon">
+                            </span>
+                            <span *ngIf="payment.invoice_statuses_id==1" [routerLink]="['/send-invoice',payment.id]">Send Invoice</span>
+                            <span *ngIf="payment.invoice_statuses_id!=1">Send Reminder</span>
+                          </a>
+                        </li>
+                        <li *ngIf="payment.invoice_statuses_id!=6  && payment.invoice_statuses_id!=3">
+                          <a (click)="OnClickMarkPayment(payment)" title="Mark Payment">
+                            <span class="editIcons">
+                              <img src="assets/icons/payments_icon1.svg" alt="icon">
+                            </span>
+                            <span>Mark Payment</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a (click)="OnClickDownloadInvoice(payment)" title="Download">
+                            <span class="editIcons">
+                              <img src="assets/icons/greyDownload.svg" alt="icon">
+                            </span>
+                            <span>Download Invoice</span>
+                          </a>
+                        </li>
+                        <li *ngIf="payment.invoice_statuses_id!=4 && payment.invoice_statuses_id!=3 && payment.invoice_statuses_id!=6">
+                          <a (click)="OnClickCancleInvoice(payment)" title="">
+                            <span class="editIcons">
+                              <img src="assets/icons/greycancel-icon.svg" alt="icon">
+                            </span>
+                            <span>Cancel Invoice</span>
+                          </a>
+                        </li>
+                        <li *ngIf="payment.invoice_types_id==3 && payment.invoice_statuses_id!=6 && payment.recurrence_pending!=0">
+                          <a (click)="OnClickStopRecurring(payment)" title="">
+                            <span class="editIcons">
+                              <img src="assets/icons/recurring.svg" alt="icon">
+                            </span>
+                            <span>Stop Recurring</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </span>
+                    <span #getPaymentDetail data-toggle="modal" data-target="#payment-detail"></span>
+                    <span #cancelPaymentModel data-toggle="modal" data-target="#cancel-payment"></span>
+                  </ng-template>
+                </p-column>
+                <p-column *ngIf="type=='3'" styleClass="col-button" expander="true" [style]="{'width':'4%'}">
+                  <!-- <ng-template let-payment="rowData" pTemplate="body">
+                    <button class="iconoptionTable" type="button" pButton (click)="getSubRecurring(payment.id)"></button>
+                  </ng-template> -->
+                </p-column>
+
+
+                <!-- working table -->
+                <ng-template let-cp pTemplate="rowexpansion">
+                  <p-dataTable *ngIf="cp.recurring_invoices.data" #dtSeasons [value]="cp.recurring_invoices.data" class="ui-expanded-row-content">
+                    <p-column field="invoice_sequence_id" header="Invoice #">
+                      <ng-template let-col let-invoice="rowData" pTemplate="body">
+                        <a [routerLink]="['/invoice-detail/',invoice.id]">{{invoice.invoice_sequence_id}}</a>
+                      </ng-template>
+                    </p-column>
+                    <p-column field="created_at" header="Invoice Date">
+                      <ng-template let-col let-sd="rowData" pTemplate="body">
+                        <span *ngIf="sd[col.field]!='0000-00-00 00:00:00'">{{sd[col.field] | date:'d/MM/y'}}</span>
+                        <span *ngIf="sd[col.field]=='0000-00-00 00:00:00' || (sd[col.field]==null)">-</span>
+                      </ng-template>
+                    </p-column>
+                    <p-column field="last_paid_at" header="Payment Date">
+                      <ng-template let-col let-pd="rowData" pTemplate="body">
+                        <span *ngIf="(pd[col.field]!='0000-00-00 00:00:00') && (pd[col.field]!=null)">{{pd[col.field] | date:'d/MM/y'}}</span>
+                        <span *ngIf="(pd[col.field]=='0000-00-00 00:00:00') || (pd[col.field]==null)">-</span>
+                      </ng-template>
+                    </p-column>
+                    <p-column header="Amount Paid">
+                      <ng-template let-inv="rowData" pTemplate="body">
+                        {{ inv.net_total_after_taxes - inv.total_amount_due | currency:'INR':true }}
+                      </ng-template>
+                    </p-column>
+                    <p-column field="total_amount_due" header="Balance">
+                      <ng-template let-inv="rowData">
+                        {{ inv.totak_amount_due | currency:'INR':true}}
+                      </ng-template>
+                    </p-column>
+                    <p-column styleClass="col-button" [style]="{'width':'3%'}">
+                      <ng-template let-payment="rowData" pTemplate="body">
+                        <button class="iconoptionTable" type="button" pButton></button>
+                        <span class="invoiceListOption">
+                          <ul class="invoiceListOptionList">
+                            <li *ngIf="(payment.invoice_statuses_id!=4 || payment.invoice_statuses_id!=3) && payment.invoice_statuses_id!=6">
+                              <a [routerLink]="['/edit-invoice/',payment.id]" title="Edit">
+                                <span class="editIcons">
+                                  <img src="assets/icons/greyedit-icon.svg" alt="icon">
+                                </span>
+                                <span>Edit Invoice</span>
+                              </a>
+                            </li>
+                            <li *ngIf="payment.invoice_statuses_id!=6">
+                              <a (click)="OnClickSendReminder(payment)" title="Send Reminder">
+                                <span class="editIcons">
+                                  <img src="assets/icons/mail.svg" alt="icon">
+                                </span>
+                                <span>Send Reminder</span>
+                              </a>
+                            </li>
+                            <li *ngIf="payment.invoice_statuses_id!=6">
+                              <a (click)="OnClickMarkPayment(payment)" title="Mark Payment">
+                                <span class="editIcons">
+                                  <img src="assets/icons/payments_icon1.svg" alt="icon">
+                                </span>
+                                <span>Mark Payment</span>
+                              </a>
+                            </li>
+                            <li>
+                              <a (click)="OnClickDownloadInvoice(payment)" title="Download">
+                                <span class="editIcons">
+                                  <img src="assets/icons/greyDownload.svg" alt="icon">
+                                </span>
+                                <span>Download Invoice</span>
+                              </a>
+                            </li>
+                            <li *ngIf="(payment.invoice_statuses_id!=4 || payment.invoice_statuses_id!=3) && payment.invoice_statuses_id!=6">
+                              <a (click)="OnClickCancleInvoice(payment)" title="">
+                                <span class="editIcons">
+                                  <img src="assets/icons/greycancel-icon.svg" alt="icon">
+                                </span>
+                                <span>Cancel Invoice</span>
+                              </a>
+                            </li>
+                            <li *ngIf="payment.invoice_types_id==3 && payment.invoice_statuses_id!=6 && payment.recurrence_pending!=0">
+                              <a (click)="OnClickStopRecurring(payment)" title="">
+                                <span class="editIcons">
+                                  <img src="assets/icons/recurring.svg" alt="icon">
+                                </span>
+                                <span>Stop Recurring</span>
+                              </a>
+                            </li>
+                          </ul>
+                        </span>
+                      </ng-template>
+                    </p-column>
+                    <ng-template pTemplate="emptymessage">
+                      <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                        <img src="assets/icons/no_invoices.svg" alt="">
+                        <span>
+                          <em>Oops!</em> There's nothing 'ere yet!</span>
+                      </div>
+                    </ng-template>
+                  </p-dataTable>
+                </ng-template>
+                <!-- working table -->
+
+                <ng-template pTemplate="emptymessage">
+                  <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                    <img src="assets/icons/no_invoices.svg" alt="">
+                    <span>
+                      <em>Oops!</em> There's nothing 'ere yet!</span>
+                  </div>
+                </ng-template>
+
+              </p-dataTable>
+              <div class="showingPagination">
+                <span>showing page {{current_page}} of {{total_pages}}</span>
+                <button *ngIf="previous!=''" class="afterColor" (click)="change_page(previous)">Previous</button>
+                <button *ngIf="previous==''" disabled>Previous</button>
+                <button *ngIf="next!=''" class="afterColor" (click)="change_page(next)">Next</button>
+                <button *ngIf="next==''" disabled>Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<div *ngIf="showMarkPopup">
+  <span data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#markPayment" #markPayment></span>
+  <div class="modal fade" id="markPayment" role="dialog">
+    <span data-dismiss="modal" #closeMarkPaymentModal></span>
+    <div class="modal-dialog markPopup {{loaderClassPopup}} {{toggle_classTips}}">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="modalUnder">
+            <h2 class="modal-title text-left">Mark Payment</h2>
+            <a title="" (click)="toggleTipsMark()" class="toolTip">
+              <img src="assets/icons/tooltip.svg" alt="tooltip">
+            </a>
+            <div class="markInvoiceBox">
+              <div class="markInvoiceInfo">
+                <ul>
+                  <li>
+                    <span class="makInvoicelabel">Invoice #</span>
+                    <span class="markInvoiceValue">{{markPaymentdata.invoice_sequence_id}}</span>
+                  </li>
+                  <li>
+                    <span class="makInvoicelabel">Invoice Date</span>
+                    <span class="markInvoiceValue">{{markPaymentdata.start_date|date:'d/MM/y'}}</span>
+                  </li>
+                  <li>
+                    <span class="makInvoicelabel">Due Date</span>
+                    <span class="markInvoiceValue">{{markPaymentdata.due_date|date:'d/MM/y'}}</span>
+                  </li>
+                  <li>
+                    <span class="makInvoicelabel">Invoice To</span>
+                    <span class="markInvoiceValue">{{markPaymentdata.contact.data.name}}</span>
+                  </li>
+                  <li>
+                    <span class="makInvoicelabel">Ref. ID</span>
+                    <span class="markInvoiceValue">{{markPaymentdata.invoice_user_input_reference_id}}</span>
+                  </li>
+                  <li>
+                    <span class="makInvoicelabel">Invoice Amount</span>
+                    <span class="markInvoiceValue price">
+                      <strong>{{markPaymentdata.total_amount_due | currency:'INR':true}}</strong>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <ul class="markPaymentsTableNav">
+              <li [class]="(markPaymentType=='online')?'active':''">
+                <button (click)="changeMarkPaymentType('online')" class="bttn bttn-default">Online</button>
+              </li>
+              <li [class]="(markPaymentType=='offline')?'active':''">
+                <button (click)="changeMarkPaymentType('offline')" class="bttn bttn-default">Offline</button>
+              </li>
+            </ul>
+            <div class="markPaymentsTableBox" *ngIf="markPaymentType=='online'">
+              <form #f="ngForm" (ngSubmit)="onSubmitMarkPayment(f.value,f.valid)" novalidate>
+                <div class="markPaymentsTableButtons"></div>
+                <div class="markPaymentsTable">
+                  <table>
+                    <tr>
+                      <th>Date</th>
+                      <th>Txn Amount</th>
+                      <th>Available Balance</th>
+                      <th>Allocate Amount</th>
+                    </tr>
+                    <tr *ngFor="let mp of externalPaymentData; let i = index">
+                      <td>{{mp.paid_at | date:'d/MM/y'}}</td>
+                      <td>{{mp.amount | currency:'INR':true}}</td>
+                      <td>{{mp.balance_amount_to_be_tagged | currency:'INR':true}}</td>
+                      <td>
+                        <div class="form-group">
+                          <input type="number" (keyup)="calculateAllocatedAmt(markPaymentdata.total_amount_due,mp,allocated_amt_tagged.value)" min="0"
+                            class="form-control" name="allocated_amt_tagged_{{i}}" #allocated_amt_tagged="ngModel" [(ngModel)]="user.allocated_amt_tagged[i]"
+                            required>
+                          <div [hidden]="!(allocated_amt_tagged.value > mp.balance_amount_to_be_tagged)" class="error" #hiddenError>
+                            Enter an amount less than the available balance.
+                          </div>
+                          <div [hidden]="allocated_amt_tagged.valid || (allocated_amt_tagged.pristine && !f.submitted)" class="error">
+                            Amount is required.
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                  <div class="markPaymentsTableTotal">
+                    <div class="form-group" *ngIf="errorAmt==''">
+                      <p>
+                        <strong>{{totalAmtForMarkPayment | currency:'INR':true:'1.0-1'}}</strong>
+                      </p>
+                    </div>
+                    <div class="form-group" *ngIf="errorAmt!=''">
+                      <p>
+                        <strong>{{errorAmt | currency:'INR':true:'1.0-1'}}</strong>
+                      </p>
+                      <div class="error">Allocated amount is more than the Invoice Amount</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="markPaymentsTableFooter">
+                  <a class="bttn bttn-default" (click)="closeModalMarkPayment()">Cancel</a>
+                  <button class="bttn bttn-theme" [disabled]="!(f.valid) || (errorAmt!='') || (totalAmtForMarkPayment <= 0) || (allocatedAmtTagged)">Save Details</button>
+                </div>
+              </form>
+            </div>
+            <div class="markPaymentsTableBox" *ngIf="markPaymentType=='offline'">
+              <form [formGroup]="markPaymentOfflineForm" (ngSubmit)="onSubmitMarkPaymentOffline()" novalidate>
+                <div class="markPaymentsTableButtons"></div>
+                <div class="markPaymentsTable">
+                  <table>
+                    <tr>
+                      <th>Date</th>
+                      <th>Mode of Payment</th>
+                      <th>Remarks</th>
+                      <th>Amount</th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="form-group">
+                          <p-calendar placeholder="yyyy/mm/dd" dateFormat="yy-mm-dd" formControlName="paid_at" [monthNavigator]="true" [yearNavigator]="true"
+                            yearRange="1970:2030"></p-calendar>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-groupNew">
+                          <p-dropdown [options]="modeofpayment" formControlName="mode_of_payment" [autoWidth]="false" placeholder="Select"></p-dropdown>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <input type="text" class="form-control" formControlName="remarks" placeholder="Add Remarks" />
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <input type="number" class="form-control" formControlName="invoice_amount_tagged" min="0" #invoice_amount_tagged placeholder="Amount"
+                            (keyup)="calculateAllocatedAmtOffline(markPaymentdata.total_amount_due,invoice_amount_tagged.value)"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                  <div class="markPaymentsTableTotal">
+                    <div class="form-group" *ngIf="errorAmtOffline==''">
+                      <p>
+                        <strong>{{totalAmtForMarkPaymentOffline | currency:'INR':true:'1.0-1'}}</strong>
+                      </p>
+                    </div>
+                    <div class="form-group" *ngIf="errorAmtOffline!=''">
+                      <p>
+                        <strong style="color:red">{{errorAmtOffline | currency:'INR':true:'1.0-1'}}</strong>
+                      </p>
+                      <div class="error">Allocated amount is more than the Invoice Amount</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="markPaymentsTableFooter">
+                  <a class="bttn bttn-default" (click)="closeModalMarkPayment()">Cancel</a>
+                  <button class="bttn bttn-theme" [disabled]="!(markPaymentOfflineForm.valid) || errorAmtOffline!=''">Save Details</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div *ngIf="toggle_classTips!=''" class="toolTipbox">
+            <a (click)="toggleTipsMark()" title="cancel" class="closeTooltip">
+              <img src="assets/icons/cancel_black.svg" alt="close">
+            </a>
+            <p>
+              <b>Online Transactions</b> This will give you a view of all the fund in flow that has happened Online to your
+              Open Account
+            </p>
+            <p>
+              <b>Offline Transactions</b> This will give you a view of all the fund in flow that has happened Offline to your
+              Open Account
+            </p>
+            <p>
+              <b>Allocate amount</b> You can allocate this specific amount in full or partially to the invoice that you have
+              raised to the specific customer. </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="stopRecurringInvoice" role="dialog">
+  <span data-toggle="modal" data-target="#stopRecurringInvoice" #stopRecurringInvoiceopen></span>
+  <div class="modal-dialog {{ loaderClassPopup }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Stop Recurrence</h2>
+      </div>
+      <div class="modal-body">
+        <div class="markInvoiceBox">
+          <div class="markInvoiceInfo">
+            <ul>
+              <li>
+                <span class="makInvoicelable">Invoice # </span>
+                <span class="markInvoiceValue">{{invoice_data.invoice_sequence_id}}</span>
+              </li>
+              <li>
+                <span class="makInvoicelable">Invoice Amount</span>
+                <span class="markInvoiceValue">{{invoice_data.total_amount_due | currency:'INR':true}}</span>
+              </li>
+              <li>
+                <span class="makInvoicelable">Frequency</span>
+                <span class="markInvoiceValue">{{invoice_frequency.frequency_name}}</span>
+              </li>
+              <li>
+                <span class="makInvoicelable">Start Date</span>
+                <span *ngIf="invoice_data.start_date!='0000-00-00 00:00:00'" class="markInvoiceValue">{{(invoice_data.start_date | date:'d/MM/y') }}</span>
+                <span *ngIf="invoice_data.start_date=='0000-00-00 00:00:00' || invoice_data.start_date==null" class="markInvoiceValue">-</span>
+              </li>
+              <li>
+                <span class="makInvoicelable">Completed</span>
+                <span class="markInvoiceValue">{{invoice_data.recurrence_completed || '-'}}</span>
+              </li>
+              <li>
+                <span class="makInvoicelable">Pending</span>
+                <span class="markInvoiceValue">{{invoice_data.recurrence_pending || '-'}}</span>
+              </li>
+
+            </ul>
+          </div>
+          <div class="checkbox">
+            <label>
+              <p-checkbox (onChange)="toggleStopRecurrence($event)" binary="true">
+              </p-checkbox>
+              I confirm to stop the recurrence of this invoice
+            </label>
+          </div>
+          <div class="markPaymentsTableFooter">
+            <button (click)="OnSubmitStopRecurring()" class="bttn bttn-theme" [disabled]="!stopRecurrence">Stop Recurrence</button>
+            <a data-dismiss="modal" class="bttn bttn-default" title="Close" #stopRecurringInvoiceclose>Cancel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelInvoice" role="dialog" data-backdrop="static" data-keyboard="false">
+  <span data-toggle="modal" data-target="#cancelInvoice" #cancelInvoiceopen></span>
+  <div class="modal-dialog {{ loaderClassPopup }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Cancel Invoice</h2>
+      </div>
+      <div class="modal-body">
+        <span>
+          Are you sure to cancel the invoice #{{invoice_data.invoice_sequence_id}} to {{inv_contact_data.name}}
+        </span>
+      </div>
+      <div class="sendinvoice-footer">
+        <ul>
+          <li>
+            <button (click)="OnSubmitCancelInvoice()" class="bttn bttn-theme btn-custom-xs">Confirm</button>
+          </li>
+          <li>
+            <a class="bttn bttn-default btn-custom-xs" data-dismiss="modal" title="Cancel" #cancelInvoiceclose>Cancel</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="sendReminder" data-backdrop="static" data-keyboard="false" role="dialog">
+  <span data-toggle="modal" data-target="#sendReminder" #sendreminderopen></span>
+  <div class="modal-dialog sendReminderPopup {{loaderClassPopup}}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Send Reminder</h2>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="sendReminder" (ngSubmit)="onSubmitSendReminder()">
+          <div class="sendinvoice-rightsec">
+            <div class="company-id">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <input class="form-control" (keyup)="check_email($event)" ngModel="{{contact_email_id}}" formControlName="login" placeholder="To: "
+                      type="text">
+                    <div *ngIf="sendReminder.controls['login'].hasError('required') && (sendReminder.controls['login'].dirty || sendReminder.controls['login'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                    <div *ngIf="!valid_email" class="error">
+                      Enter a valid email
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="company-name">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <input class="form-control" formControlName="email_subject" placeholder="Subject: " ngModel="{{sendReminderSubj}}" type="text">
+                    <div *ngIf="sendReminder.controls['email_subject'].hasError('required') && (sendReminder.controls['email_subject'].dirty || sendReminder.controls['email_subject'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="company-request">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <textarea formControlName="email_body" class="form-control"></textarea>
+                    <!-- <div *ngIf="inv_reminder_attachments.length > 0" class="pAbsolute">
+                      <span class="attachfileshowCase" *ngFor="let file of inv_reminder_attachments, let i = index">
+                        <a class="attachedLink" href="{{file.files.data[0].url}}" title="">{{file.files.data[0].url}}
+                        </a>
+                        <a class="attachedRemove pull-right" (click)="delteOtherFiles(file)" title="Delete">
+                          <img src="assets/icons/canel_icon.svg">
+                        </a>
+                      </span>
+                    </div> -->
+                    <div *ngIf="sendReminder.controls['email_body'].hasError('required') && (sendReminder.controls['email_body'].dirty || sendReminder.controls['email_body'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="sendinvoice-footer">
+              <ul>
+                <li>
+                  <input class="bttn bttn-theme btn-custom-xl" [disabled]="!sendReminder.valid" value="Send Reminder" type="submit">
+                </li>
+                <li>
+                  <a class="bttn bttn-default btn-custom-sm" data-dismiss="modal" #sendreminderclose title="">Cancel</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirm_markpayment" role="dialog">
+  <span data-toggle="modal" data-target="#confirm_markpayment" #openmarkconfirm></span>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Mark Payment</h2>
+      </div>
+      <div class="modal-body text-center">
+        <span class="p-d-0">Once invoice is marked paid, it cannot be reversed. Do you want to proceed ?</span>
+      </div>
+      <div class="sendinvoice-footer dib w-100 text-center m-b-30 m-t-35">
+        <ul class="dib">
+          <li>
+            <button (click)="confirmMarkpayment(markPaymentType)" class="bttn bttn-theme btn-custom-xs">Confirm</button>
+          </li>
+          <li>
+            <a class="bttn bttn-default btn-custom-xs" data-dismiss="modal" title="Cancel" #cancelmarkconfirm>Cancel</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>

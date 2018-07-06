@@ -1,0 +1,243 @@
+<ng2-slim-loading-bar>
+</ng2-slim-loading-bar>
+
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+      <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+
+
+<article>
+  <div class="sec-signin">
+    <div class="signin-left">
+      <!-- <span>it work best when you</span>
+      <h1>OPEN UP</h1> -->
+      <div class="logo">
+        <img src="assets/images/logofullwhite.png" alt="logo" title="open-logo">
+      </div>
+    </div>
+    <div class="signin-right {{submitLoaderClass}}">
+      <div class="boxSignin">
+        <form class="signin-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <h1>Sign In</h1>
+          <ul>
+            <li>
+              <div class="form-group">
+                <input type="text" formControlName="login" class="form-control" placeholder="Your Email or Mobile Number" (keyup)="check_login()">
+                <div *ngIf="loginForm.controls['login'].hasError('required') && (loginForm.controls['login'].dirty || loginForm.controls['login'].touched)"
+                  class="error">
+                  Please enter a username
+                </div>
+                <div *ngIf="loginForm.controls['login'].hasError('pattern') && (loginForm.controls['login'].dirty || loginForm.controls['login'].touched)"
+                  class="error">
+                  Please enter a valid mobile number or email
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <input type="password" formControlName="password" class="form-control" placeholder="Enter Password" (keyup)="check_login()">
+                <div *ngIf="loginForm.controls['password'].hasError('required')  && (loginForm.controls['password'].dirty || loginForm.controls['password'].touched)"
+                  class="error">
+                  Please enter a password
+                </div>
+                <div class="error">{{error}}</div>
+              </div>
+            </li>
+            <li>
+              <ul class="signin-btn">
+                <li>
+                  <input type="submit" [disabled]="!loginForm.valid" class="bttn bttn-theme btn-large" value="Sign In" />
+                </li>
+                <li>
+                  <a [routerLink]="['/register']" title="New User?">New User?</a>
+                </li>
+              </ul>
+              <div class="forgot-passlink">
+                <a href="#" title="Forgot password" data-toggle="modal" data-target="#forgotpsw">Forgot Password?</a>
+              </div>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <!-- <div class="dot-image">
+        <img src="assets/images/signin-bg2.png" alt="signin">
+      </div> -->
+    </div>
+  </div>
+</article>
+
+<!-- Modal -->
+<div class="modal fade" id="forgotpsw" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{submitLoaderClass1}}">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div *ngIf="forgot_step==1" class="passForStps passForStp1">
+        <h2 class="textCenter">Forgot Password</h2>
+        <span>Enter your registered email address / mobile number.</span>
+        <form [formGroup]="ForgotForm1" (ngSubmit)="onSubmitForgot1()">
+          <div class="form-group">
+            <input type="text" formControlName="login" class="form-control" placeholder="Email/Mobile Number" (keyup)="check_login()">
+            <div *ngIf="ForgotForm1.controls['login'].hasError('required') && (ForgotForm1.controls['login'].dirty || ForgotForm1.controls['login'].touched)"
+              class="error">
+              Please enter a username
+            </div>
+            <div *ngIf="ForgotForm1.controls['login'].hasError('pattern') && (ForgotForm1.controls['login'].dirty || ForgotForm1.controls['login'].touched)"
+              class="error">
+              Please enter a valid mobile number or email
+            </div>
+            <div class="error">{{error1}}</div>
+
+          </div>
+          <ul class="popup-btns">
+            <li>
+              <!--<a href="#" title="" class="bttn bttn-theme btn-large" data-dismiss="modal" data-toggle="modal" data-target="#verify-modal">Send</a>-->
+              <input type="submit" [disabled]="!ForgotForm1.valid" class="bttn bttn-theme btn-custom" value="Send" />
+            </li>
+            <li>
+              <a href="#" title="" class="bttn bttn-default btn-custom" data-dismiss="modal">Cancel</a>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div *ngIf="forgot_step==2" class="passForStps passForStp2">
+        <h2 class="textCenter">Verify</h2>
+        <span>Enter the 6 digit OTP received</span>
+        <form [formGroup]="ForgotForm2" (ngSubmit)="onSubmitForgot2()">
+          <div class="otpFieldBox">
+            <ul class="otp-number">
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp1 formControlName="otp1" class="form-control" (keyup)="next(otp2,$event)">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp2 formControlName="otp2" class="form-control" (keyup)="next(otp3,$event)">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp3 formControlName="otp3" class="form-control" (keyup)="next(otp4,$event)">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp4 formControlName="otp4" class="form-control" (keyup)="next(otp5,$event)">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp5 formControlName="otp5" class="form-control" (keyup)="next(otp6,$event)">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="otp-number-box">
+                  <div class="form-group">
+                    <input type="number" maxlength ="1" #otp6 formControlName="otp6" class="form-control" (keyup)="next(sub,$event)">
+                  </div>
+                </div>
+              </li>
+
+            </ul>
+            <div class="error otpError">{{error2}}</div>
+          </div>
+
+          <ul class="popup-btns">
+            <li>
+              <input type="submit" #sub [disabled]="!ForgotForm2.valid" class="bttn bttn-theme btn-custom" value="Verify" />
+            </li>
+            <li>
+              <a href="#" title="" class="bttn bttn-default btn-custom" data-dismiss="modal">Cancel</a>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div *ngIf="forgot_step==3" class="passForStps passForStp3">
+        <h2 class="textCenter">New Password</h2>
+        <form [formGroup]="ForgotForm3" (ngSubmit)="onSubmitForgot3()">
+          <div class="form-group">
+            <input type="password" formControlName="password" class="form-control" placeholder="Your New Password" (keyup)="check_login()">
+            <div *ngIf="ForgotForm3.controls['password'].hasError('required') && (ForgotForm3.controls['password'].dirty || ForgotForm3.controls['password'].touched)"
+              class="error">
+              Please enter a password
+            </div>
+            <div *ngIf="ForgotForm3.controls['password'].hasError('pattern') && (ForgotForm3.controls['password'].dirty || ForgotForm3.controls['password'].touched)"
+              class="error">
+              Min 8 char, 1 letter &amp; 1 number
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="password" formControlName="c_password" class="form-control" placeholder="Confirm Password" (keyup)="check_login()">
+            <div *ngIf="ForgotForm3.controls['c_password'].hasError('required')  && (ForgotForm3.controls['c_password'].dirty || ForgotForm3.controls['c_password'].touched)"
+              class="error">
+              Please enter a confirm password
+            </div>
+            <div *ngIf="ForgotForm3.controls.c_password.errors?.equalTo  && (ForgotForm3.controls['c_password'].dirty || ForgotForm3.controls['c_password'].touched)"
+              class="error">
+              Password and confirm password not matched
+            </div>
+            <div class="error">{{error}}</div>
+          </div>
+          <ul class="popup-btns">
+            <li>
+              <input type="submit" [disabled]="!ForgotForm3.valid" class="bttn bttn-theme btn-custom" value="Save" />
+            </li>
+            <li>
+              <a href="#" title="" class="bttn bttn-default btn-custom" data-dismiss="modal">Cancel</a>
+            </li>
+          </ul>
+        </form>
+      </div>
+      <div *ngIf="forgot_step==4" class="passForStps passForStp4">
+        <h2 class="textCenter">Password Reset Successfully</h2>
+        <h3>
+          <p>You have successfully changed your password.</p>
+          <p>You may now Sign In</p>
+        </h3>
+        <p class="textCenter">
+          <a title="" class="bttn bttn-theme btn-custom" data-dismiss="modal">Ok</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Thank you Modal -->
+<div class="modal fade" id="thanku" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">We are so glad to see you back!</h2>
+      </div>
+      <div class="modal-body">
+        <img src="assets/images/msg_image.png" alt="msg">
+        <span>To keep your fnancial information safe & secure a verification email has been sent to </span>
+        <p>sajesh.jose@gmail.com
+          <a href="#" title="edit" style="padding-left:10px;">Edit</a>
+        </p>
+        <div class="resend-email">
+          <span>Didn't get the email?</span>
+          <a href="#" title="Resend email">Resend Email</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,144 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div *ngIf="loader_status" class="topToast"><!--toastFailed-->
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<article>
+  <section class="main-body {{pageLoader}}">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="invoice-wraper">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="invoice-wraper-heading">
+                <h2>Send Invoice</h2>
+              </div>
+            </div>
+          </div>
+          <div class="white-Box sendinvoice">
+            <div class="sendinvoice-top">
+              <div class="row">
+                <div class="col-md-7">
+                  <ul class="default-breadcrumb">
+                    <li><a [routerLink]="['/dashboard']">Home</a></li>
+                    <li><a [routerLink]="['/invoices']">Invoice</a></li>
+                    <li>Create Invoice</li>
+                    <li>Send Invoice</li>
+                  </ul>
+                </div>
+                <div class="col-md-5">
+                  <ul class="download-print" *ngIf="type==1">
+                    <li><a  href="{{invoice_pdf}}" title="Download" download class="bttn bttn-default download" (click)="hrefClick('one-time-download-inv-clicked')"> Download Invoice</a></li>
+                    <li><a (click)="print_pdf(invoice_pdf)" title="Print Invoice" class="bttn bttn-default print" (click)="hrefClick('one-time-print-inv-clicked')">Print Invoice</a></li>
+                  </ul>
+                  <ul class="download-print" *ngIf="type==3">
+                    <li><a  href="{{invoice_pdf}}" title="Download" download class="bttn bttn-default download" (click)="hrefClick('recurring-download-inv-clicked')"> Download Invoice</a></li>
+                    <li><a (click)="print_pdf(invoice_pdf)" title="Print Invoice" class="bttn bttn-default print" (click)="hrefClick('recurring-print-inv-clicked')">Print Invoice</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="sendinvoice-body">
+              <div class="row">
+                <div class="col-md-6">
+                  
+                    <div class="inner-div">
+
+                        <!-- <pdf-viewer [src]="invoice_pdf" [render-text]="true"></pdf-viewer> -->
+                        <!-- <iframe width="100%" height="600px" type="application/pdf" [src]="url">
+                        </iframe> -->
+                        <embed width="100%" height="600px" type="application/pdf" [src]="url">
+                        <!-- <object width="100%" height="600px" type="application/pdf" data="{{invoice_pdf}}">
+                        </object> -->
+                    </div>
+                  
+                </div>
+                <div class="col-md-6 {{invoiceSendLoader}}">
+                <form [formGroup]="sendInvoiceForm" (ngSubmit)="onSubmitSendInvoice()">
+                                
+                  <div class="sendinvoice-rightsec">
+                    <div class="company-id">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <input type="text" (keyup)="check_email($event)" formControlName="login" ngModel="{{contact.email_id}}" class="form-control" placeholder="info@lemoncandy.in, skipper@lemoncandy.in">
+                            <div *ngIf="sendInvoiceForm.controls['login'].hasError('required') && (sendInvoiceForm.controls['login'].dirty || sendInvoiceForm.controls['login'].touched)"
+                            class="error">
+                            This Field is Required.
+                            </div>
+                            <div *ngIf="!valid_email" class="error">
+                              Please enter a valid  email
+                            </div>
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="company-name">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-group">
+                            <input type="text" formControlName="email_subject" class="form-control" [value]="default_subject" placeholder="Invoice from Company name">
+                            <div *ngIf="sendInvoiceForm.controls['email_subject'].hasError('required') && (sendInvoiceForm.controls['email_subject'].dirty || sendInvoiceForm.controls['email_subject'].touched)"
+                            class="error">
+                            This Field is Required.
+                            </div>
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="company-request">
+                      <div class="row">
+                        <div class="col-md-12  {{image_loader}}">
+                          <div class="form-group">
+                            <textarea formControlName="email_body" class="form-control" [value]="default_message_to_customer"></textarea>
+                            <div *ngIf="sendInvoiceForm.controls['email_body'].hasError('required') && (sendInvoiceForm.controls['email_body'].dirty || sendInvoiceForm.controls['email_body'].touched)"
+                            class="error">
+                            This Field is Required.
+                            </div>
+                          </div>
+                          <div class="textAttachfile">
+                            <span class="attachfileshowCase" *ngFor="let file of file_arr, let i = index">
+                                <a class="attachedLink" href="{{file.url}}" title="">{{file.original_file_name}}<!--{{file.files.data[0].url}}--></a>
+                                <a class="attachedRemove pull-right" (click)="delteOtherFiles(file)" title="Delete"><img src="../../assets/icons/canel_icon.svg"></a>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sendinvoice-footer">
+                      <ul *ngIf="type==1">
+                        <li><input type="submit" class="bttn bttn-theme" value="Send Invoice"></li>
+                        <li>
+                          <div class="attach-file file-input">
+                            <label>
+                                <input  (change)="onChangeOthers($event)" type="file">
+                                <span><img src="assets/icons/attach.svg" alt="attach">  Attach Files</span>
+                                <p class="file-select" data-js-label=""></p>
+                                </label>
+                          </div>
+                        </li>
+                        <li>
+                          <a [routerLink]="['/invoices']" title="Cancel" class="bttn bttn-default"  (click)="hrefClick('one-time-inv-cancel-send-clicked')">Cancel</a>
+                        </li>
+                      </ul>
+                      <ul *ngIf="type==3">
+                        <li><input type="submit" class="bttn bttn-theme" value="Schedule Recurring Invoice"></li>
+                      </ul>
+                    </div>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>

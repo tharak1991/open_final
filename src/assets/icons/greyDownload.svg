@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="12.468px" height="14.176px" viewBox="0 0 12.468 14.176" enable-background="new 0 0 12.468 14.176" xml:space="preserve">
+<polyline fill="none" stroke="#AAADAF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	11.52,7.848 6.009,13.357 0.5,7.848 "/>
+<line fill="none" stroke="#AAADAF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="6.01" y1="13.357" x2="6.01" y2="0.563"/>
+<g>
+	<defs>
+		<rect id="SVGID_1_" x="0.123" y="13.676" width="12.222" height="0.5"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_1_"  overflow="visible"/>
+	</clipPath>
+	<g clip-path="url(#SVGID_2_)">
+		<defs>
+			<rect id="SVGID_3_" x="-941.377" y="-664.457" width="1200" height="922"/>
+		</defs>
+		<clipPath id="SVGID_4_">
+			<use xlink:href="#SVGID_3_"  overflow="visible"/>
+		</clipPath>
+		<g clip-path="url(#SVGID_4_)" enable-background="new    ">
+			<g>
+				<defs>
+					<rect id="SVGID_5_" x="-0.377" y="13.543" width="13" height="1"/>
+				</defs>
+				<clipPath id="SVGID_6_">
+					<use xlink:href="#SVGID_5_"  overflow="visible"/>
+				</clipPath>
+				<g clip-path="url(#SVGID_6_)">
+					<defs>
+						<rect id="SVGID_7_" x="-0.377" y="13.543" width="13" height="1"/>
+					</defs>
+					<clipPath id="SVGID_8_">
+						<use xlink:href="#SVGID_7_"  overflow="visible"/>
+					</clipPath>
+					
+						<line clip-path="url(#SVGID_8_)" fill="none" stroke="#AAADAF" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="0.123" y1="13.676" x2="12.345" y2="13.676"/>
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

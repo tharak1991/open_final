@@ -1,0 +1,138 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+    <p>{{warning_message}}</p>
+    <a (click)="hideWarning()" title="close" class="closeWarn">
+      <img src="assets/icons/cancel_white.svg" alt="">
+    </a>
+</div>
+<section class="main-body">
+    <div class="content">
+        <div class="container-fluid">
+            <div class="wraper">
+                <div class="dashboardAccount {{balanceLoader}}">
+                    <div class="dashboardAccountDetails">
+                        <h2 *ngIf="brand_name=='' || brand_name==null" class="pageTitle headingPadding">{{fname}} {{lname}}</h2>
+                        <h2 *ngIf="brand_name!='' || brand_name!=null" class="pageTitle headingPadding">{{brand_name}}</h2>
+                        
+                        <ul>
+                            <li><span>Account No: {{account_detail.open_bank_account_number}}</span></li>
+                            <li><span>IFSC: {{account_detail.open_bank_ifsc}}</span></li>
+                            <li><span>Branch: {{account_detail.open_bank_branch}}</span></li>
+                        </ul>
+                    </div>
+                    <div class="dashboardAccountBalance">                    
+                        <span>Current Account Balance </span>
+                        <em>{{account_balance | currency:'INR':true}}</em>
+                    </div>
+                    <div class="addFundtop">
+                        <a [routerLink]="['/add-fund']" title="Add Fund" class="bttn bttn-theme btn-custom-sm">Add Fund</a>
+                      </div>
+                </div>
+                
+                <div class="secDashMain">
+                    <div class="secLeftDashMain">
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2 class="upperCase">{{today | date : "MMMM"}} {{today | date : "y"}}</h2>
+                                <p-dropdown (onChange)="GetData($event)" [options]="filter" [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="dashWidgetMain">
+                                <ul>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Total Income</span><span class="dashWidgetValue">{{transfer_detail.total_income | currency:'INR':true}}</span></a></li>
+                                    <li class="dashWidgetPink {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Total Expense</span><span class="dashWidgetValue">{{transfer_detail.total_expense | currency:'INR':true}}</span></a></li>
+                                    <li class="dashWidgetPink {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Transfer Completed</span><span class="dashWidgetValue">{{transfer_detail.transfer_completed | currency:'INR':true}}</span></a></li>
+                                    
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Raised</span><span class="dashWidgetValue">{{dashboard_detail.invoice_raised_amount | currency:'INR':true}} <em>({{dashboard_detail.invoice_raised_count}})</em></span></a></li>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Honored</span><span class="dashWidgetValue">{{dashboard_detail.invoice_paid_amount | currency:'INR':true}} <em>({{dashboard_detail.invoiced_paid_count}})</em></span></a></li>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Pending</span><span class="dashWidgetValue">{{dashboard_detail.invoice_pending_amount | currency:'INR':true}} <em>({{dashboard_detail.invoice_pending_count}})</em></span></a></li>
+                                
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2>CASH FLOW REPORT</h2>
+                                  <h2 class="pull-right">{{meta.graph_fin_year}}</h2>
+                              </div>
+                            <div class="dashWidgetMain dashWidgetGraph {{dashboardDataLoader}} charByV">
+                                <p-chart type="bar" [data]="graph_data" [options]="graph_option"></p-chart>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="secRightDashMain">
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2>Recent Activities</h2>                                
+                            </div>
+                            <div class="dashWidgetMain dashWidgetTab {{submitLoader}}">
+                                <div>
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li (click)="getUpcoming('all')" role="presentation" class="active"><a href="#all" aria-controls="all" role="tab" data-toggle="tab">All</a></li>
+                                        <li (click)="getUpcoming('invoices')" role="presentation"><a href="#inflow" aria-controls="inflow" role="tab" data-toggle="tab"><span class="sm-circle sm-blue"></span>
+                                        Invoices</a></li>
+                                        <li (click)="getUpcoming('transfers')" role="presentation"><a href="#outflow" aria-controls="outflow" role="tab" data-toggle="tab"><span class="sm-circle sm-pink"></span>
+                                        Transfers</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="all">
+                                            <ul *ngIf="upcoming_details.length > 0" class="listTransitionsWidget {{submitLoader}}">
+                                                <li *ngFor="let upcoming of upcoming_details" class="listTransitionsOutflow">
+                                                    <span class="listTransitionsDate">
+                                                        <span>{{upcoming.date | date : 'd'}}</span>
+                                                    <span>{{upcoming.date | date : 'MMM'}}</span>
+                                                    </span>
+                                                    <span class="listTransitionsName">
+                                                        <span>{{upcoming.heading}}</span>
+                                                    <span>{{upcoming.sub_heading}}</span>
+                                                    </span>
+                                                    <span *ngIf="upcoming.type=='invoices'" class="listTransitionsAmount colorBlue">{{upcoming.amount | currency:'INR':true}}</span>
+                                                    <span *ngIf="upcoming.type=='transfers'" class="listTransitionsAmount">{{upcoming.amount | currency:'INR':true}}</span>
+                                                    
+                                                </li>
+                                            </ul>
+                                            
+                                            <div class="listTransitionsName center-align listTransitionsWidget {{submitLoader}}" *ngIf="upcoming_details.length== 0 && submitLoader==''">
+                                                <img src="assets/images/cleanbook01.svg" alt="cleanbook">
+                                                <span>It's a clean book.</span>
+                                                <span>Looks like you have not done any activities.</span>    
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="welcomeMsgpopup" data-backdrop="static" data-keyboard="false" role="dialog">
+    <div class="modal-dialog">
+        <span data-toggle="modal" data-target="#welcomeMsgpopup" #welcomeModal></span>
+ 
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="welcomeMsgbox">
+                    <div class="welcomeMsgimg">
+                        <img src="assets/images/welcomeimg.png">
+                    </div>
+                    <h2>Welcome to Open!</h2>
+                    <p>We have received your information and it is under verification. This can take up to 72 hours. However,
+                        your account is active and details are available on the dashboard.</p>
+                    <a title="" class="bttn bttn-theme btn-lg" #closeBtn data-dismiss="modal">Take me to Dashboard</a>
+                </div>
+                <div class="welcomeMsgfooter">
+                    <p>
+                        * Your account usage is subject to verification, any discrepancy in the same can lead to deactivation of your Open Account
+                        temporarily/permanently. In case of verification failure, the money credited to your account will
+                        be reversed back to the source.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

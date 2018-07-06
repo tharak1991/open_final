@@ -1,0 +1,276 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+<article>
+  <section class="main-body makePayment">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="dashboardAccount">
+            <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/transactions']">Accounts</a></li>
+              <li><a>Withdrawals</a></li>
+              <li>Withdraw Money</li>
+            </ul>
+            <h2 class="pageTitle">Withdraw Money</h2>
+            <!-- <div class="pageTips-dropdown" id="panel">
+              <span title="page tips" (click)="toggleTips()">Page Tips</span>
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                      Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div> -->
+          </div>
+          <form class="white-Box" [formGroup]="withdraw_money" (ngSubmit)="onSubmitWithdraw()">
+            <div class="boxFormCenter">
+              <ul>
+                <li>
+                  <div class="form-group">
+                    <label>Withdraw money To</label>
+                    <p-autoComplete [suggestions]="filteredCustomerSingle" field="beneficiary_name" formControlName="beneficiary_name" (onSelect)="getBankDetail($event)"
+                      (completeMethod)="search($event)" placeholder="select" [dropdown]="true">
+                      <ng-template let-to pTemplate="item">
+                          <span *ngIf="to.bank_account_number!=''"><span>{{to.bank_account_number}}</span><br>{{to.beneficiary_name}} ,{{to.baranch_name}}</span>
+                          <span *ngIf="to.bank_account_number==''" class="{{to.class}}">{{to.beneficiary_name}}</span>
+                      </ng-template>
+                    </p-autoComplete>
+                    <input type="hidden" formControlName="withdraw_bank_accounts_id">
+                    <div *ngIf="withdraw_money.controls['withdraw_bank_accounts_id'].hasError('required') && (withdraw_money.controls['withdraw_bank_accounts_id'].dirty || withdraw_money.controls['withdraw_bank_accounts_id'].touched)"
+                      class="error">
+                      Please select valid Bank
+                    </div>
+
+                    <span data-toggle="modal" data-target="#addNewBank" #addBankpop></span>
+                    <span data-toggle="modal" data-target="#confirm-payment" #confirmPayment></span>
+                    <span data-toggle="modal" data-target="#requestint" #requestInitiate></span>
+                    <!-- <a href="#" class="search_down"><img src="assets/icons/opencaret.svg" alt=""></a> -->
+
+                  </div>
+                </li>
+                <li>
+                  <div class="form-group rupees">
+                    <label>Amount</label>
+                    <input type="text" (keyup)="check_balance($event)" formControlName="amount" class="form-control">
+                    <div *ngIf="withdraw_money.controls['amount'].hasError('required') && (withdraw_money.controls['amount'].dirty || withdraw_money.controls['amount'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                    <div *ngIf="withdraw_money.controls['amount'].hasError('pattern')" class="error">
+                      Amount is Not Valid
+                    </div>
+                    <div *ngIf="balance_error && !withdraw_money.controls['amount'].hasError('pattern')" class="error">
+                      Balance is Not sufficient
+                    </div>
+                    <span class="availableBalance">Available Balance: <span class="iconRupeeBalance">{{account_balance | currency:'INR':true}}</span></span>
+
+                  </div>
+                </li>
+
+                <li>
+                  <div class="form-group">
+                    <label>Remarks</label>
+                    <input type="text" formControlName="purpose" class="form-control" placeholder="">
+                  </div>
+                </li>
+              </ul>
+              <ul class="withdrawFooter">
+                <li>
+                  <input type="submit" [disabled]="!withdraw_money.valid  || balance_error" title="Continue" class="bttn bttn-theme" value="Withdraw">
+                </li>
+                <li>
+                  <input class="bttn bttn-default" #cancelPayment type="reset" value="Cancel">
+                </li>
+              </ul>
+            </div>
+
+
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+<div class="modal fade" id="addNewBank" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClassSubmitBank}}">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Add Bank Account</h2>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addBank" (ngSubmit)="onSubmitaddBank()">
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" formControlName="beneficiary_name" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['beneficiary_name'].hasError('required')  && (addBank.controls['beneficiary_name'].dirty || addBank.controls['beneficiary_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBank.controls['beneficiary_name'].hasError('pattern')" class="error">
+                  Please enter a valid Name
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text" formControlName="mobile_number" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['mobile_number'].hasError('required')  && (addBank.controls['mobile_number'].dirty || addBank.controls['mobile_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBank.controls['mobile_number'].hasError('pattern')" class="error">
+                  Please enter a valid mobile number
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Account Number</label>
+                <input type="password" formControlName="bank_account_number" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['bank_account_number'].hasError('required')  && (addBank.controls['bank_account_number'].dirty || addBank.controls['bank_account_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBank.controls['bank_account_number'].hasError('pattern')"
+                class="error">
+                Account Number is not valid.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Confirm Account Number</label>
+                <input type="text" formControlName="confirm_acc_number" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['confirm_acc_number'].hasError('required')  && (addBank.controls['confirm_acc_number'].dirty || addBank.controls['confirm_acc_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBank.controls.confirm_acc_number.errors?.equalTo  && (addBank.controls['confirm_acc_number'].dirty || addBank.controls['confirm_acc_number'].touched)"
+                  class="error">
+                  Account number is not matched
+                </div>
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>IFSC Code</label>
+                <input type="text" (keyup)="searchBank(1,$event)" formControlName="ifsc_code" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['ifsc_code'].hasError('required')  && (addBank.controls['ifsc_code'].dirty || addBank.controls['ifsc_code'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li class="half">
+
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Bank</label>
+                <input type="text" formControlName="bank_name" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['bank_name'].hasError('required')  && (addBank.controls['bank_name'].dirty || addBank.controls['bank_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Branch</label>
+                <input type="text" formControlName="branch_name" class="form-control" placeholder="">
+                <div *ngIf="addBank.controls['branch_name'].hasError('required')  && (addBank.controls['branch_name'].dirty || addBank.controls['branch_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+
+          </ul>
+          <div class="modal-footer">
+            <ul>
+              <li>
+                <input class="bttn bttn-theme" value="Add Account" [disabled]="!addBank.valid" type="submit">
+
+              </li>
+              <li>
+                <input #closeAddBank class="bttn bttn-default" type="reset" value="Cancel" data-dismiss="modal">
+              </li>
+            </ul>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal fade" id="confirm-payment" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClasssubmit}}">
+    <div class="modal-content">
+      <div class="modal-body" *ngIf="transfer_detail">
+        <div class="con-payment" *ngIf="payment_schedules_id =='1'">
+          <h2 class="popup-heading text-center">Confirm Withdrawal</h2>
+          <p class="uwpay">You are withdrawing</p>
+          <p class="confirm-payment-price">₹ {{transfer_detail.amount}}</p>
+          <p>to</p>
+          <span>{{transfer_detail.beneficiary_name.beneficiary_name}}</span>
+          <span>{{transfer_detail.beneficiary_name.bank_account_number}}</span>
+          <span>{{transfer_detail.beneficiary_name.bank_name}}, {{transfer_detail.beneficiary_name.baranch_name}}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <ul>
+          <li><button type="button" (click)="confirmTransfer()" class="bttn bttn-theme btn-sm">Confirm</button></li>
+          <li><button type="button" class="bttn bttn-default btn-sm" #closeConfirm data-dismiss="modal">Cancel</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="requestint" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="req-initiated">
+          <h2 class="popup-heading text-center">Request Initiated</h2>
+          <span class="tick-circle">
+	   			<img src="../../assets/icons/tick-icon-green.svg" alt="tick">
+	   		</span>
+          <span>The account will be credited in 48 hours.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <ul>
+          <li class="singleCenter">
+            <button type="button" data-dismiss="modal" (click)="makeAnother()" class="bttn bttn-theme btn-sm">OK</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

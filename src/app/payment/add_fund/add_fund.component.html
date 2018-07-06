@@ -1,0 +1,100 @@
+<app-header></app-header>
+<!-- <div class="topToast toastFailed">
+    <span><em class="iconToast"></em><span class="toastMessage">Reconciled amount has been reverted successfully</span></span>
+</div> -->
+<sidebar></sidebar>
+<article>
+
+        <section class="main-body pad-zero">
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="fund-transfer">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <ul class="default-breadcrumb">
+                                    <li><a [routerLink]="['/transactions']">Accounts</a></li>
+                                    <li>Add Fund</li>
+                                </ul>
+                                <div class="invoice-wraper-heading">
+                                    <h2>Add Fund</h2>
+                                </div>
+                                <div class="addfund-whitebox">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <ul>
+                                                <li>Saved Cards</li>
+                                                <li>Cards</li>
+                                                <li>Net Banking</li>
+                                                <li>UPI</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-7">
+                                            <div class="rh-content">
+                                                <div class="rh-content-img">
+                                                    <img src="assets/images/fund-t01.png" align="fund-transfer01">
+                                                </div>
+                                                <span>We are working on it! </span>
+                                                <span>Adding funds online will be available  soon. </span>
+                                                <p>Meanwhile use your OPEN account credentials to transfer money from any of your other accounts. </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 {{sumbitLoader}} paddingRightzero">
+                                <div class="rh-bluecontent">
+                                    <!-- <div class="pageTips-dropdown mr-40" id="panel">
+                                        <span title="page tips" (click)="toggleTips()">Page Tips</span>
+                                        <div class="white-Box {{toggle_class}}">
+                                            <h3>Page Tips</h3>
+                                            <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                                            <div class="white-Box-Inner">
+                                                <ul class="pageTips-list">
+                                                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                                                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                                                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                                                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                                                        Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                                                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                                                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                                                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div  class="show-balance ">
+                                        <div class="current-balance">
+                                            <span>Current Balance</span>
+                                            <h2>{{account_balance | currency:'INR':true}}</h2>
+                                        </div>
+                                        <div class="show-balance-name">
+                                            <span>Name</span>
+                                            <!-- <p>{{fname}} {{lname}}</p> -->
+                                            <p>{{company_detail.company_name}}</p>
+                                            
+                                        </div>
+                                        <div class="show-balance-ac">
+                                            <span>Account Number</span>
+                                            <p>{{account_detail.open_bank_account_number}}</p>
+                                        </div>
+                                        <div class="show-balance-ifsc">
+                                            <span>IFSC Code</span>
+                                            <p>{{account_detail.open_bank_ifsc}}</p>
+                                        </div>
+                                        <div class="show-balance-branch">
+                                            <span>Bank, Branch</span>
+                                            <p>Open Bank, {{account_detail.open_bank_branch}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="dot-image">
+                                        <img alt="signin" src="assets/images/signin-bg2.png">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </article>

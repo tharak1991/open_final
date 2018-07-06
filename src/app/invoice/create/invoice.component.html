@@ -1,0 +1,1568 @@
+<!--<div class="topNotificationfixed"></div>-->
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+    <p>{{warning_message}}</p>
+    <a (click)="hideWarning()" title="close" class="closeWarn">
+        <img src="assets/icons/cancel_white.svg" alt="">
+    </a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+    <span>
+        <em class="iconToast"></em>
+        <span class="toastMessage">{{http_message}}</span>
+    </span>
+</div>
+<section class="main-body invoiceGstMain">
+    <div class="content">
+        <div class="container-fluid">
+            <div class="wraper">
+                <div class="m-t-20 c-place">
+                    <ul class="default-breadcrumb">
+                        <li>
+                            <a [routerLink]="['/invoices']">Invoice</a>
+                        </li>
+                        <li>Create Invoice</li>
+                    </ul>
+                </div>
+                <h2 class="pageTitle" >Create Invoice</h2>
+                <!-- <div class="pageTips-dropdown mr-40" id="panel">
+                    <span title="page tips" (click)="toggleTips()">Page Tips</span>
+                    <div class="white-Box {{toggle_class}}">
+                        <h3>Page Tips</h3>
+                        <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                        <div class="white-Box-Inner">
+                            <ul class="pageTips-list">
+                                <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                                <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                                <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                                <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                                    Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                                <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                                <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                                <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div> -->
+                <form #invoice_form="ngForm" (ngSubmit)="onSubmitCreateInvoice(invoice_form.value)">
+                    <div class="{{invoiceFormLoader}}">
+                        <div class="white-Box">
+                            <h4 *ngIf="gstin=='1'">Tax Invoice</h4>
+                            <h4 *ngIf="gstin!='1'">Invoice</h4>
+                            
+                            <div class="invoice-detail">
+                                <div class="address-section">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group addNewdrDown">
+                                                <label>Invoice to</label>
+                                                <p-autoComplete class="autoComplete" placeholder="Enter Customer Name" [suggestions]="filteredCustomerSingle" field="name" [(ngModel)]="store.invoice.invoiceto"
+                                                    name="customername" #customername="ngModel" required (onSelect)="getCustomerDetail($event)"
+                                                    (completeMethod)="search($event)" [dropdown]="true">
+                                                    <ng-template let-to pTemplate="item">
+                                                        <span *ngIf="to.email_id!=''">{{to.name}} - {{to.email_id}}</span>
+                                                        <span *ngIf="to.email_id==''" class="{{to.class}}">{{to.name}}</span>
+                                                    </ng-template>
+                                                </p-autoComplete>
+                                                <div *ngIf="store.to.phone || store.to.email">
+                                                    <p>{{store.to.phone}}
+                                                        <span>{{store.to.email}}</span>
+                                                        <span>
+                                                            <a (click)="updatecontact()">edit details</a>
+                                                        </span>
+                                                    </p>
+
+                                                </div>
+
+                                                <div *ngIf="customername.errors?.required && (customername.dirty || customername.touched || invoice_form.submitted)" class="error">
+                                                    Name is required
+                                                </div>
+                                                <span data-toggle="modal" data-target="#newcustomer" #addCustomer></span>
+                                                <span data-toggle="modal" data-target="#updateCustomer" #updateCustomer></span>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group" style="position:relative">
+                                                <label>Income Category
+                                                    <span _ngcontent-c0="" class="grey-help-circle">i
+                                                        <span class="tooltipShowcase">You can connect your income/expenses to a specific category of expense
+                                                            in order to make income/expense tracking easier</span>
+                                                    </span>
+                                                </label>
+                                                <p-autoComplete [minLength]="1" required="true" ngControl="category" name="category" class="autoComplete" placeholder="Enter Category Name"
+                                                    [(ngModel)]="store.category.name" [suggestions]="filteredCategorySingle" #category="ngModel"
+                                                    field="category_name" (onSelect)="getCategoryDetail($event)" (completeMethod)="searchCategory($event)"
+                                                    [dropdown]="true" (onBlur)="check_category()">
+                                                </p-autoComplete>
+
+                                                <input type="hidden" name="category_id" [(ngModel)]="store.category.id" #category_id="ngModel" required="true">
+                                                <div *ngIf="category.errors?.required && (category.dirty || category.touched || invoice_form.submitted)" class="error">
+                                                    Category is required
+                                                </div>
+                                                <div *ngIf="category_id.errors?.required && (category_id.dirty || category_id.touched || invoice_form.submitted) && store.category.name!=''" class="error">
+                                                    Please select category from category list
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label>Invoice Type</label>
+                                                <ul class="listInvoiceType">
+                                                    <li>
+                                                        <p-radioButton name="invoiceType" value="1" [(ngModel)]="store.type" (click)="invoiceChanged()"></p-radioButton>
+                                                        <span>One Time</span>
+                                                    </li>
+                                                    <li>
+                                                        <p-radioButton name="invoiceType" value="3" [(ngModel)]="store.type" (click)="invoiceChanged()"></p-radioButton>
+                                                        <span>Recurring</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="invoce-refernce">
+                                    <div class="createInvoicerecurring">
+                                        <ul *ngIf="store.type == '3'">
+                                            <li class="invoiceOverride">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Invoice #
+                                                        <span class="over">
+                                                            <label class="override">
+                                                                <p-checkbox name="override" [(ngModel)]="store.invoice.is_override" binary="true"></p-checkbox>
+                                                                <span></span> Override</label>
+                                                        </span>
+                                                    </label>
+                                                    <span *ngIf="store.invoice.is_override">
+                                                        <input name="sequnecId" #sequnecId="ngModel" required [(ngModel)]="store.invoice.id" [value]="invoice_id" type="text" class="form-control">
+                                                    </span>
+                                                    <span *ngIf="!store.invoice.is_override">
+                                                        <input name="sequnecId" #sequnecId="ngModel" required [(ngModel)]="store.invoice.id" [value]="invoice_id" type="text" class="form-control"
+                                                            disabled>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                            <li class="invoiceDate">
+                                                <div class="form-group">
+                                                    <label>Invoice Date</label>
+                                                    <p-calendar name="invoicedate" dateFormat="yy-mm-dd" #invoicedate="ngModel" placeholder="select date" required [(ngModel)]="store.invoice.date"
+                                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2030"></p-calendar>
+                                                    <div *ngIf="invoicedate.errors?.required && (invoicedate.dirty || invoicedate.touched || invoice_form.submitted)" class="error">
+                                                        invoice date is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="startDate">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Start Date
+                                                    </label>
+                                                    <p-calendar name="startdate" [minDate]="todaysDate1" (onSelect)="check_invoice_start_date($event)"  dateFormat="yy-mm-dd" placeholder="select date" required
+                                                        #startdate="ngModel" yearRange="2000:2030" [(ngModel)]="store.invoice.start" [monthNavigator]="true"
+                                                        [yearNavigator]="true" ></p-calendar>
+                                                    <div *ngIf="startdate.errors?.required && (startdate.dirty || startdate.touched || invoice_form.submitted)" class="error">
+                                                        Start date is required
+                                                    </div>
+                                                </div>
+
+                                            </li>
+                                            <li class="freQuency">
+                                                <div style="position:relative;">
+                                                    <label>Frequency</label>
+                                                    <p-dropdown name="frequency" [(ngModel)]="store.invoice.freq" required #frequency="ngModel" [options]="frequnecy" [(ngModel)]="selectedFrequency">
+                                                    </p-dropdown>
+                                                    <div *ngIf="frequency.errors?.required && (frequency.dirty || frequency.touched || invoice_form.submitted)" class="error">
+                                                        frequency is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="repeatFor">
+                                                <div class="form-group">
+                                                    <label>Repeat for</label>
+                                                    <input name="paymentterms" #paymentterms="ngModel" required [(ngModel)]="store.invoice.months_term" type="text" class="form-control"
+                                                    />
+                                                    <span *ngIf="store.invoice.freq==1">Weeks</span>
+                                                    <span *ngIf="store.invoice.freq==2">Months</span>
+                                                    <span *ngIf="store.invoice.freq==3">Quarters</span>
+                                                    <span *ngIf="store.invoice.freq==4">Half-Years</span>
+                                                    <span *ngIf="store.invoice.freq==5">Years</span>
+
+                                                    <div *ngIf="paymentterms.errors?.required && (paymentterms.dirty || paymentterms.touched || invoice_form.submitted)" class="error">
+                                                        repeat for is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="refId">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Ref.ID
+                                                        <em>(optional)</em>
+                                                    </label>
+                                                    <input name="refrenceid" #refrenceid="ngModel" [(ngModel)]="store.invoice.ref" type="text" class="form-control" placeholder="INV001234">
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="createInvoiceonetime">
+                                        <ul *ngIf="store.type == '1'">
+                                            <li class="invoiceOverride">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Invoice #
+                                                        <span class="over">
+                                                            <label class="override">
+                                                                <p-checkbox name="override" [(ngModel)]="store.invoice.is_override" binary="true"></p-checkbox>
+                                                                <span></span> Override</label>
+                                                        </span>
+                                                    </label>
+                                                    <span *ngIf="store.invoice.is_override">
+                                                        <input name="sequnecId" #sequnecId="ngModel" required [(ngModel)]="store.invoice.id" [value]="invoice_id" type="text" class="form-control">
+                                                    </span>
+                                                    <span *ngIf="!store.invoice.is_override">
+                                                        <input name="sequnecId" #sequnecId="ngModel" required [(ngModel)]="store.invoice.id" [value]="invoice_id" type="text" class="form-control"
+                                                            disabled>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                            <li class="invoiceDate">
+                                                <div class="form-group">
+                                                    <label>Invoice Date</label>
+                                                    <p-calendar name="invoicedate" dateFormat="yy-mm-dd" #invoicedate="ngModel" placeholder="select date" required [(ngModel)]="store.invoice.date"
+                                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2030"></p-calendar>
+                                                    <div *ngIf="invoicedate.errors?.required && (invoicedate.dirty || invoicedate.touched || invoice_form.submitted)" class="error">
+                                                        invoice date is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="paymentTerm" style="position:relative">
+                                                <div>
+                                                    <label>Payments Terms</label>
+                                                    <p-dropdown (onChange)="change_payment_term($event)" name="paymentterms" [options]="paymentterms" required [(ngModel)]="store.terms.value">
+                                                    </p-dropdown>
+                                                    <div *ngIf="payment_error!=''" class="error">
+                                                        Payment terms is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="dueDate">
+                                                <div class="form-group">
+                                                    <label>Select Due Date</label>
+                                                    <p-calendar name="duedate" [minDate]="todaysDate1" dateFormat="yy-mm-dd" #duedate="ngModel" placeholder="Select Due Date" required [(ngModel)]="store.invoice.due"
+                                                        [monthNavigator]="true" [yearNavigator]="true" yearRange="2000:2030"></p-calendar>
+                                                    <div *ngIf="duedate.errors?.required && (duedate.dirty || duedate.touched || invoice_form.submitted)" class="error">
+                                                        Invoice due date is required
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="refId">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Ref.ID
+                                                        <em>(optional)</em>
+                                                    </label>
+                                                    <input name="refrenceid" #refrenceid="ngModel" [(ngModel)]="store.invoice.ref" type="text" class="form-control" placeholder="INV001234">
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- table structure -->
+                            <div class="table-content">
+                                <table class="table invoice-table">
+                                    <thead class="invoice-table-header">
+                                        <tr align="middle">
+                                            <th class="width-1">#</th>
+                                            <th class="width-15">Item Name</th>
+                                            <th class="width-7">Item Type</th>
+                                            <th class="width-7">Qty</th>
+                                            <th class="width-7">Unit</th>
+                                            <th class="width-7">Rate/unit</th>
+                                            <th class="width-7">Discount(%)</th>
+                                            <th *ngIf="gstin == '1'" class="width-7">GST(%)</th>
+                                            <th class="width-7">Amount
+                                                <span class="sm-size">Excluding Tax</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of store.items; let i = index;trackBy: trackByFn" valign="middle" class="item-tr-border">
+                                            <td valign="bottom" class="serial-num">
+                                                {{ i+1 }}
+                                            </td>
+                                            <td valign="middle" class="item-name">
+                                                <input [(ngModel)]="item.name" type="text" name="name_{{i}}" class="form-control" required>
+                                                <!-- <a data-target="#addItem" data-toggle="modal" class="item-cancel pull-right"> &#10005;</a> -->
+                                                <a (click)="removeItem(item,i)" class="item-cancel pull-right"> &#10005;</a>
+
+                                            </td>
+                                            <td class="item-type form-group">
+                                                <input [(ngModel)]="item.type" type="text" name="type_{{i}}" class="form-control">
+                                            </td>
+                                            <td class="qty form-group">
+                                                <input (keyup)="updateQuantity(item,$event,i);qty_next($event)" [class.borderError]="item.qty<=0" [(ngModel)]="item.qty" type="number" min="1" name="qty_{{i}}" class="form-control"
+                                                    required>
+                                                <!-- <div *ngIf="item.qty<=0" class="borderError">
+                                                    <input type="hidden" name="hide" [(ngModel)]="isValid" value="true">
+                                                </div> -->
+                                            </td>
+                                            <td class="unit form-groupNew">
+                                                <p-dropdown name="unit_{{i}}" [class.borderError]="(item.unit=='' || item.unit==null) && invoice_form.submitted" [options]="units" [(ngModel)]="item.unit" required></p-dropdown>
+                                            </td>
+                                            <td class="rate form-group">
+                                                <input name="rate_{{i}}" (keyup)="updateTotal();rate_next($event)" [class.borderError]="item.rate<=0" [(ngModel)]="item.rate" type="number" min="0" class="form-control" required>
+                                                <!-- <div *ngIf="item.rate<=0" class="borderError">
+                                                    <input type="hidden" name="hide" [(ngModel)]="isValid" value="true">
+                                                </div> -->
+                                            </td>
+                                            <td class="discount form-group">
+                                                <input name="dsc_{{i}}" (keyup)="updateTotal();dis_next($event)" [class.borderError]="item.dsc<0 ||item.dsc>100" [(ngModel)]="item.dsc" type="number" min="0" max="100" class="form-control">
+                                                <!-- <div *ngIf="item.dsc<0 ||item.dsc>100" class="borderError">
+                                                    <input type="hidden" name="hide" [(ngModel)]="isValid" value="true"> 
+                                                
+                                                </div> -->
+                                            </td>
+                                            <td *ngIf="gstin =='1'" class="gst form-groupNew">
+                                                <p-dropdown name="gst_{{i}}" (onChange)="updateTotal();" [(ngModel)]="item.gst" [options]="gstrates">
+                                                </p-dropdown>
+                                            </td>
+                                            <td class="amount form-group">
+                                                {{item.subtotal}}
+                                            </td>
+                                        </tr>
+                                        <!--Sample-->
+                                        <tr valign="middle" class="item-tr-border">
+                                            <td valign="bottom" class="serial-num">
+
+                                            </td>
+                                            <td valign="middle" class="item-name">
+                                                <div class="link">
+                                                    <span>
+                                                        <!-- <a title="Add Item" #openAddItemModel data-target="#addItem" data-toggle="modal">+ Add New Item</a> -->
+                                                        <p-autoComplete [suggestions]="filteredItemSingle" placeholder="Enter Item Name" field="item_name" (onSelect)="addItemDetail($event)"
+                                                            [(ngModel)]="item_search" name="item_search" (completeMethod)="searchItem($event)">
+                                                            <ng-template let-items pTemplate="item">
+                                                                <span *ngIf="items.id!='new'">{{items.item_name}}</span>
+                                                                <span *ngIf="items.id=='new'" class="{{items.class}}">{{items.item_name}}</span>
+                                                            </ng-template>
+                                                        </p-autoComplete>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="item-type form-group">
+                                            </td>
+                                            <td class="qty form-group">
+                                            </td>
+                                            <td class="unit form-group">
+                                            </td>
+                                            <td class="rate form-group">
+                                            </td>
+                                            <td class="discount form-group">
+                                            </td>
+                                            <td *ngIf="gstin =='1'" class="gst form-group">
+                                            </td>
+                                            <td class="amount form-group">
+                                            </td>
+                                        </tr>
+                                        <!--Sample Row -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="lower-section  {{image_loader}}">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <ul class="listCreatInvoiceBotButtons">
+                                            <li>
+                                                <div class="attach-file file-input">
+                                                    <label>
+                                                        <input type="file" (change)="onChangeOthers($event)" multiple>
+                                                        <span>Attach Files</span>
+                                                        <p class="file-select" data-js-label></p>
+                                                    </label>
+                                                </div>
+
+                                                <div class="floatShift">
+                                                <span class="attachfileshowCase" *ngFor="let file of file_arr, let i = index">
+                                                    <a class="attachedLink" href="{{file.url}}" title="">{{file.original_file_name}}</a>
+                                                    <a class="attachedRemove pull-right" (click)="delteOtherFiles(file)" title="Delete">
+                                                        <img src="../../assets/icons/canel_icon.svg">
+                                                    </a>
+                                                </span>
+                                            </div>
+
+                                            </li>
+                                            <li>
+                                                <a class="bttn bttn-default" data-target="#tags-notes" data-toggle="modal">Add Notes</a>
+                                            </li>
+                                            <li>
+                                                <a *ngIf="gstin=='0'" data-target="#addedittax" data-toggle="modal" class="bttn bttn-default">Add/Edit Tax</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="invoice-total">
+                                            <div class="sub-total">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <span>Sub Total</span>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <span class="pull-right">
+                                                            <!-- Generator: Adobe Illustrator 19.1.1, SVG Export Plug-In  -->
+                                                            {{sub_total | currency:'INR':true}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="selectedTax.length>0">
+                                                <div *ngFor="let seltax of selectedTax" class="sub-total">
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            <span>{{seltax.tax_name}}</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <span class="pull-right">
+                                                                <!-- Generator: Adobe Illustrator 19.1.1, SVG Export Plug-In  -->
+                                                                {{seltax.taxamount | currency:'INR':true}}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="gstin == '1'" class="gst-total">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <span>GST</span>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <span class="pull-right">
+                                                            <!-- Generator: Adobe Illustrator 19.1.1, SVG Export Plug-In  -->
+                                                            {{gst_total | currency:'INR':true}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="dis-count">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <span>Additional Charges
+                                                            <em>eg: Shipping/ Convenience etc.</em>
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <input (keyup)="updateTotal()" name="add_charge" #add_charge="ngModel" [(ngModel)]="addtionalcharges" minlength="0" type="number"
+                                                                class="form-control text-right">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="adjustment">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <span>Adjustments</span>
+                                                        <!-- <span class="grey-help-circle">i
+                                                            <span class="tooltipShowcase">ajdhahwdhwahdawdhwdhwa</span>
+                                                        </span> -->
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <input [class.borderError]="!adj_amt_valid" (keyup)="updateTotal();check_adj()" name="adj_charge" #Adjustments="ngModel" [(ngModel)]="Adjustments_charges" type="number" class="form-control text-right">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="amt-due">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <span>Amount Due</span>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <span class="pull-right">
+                                                        <strong>{{total | currency:'INR':true}}</strong>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <span class="terms">
+                                <div class="checkbox pull-left">
+                                    <label>
+                                        <span class="form-group">
+                                            <p-checkbox name="terms" [(ngModel)]="selectedValues2"></p-checkbox>
+                                        </span>Include Terms &amp; Conditions
+                                </label>
+                            </div>
+                            </span> -->
+                            </div>
+                        </div>
+                        <div class="footer-btn">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="cancel">
+                                        <a [routerLink]="['/invoices']" class="bttn bttn-default">Cancel</a>
+                                        <!-- <button disabled class="bttn bttn-default">Preview Invoice</button> -->
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="pull-right">
+                                        <li>
+                                            <input [disabled]="!submit"  (click)="saveType('1')" type="submit" class="bttn bttn-theme" value="Save Invoice">
+                                        </li>
+                                        <li *ngIf="store.type == '1' || (store.type == '3' && is_future_date==false)">
+                                            <input [disabled]="!submit"  (click)="saveType('2')" type="submit" class="bttn bttn-theme" value="Preview &amp; Send">
+                                            <!-- <a [routerLink]="['/sendinvoice']" title="" class="bttn bttn-theme">Save &amp; Send Invoice</a> -->
+                                        </li>
+                                        <li *ngIf="store.type == '3' && is_future_date==true">
+                                            <input [disabled]="!submit"  (click)="saveType('2')" type="submit" class="bttn bttn-theme" value="Preview &amp; Schedule">
+                                            <!-- <a [routerLink]="['/sendinvoice']" title="" class="bttn bttn-theme">Save &amp; Send Invoice</a> -->
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<div *ngIf="gstin=='0'" class="warnMessage {{hideWarningClassGST}}">
+    <p>Please add your GST number for Tax Compliance in settings</p>
+    <a (click)="hideWarningGst()" title="close" class="closeWarn">
+        <img src="assets/icons/cancel_white.svg" alt="">
+    </a>
+</div>
+
+<div class="modal fade" id="tags-notes" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Notes</h2>
+            </div>
+            <form [formGroup]="addNotesForm" (ngSubmit)="addNotesandTags()">
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- <div class="col-md-12">
+                            <div class="form-group">
+                                <label> Tags</label>
+                                <p-chips formControlName="tags"></p-chips>
+                            </div>
+                        </div> -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <textarea class="form-control" formControlName="notes" placeholder="Notes added here can be used for internal purpose and wont be shared to client"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <ul>
+                        <li>
+                            <button #closeTagNotesModel class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+                        </li>
+                        <li>
+                            <button type="submit" class="bttn bttn-theme">Add</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addedittax" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog {{taxFormLoder}}">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add/ Edit Tax</h2>
+            </div>
+            <div class="modal-body">
+                <div class="addBoxtax">
+                    <ul class="taxType">
+                        <li class="form-group">
+                            <input type="text" #taxname class="form-control" placeholder="Add tax type">
+                        </li>
+                        <li class="form-group">
+                            <input #taxperc type="text" class="form-control" placeholder="%">
+                        </li>
+                        <li class="addPlus">
+                            <a (click)="addTax()">+</a>
+                        </li>
+                    </ul>
+                    <ul class="taxes">
+                        <li *ngFor="let tax of companytax;">
+                            <div class="taxesListcheckbox form-group">
+                                <p-checkbox (onChange)="selectedtax(tax,$event)"></p-checkbox>
+                                <p class="after-checkbox">{{tax.tax_name}}</p>
+                            </div>
+                            <div class="taxesListpercentage form-group">
+                                <input type="text" (keyup)="updateTax(tax,$event)" [value]="tax.tax_perc" class="form-control">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer pull-left">
+                <button data-dismiss="modal" (click)="updateTotal()" class="bttn bttn-theme">Add Tax</button>
+                <button data-dismiss="modal" class="bttn bttn-default">Cancel</button>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="newcustomer" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog {{contactFormLoader}}">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Customer</h2>
+            </div>
+            <form [formGroup]="addCustomerForm" (ngSubmit)="addCustomerFormSubmit()">
+                <div class="modal-body">
+                    <div class="customer-name">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Customer Name</label>
+                                    <span class="mandatory">*</span>
+                                    <input type="text" formControlName="name" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['name'].dirty || addCustomerForm.controls['name'].touched">
+                                        <div class="error" *ngIf="addCustomerForm.controls['name'].hasError('required')">
+                                            Customer Name is required
+                                        </div>
+                                        <div class="error" *ngIf="addCustomerForm.controls['name'].hasError('pattern')">
+                                            Customer Name can not contains numbers
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="organisation-individual">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="radioBtnCircle">
+                                    <li>
+                                        <p-radioButton formControlName="type_of_contact" ngModel="{{customertypedefault}}" name="group1" value="Organization"></p-radioButton>
+                                        <span>Organisation</span>
+                                    </li>
+                                    <li>
+                                        <p-radioButton formControlName="type_of_contact" ngModel="{{customertypedefault}}" name="group1" value="Individual"></p-radioButton>
+                                        <span>Indiviual</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-name">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Primary Contact Name (Optional)</label>
+                                    <input type="text" formControlName="primary_contact" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['primary_contact'].dirty || addCustomerForm.controls['primary_contact'].touched">
+                                        <div class="error" *ngIf="addCustomerForm.controls['primary_contact'].hasError('pattern')">
+                                            Customer Name can not contain special characters
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-email">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <span class="mandatory">*</span>
+                                    <input type="text" formControlName="email_id" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['email_id'].hasError('required')&&(addCustomerForm.controls['email_id'].dirty || addCustomerForm.controls['email_id'].touched)"
+                                        class="error"> Email is required</div>
+                                    <div *ngIf="addCustomerForm.controls.email_id.errors?.email" class="error">
+                                        Please provide valid email id
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-number">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Phone No (Optional)</label>
+                                    <input type="number" formControlName="mobile_number" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['mobile_number'].hasError('pattern')" class="error">
+                                        Invalid Phone Number
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-pan">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PAN Number (Optional)</label>
+                                    <input type="text" formControlName="pan" class="form-control upperCase">
+                                    <div *ngIf="addCustomerForm.controls['pan'].hasError('pattern')" class="error">
+                                        Invalid PAN Number
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>TDS(%) (Optional)</label>
+                                    <input type="number" formControlName="tds" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['tds'].hasError('pattern')" class="error">
+                                        values upto two digits are accepted
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-gstin">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>GSTIN (Optional)</label>
+                                    <input type="text" formControlName="gstin" class="form-control">
+                                    <div *ngIf="addCustomerForm.controls['gstin'].hasError('pattern')" class="error">
+                                        Invalid GSTIN
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="billing-sec">
+                        <div class="billing-address">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>Billing Address</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="text" class="form-control" formControlName="address_line" placeholder="">
+                                        <div *ngIf="addCustomerForm['controls'].billing_address['controls'].address_line.hasError('required')&&(addCustomerForm['controls'].billing_address['controls'].address_line.dirty || addCustomerForm['controls'].billing_address['controls'].address_line.touched )"
+                                            class="error"> Address is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="city-code">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>City</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="text" formControlName="city" class="form-control" placeholder="">
+                                        <div *ngIf="addCustomerForm['controls'].billing_address['controls'].city.hasError('required')&&(addCustomerForm['controls'].billing_address['controls'].city.dirty || addCustomerForm['controls'].billing_address['controls'].city.touched )"
+                                            class="error"> City is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>Pin Code</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="number" formControlName="pincode" class="form-control" placeholder="">
+                                        <div *ngIf="addCustomerForm['controls'].billing_address['controls'].pincode.hasError('required')&&(addCustomerForm['controls'].billing_address['controls'].pincode.dirty || addCustomerForm['controls'].billing_address['controls'].pincode.touched )"
+                                            class="error"> Pin code is required
+                                        </div>
+                                        <div *ngIf="addCustomerForm['controls'].billing_address['controls'].pincode.hasError('pattern')" class="error">
+                                            Pin code is not valid
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="state-field">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-groupNew" formGroupName="billing_address">
+                                            <label>State</label>
+                                            <span class="mandatory">*</span>
+                                            <p-dropdown [options]="state_list" formControlName="state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                                            <div *ngIf="addCustomerForm['controls'].billing_address['controls'].state.hasError('required')&&(addCustomerForm['controls'].billing_address['controls'].state.dirty || addCustomerForm['controls'].billing_address['controls'].state.touched )"
+                                                class="error"> State is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="billing-same">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span class="mark-as">
+                                    <div class="checkbox pull-left">
+                                        <label>
+                                            <p-checkbox formControlName="is_same" (onChange)="hideShippingForm()" binary="true">
+                                            </p-checkbox>
+                                            Shipping and Billing Address are the same
+                                        </label>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isClicked == true" class="billing-sec" formGroupName="shipping_address">
+                        <div class="billing-address">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Shipping Address</label>
+                                        <input type="text" class="form-control" formControlName="address_line">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="city-code">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>City</label>
+                                        <input type="text" formControlName="city" class="form-control" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Pin Code</label>
+                                        <input type="number" formControlName="pincode" class="form-control" placeholder="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="state-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-groupNew">
+                                        <label>
+                                            State
+                                        </label>
+                                        <p-dropdown [options]="state_list" formControlName="state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <ul>
+                        <li>
+                            <button type="submit" [disabled]="!addCustomerForm.valid" class="bttn bttn-theme">Add Customer</button>
+                        </li>
+                        <li>
+                            <button #closeContactForm class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateCustomer" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog {{contactFormLoader}}">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Customer</h2>
+            </div>
+            <form [formGroup]="updateCustomerForm" (ngSubmit)="updateCustomerFormSubmit()">
+                <div class="modal-body">
+                    <div class="customer-name">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Customer Name</label>
+                                    <span class="mandatory">*</span>
+                                    <input type="text" formControlName="name" class="form-control" [(ngModel)]="store.to.name">
+                                    <div *ngIf="updateCustomerForm.controls['name'].dirty || updateCustomerForm.controls['name'].touched">
+                                        <div class="error" *ngIf="updateCustomerForm.controls['name'].hasError('required')">
+                                            Customer Name is required
+                                        </div>
+                                        <div class="error" *ngIf="updateCustomerForm.controls['name'].hasError('pattern')">
+                                            Customer Name can not contains numbers
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="organisation-individual">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="radio_align">
+                                    <li class="input_radio">
+                                        <label>
+                                            <p-radioButton name="group1" [(ngModel)]="store.to.type" value="Organization" formControlName="type_of_contact"></p-radioButton>
+                                            <span></span>Organisation
+                                        </label>
+                                    </li>
+                                    <li class="input_radio">
+                                        <label>
+                                            <p-radioButton name="group1" [(ngModel)]="store.to.type" value="Individual" formControlName="type_of_contact"></p-radioButton>
+                                            <span></span>Indiviual
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-name">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Primary Contact Name</label>
+                                    <input type="text" formControlName="primary_contact" [(ngModel)]="store.to.primary_contact" class="form-control">
+                                    <div *ngIf="updateCustomerForm.controls['primary_contact'].dirty || updateCustomerForm.controls['primary_contact'].touched">
+                                        <div class="error" *ngIf="updateCustomerForm.controls['primary_contact'].hasError('pattern')">
+                                            Customer Name can not contain special characters
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-email">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <span class="mandatory">*</span>
+                                    <input type="text" formControlName="email_id" [(ngModel)]="store.to.email" class="form-control">
+                                    <div *ngIf="updateCustomerForm.controls['email_id'].hasError('required')&&(updateCustomerForm.controls['email_id'].dirty || updateCustomerForm.controls['email_id'].touched)"
+                                        class="error"> Email is required</div>
+                                    <div *ngIf="updateCustomerForm.controls.email_id.errors?.email" class="error">
+                                        Please provide valid email id
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-number">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Phone No</label>
+                                    <input type="number" formControlName="mobile_number" [(ngModel)]="store.to.phone" class="form-control">
+                                    <div *ngIf="updateCustomerForm.controls['mobile_number'].hasError('pattern')" class="error">
+                                        Invalid Phone Number
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-pan">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PAN Number</label>
+                                    <input type="text" formControlName="pan" [(ngModel)]="store.to.pan" class="form-control upperCase">
+                                    <div *ngIf="updateCustomerForm.controls['pan'].hasError('pattern')" class="error">
+                                        Invalid PAN Number
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>TDS(%)</label>
+                                    <input type="number" formControlName="tds" [(ngModel)]="store.to.tds" class="form-control">
+                                    <div *ngIf="updateCustomerForm.controls['tds'].hasError('pattern')" class="error">
+                                        values upto two digits are accepted
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-gstin">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>GSTIN</label>
+                                    <input type="text" formControlName="gstin" [(ngModel)]="store.to.gstin" class="form-control">
+                                    <div *ngIf="updateCustomerForm.controls['gstin'].hasError('pattern')" class="error">
+                                        Invalid GSTIN
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tooltip-show">
+                                    <a title="">i</a>
+                                    <span class="tooltip-hover">If GSTIN in not available you still can add the customer as Individual</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="billing-sec">
+                        <div class="billing-address">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>Billing Address</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="text" class="form-control" [(ngModel)]="store.to.billing_address.address_line" formControlName="address_line">
+                                        <div *ngIf="updateCustomerForm['controls'].billing_address['controls'].address_line.hasError('required')&&(updateCustomerForm['controls'].billing_address['controls'].address_line.dirty || updateCustomerForm['controls'].billing_address['controls'].address_line.touched)"
+                                            class="error"> Address is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="city-code">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>City</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="text" formControlName="city" [(ngModel)]="store.to.billing_address.city" class="form-control">
+                                        <div *ngIf="updateCustomerForm['controls'].billing_address['controls'].city.hasError('required')&&(updateCustomerForm['controls'].billing_address['controls'].city.dirty || updateCustomerForm['controls'].billing_address['controls'].city.touched)"
+                                            class="error"> City is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="billing_address">
+                                        <label>Pin Code</label>
+                                        <span class="mandatory">*</span>
+                                        <input type="number" formControlName="pincode" [(ngModel)]="store.to.billing_address.pincode" class="form-control">
+                                        <div *ngIf="updateCustomerForm['controls'].billing_address['controls'].pincode.hasError('required')&&(updateCustomerForm['controls'].billing_address['controls'].pincode.dirty || updateCustomerForm['controls'].billing_address['controls'].pincode.touched)"
+                                            class="error"> Pin code is required
+                                        </div>
+                                        <div *ngIf="updateCustomerForm['controls'].billing_address['controls'].pincode.hasError('pattern')" class="error">
+                                            Pin code is not valid
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="state-field">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group" formGroupName="billing_address">
+                                            <label>State</label>
+                                            <span class="mandatory">*</span>
+                                            <p-dropdown [options]="state_list" formControlName="state" [(ngModel)]="store.to.billing_address.state" [autoWidth]="false"
+                                                placeholder="Select State"></p-dropdown>
+                                            <div *ngIf="updateCustomerForm['controls'].billing_address['controls'].state.hasError('required')&&(updateCustomerForm['controls'].billing_address['controls'].state.dirty || updateCustomerForm['controls'].billing_address['controls'].state.touched)"
+                                                class="error"> State is required
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="billing-same">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span class="mark-as">
+                                    <div class="checkbox pull-left">
+                                        <label>
+                                            <p-checkbox formControlName="is_same" (onChange)="hideShippingForm()" binary="true">
+                                            </p-checkbox>
+                                            Shipping and Billing Address are the same
+                                        </label>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isClicked == true" class="billing-sec">
+                        <div class="billing-address">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" formGroupName="shipping_address">
+                                        <label>Shipping Address</label>
+                                        <input type="text" class="form-control" formControlName="address_line" [(ngModel)]="store.to.shipping_address.address_line">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="city-code">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="shipping_address">
+                                        <label>City</label>
+                                        <input type="text" formControlName="city" class="form-control" [(ngModel)]="store.to.shipping_address.city">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="shipping_address">
+                                        <label>Pin Code</label>
+                                        <input type="number" formControlName="pincode" class="form-control" [(ngModel)]="store.to.shipping_address.pincode">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="state-field">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" formGroupName="shipping_address">
+                                        <label>
+                                            State
+                                        </label>
+                                        <p-dropdown [options]="state_list" formControlName="state" [(ngModel)]="store.to.shipping_address.state" [autoWidth]="false"
+                                            placeholder="Select State"></p-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <ul>
+                        <li>
+                            <button type="submit" [disabled]="!updateCustomerForm.valid" class="bttn bttn-theme">Update Customer</button>
+                        </li>
+                        <li>
+                            <button #closeUpdateContactForm class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade modal-lg" id="modalSac1" role="dialog" style="z-index:99999;width:100%" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog hsnCodePopup {{SAC_HSN_loader}}">
+        <div class="modal-content" style="min-width:650px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Find SAC Code</h2>
+                <div class="boxProCode">
+                    <div class="proCodeField">
+                        <input #searchSac type="text" class="form-control" placeholder="Personal Computer">
+                        <button class="bttn bttn-theme" (click)="searchSacCodeByDesc()">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="bordBox">
+                    <div class="boxProCode">
+                        <div class="proCodeList">
+                            <ul *ngFor="let saode of saccodes">
+                                <li>
+                                    <div class="proCodeRadioWrap">
+                                        <p-radioButton (click)="selectSacDetail(saode)" name="groupname" value="{{saode.sac_codes_id}}"></p-radioButton>
+                                    </div>
+                                    <div class="proCodeCodeWrap">
+                                        {{saode.SAC}}
+                                    </div>
+                                    <div class="proCodeDisWrap">
+                                        <p>{{saode.description}}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul *ngIf="saccodes.length=='0' && SAC_message!=''">
+                                <li>
+                                    {{SAC_message}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <ul class="popup-btns">
+                    <li>
+                        <button class="bttn bttn-theme btn-custom-sm" (click)="submitCode(2)">Add Item</button>
+                    </li>
+                    <li>
+                        <button #closeSacModel (click)="OpenNewItemModel()" class="bttn bttn-default btn-custom-xs" data-dismiss="modal">Cancel</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-lg" id="modalHsn1" role="dialog" style="z-index:99999;width:100%" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog hsnCodePopup {{SAC_HSN_loader}}">
+        <div class="modal-content" style="min-width:650px;">
+            <div class="modal-header">
+                <h2 class="modal-title text-center">Find HSN Code</h2>
+                <div class="boxProCode">
+                    <div class="proCodeField">
+                        <input type="text" #searchHsn class="form-control" placeholder="Personal Computer">
+                        <button class="bttn bttn-theme" (click)="searchsHsnCodeByDesc()">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="bordBox">
+                    <div class="boxProCode">
+                        <div class="proCodeList">
+                            <ul>
+                                <li *ngFor="let hsncode of hsncodes">
+                                    <div class="proCodeRadioWrap">
+                                        <p-radioButton (click)="selectSacDetail(hsncode)" name="groupname" value="{{hsncode.HSN}}"></p-radioButton>
+                                    </div>
+                                    <div class="proCodeCodeWrap">
+                                        {{hsncode.HSN}}
+                                    </div>
+                                    <div class="proCodeDisWrap">
+                                        <p>{{hsncode.description}}</p>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul *ngIf="hsncodes.length=='0' && HSN_message!=''">
+                                <li>
+                                    {{HSN_message}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <ul class="popup-btns">
+                    <li>
+                        <button class="bttn bttn-theme btn-custom-sm" (click)="submitCode(1)">Add Item</button>
+                    </li>
+                    <li>
+                        <button #closeHsnModel (click)="OpenNewItemModel()" class="bttn bttn-default btn-custom-xs" data-dismiss="modal">Cancel</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addItem" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Items</h2>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group search">
+                            <p-autoComplete [suggestions]="filteredItemSingle" placeholder="Search" field="item_name" (onSelect)="addItemDetail($event)"
+                                (completeMethod)="searchItem($event)">
+                            </p-autoComplete>
+                        </div>
+                    </div>
+                </div>
+                <div class="addnewitem">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="addnewitem-sec">
+                                <ul>
+                                    <li>
+                                        <a (click)="openNewItem()" title="Add Item">+ Add New Item</a>
+                                    </li>
+
+                                    <span *ngIf="gstin=='1'" #openNewItemModel data-target="#newItemPop" data-toggle="modal"></span>
+                                    <span *ngIf="gstin=='0'" #openNewItemModel data-target="#newItemNonGst" data-toggle="modal"></span>
+
+                                    <li *ngFor="let item of items; let i = index" [attr.data-index]="i">
+                                        <div class="itemone">
+                                            <span>
+                                                <div class="checkbox pull-left">
+                                                    <label>
+                                                        <p-checkbox name="optionsCheckboxes" binary="true" [(ngModel)]="item.is_select" (onChange)="updateStoreItems($event,item,i)"></p-checkbox>
+                                                        <span class="checkbox-material">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                        {{ item.code }} - {{ item.name }}
+                                                        <small *ngIf="item.is_service!=1">{{ item.type }}-HSN:{{ item.hsn_sac }}</small>
+                                                        <small *ngIf="item.is_service==1">SAC:{{ item.hsn_sac }}</small>
+                                                    </label>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer pull-left">
+                <button data-dismiss="modal" title="" class="bttn bttn-theme">Add Items</button>
+                <button #closeAddItem data-dismiss="modal" title="" class="bttn bttn-default">Cancel</button>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<div #gstinModal *ngIf="gstin=='1'" class="modal fade" id="newItemPop" role="dialog" data-backdrop="static" data-keyboard="false">
+    <form [formGroup]="itemForm" class="modal-dialog" (ngSubmit)="addItem()" style="max-height: 655px;overflow:auto">
+        <div class="modal-content {{itemFormLoader}}">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Item</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-item-type">
+                    <p-radioButton name="types" value="0" formControlName="type" label="Product"></p-radioButton>
+                    <p-radioButton name="types" value="1" formControlName="type" label="Service"></p-radioButton>
+                </div>
+                <div class="modal-item-name">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label *ngIf="itemForm._value.type != '1'">Item's name</label>
+                                <label *ngIf="itemForm._value.type == '1'">Service name</label>
+                                <input type="text" class="form-control" formControlName="name">
+                                <div *ngIf="itemForm.controls['name'].hasError('required') && (itemForm.controls['name'].dirty || itemForm.controls['name'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-item-type">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label *ngIf="itemForm._value.type != '1'">Item Type</label>
+                                <label *ngIf="itemForm._value.type == '1'">Service type</label>
+                                <input type="text" class="form-control" formControlName="hsn_sac_type">
+                                <div *ngIf="itemForm.controls['hsn_sac_type'].hasError('required') && (itemForm.controls['hsn_sac_type'].dirty || itemForm.controls['hsn_sac_type'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-item-type">
+                    <div class="row">
+
+                        <div class="col-md-12" *ngIf="itemForm._value.type == '1'; else other">
+                            <div class="form-group findSac">
+                                <label>Enter SAC Code</label>
+                                <!-- <p-autoComplete formControlName="hsn_sac_code" field="sac_code" [suggestions]="saccode" (completeMethod)="searchSacCode($event)"
+                                    (onSelect)="getSacCodeDetails($event)"></p-autoComplete> -->
+                                <input type="text" class="form-control" formControlName="hsn_sac_code">
+                                <a (click)="listSACCode()" class="find-hsn">Find SAC Code</a>
+                                <span #openSACModel data-target="#modalSac1" data-toggle="modal"></span>
+                                <div *ngIf="itemForm.controls['hsn_sac_code'].hasError('required') && (itemForm.controls['hsn_sac_code'].dirty || itemForm.controls['hsn_sac_code'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <ng-template #other>
+                        <div class="col-md-12" *ngIf="itemForm._value.type == '0'">
+                            <div class="form-group findHsn">
+                                <label>Enter HSN Code</label>
+                                <!-- <p-autoComplete formControlName="hsn_sac_code" [suggestions]="hsncode" field="description" (completeMethod)="searchsHsnCode($event)"
+                                    (onSelect)="getHsnCodeDetails($event)"></p-autoComplete> -->
+                                <input type="text" class="form-control" formControlName="hsn_sac_code">
+                                <a (click)="listHSNCode()" class="find-hsn">Find HSN Code</a>
+                                <span #openHSNModel data-target="#modalHsn1" data-toggle="modal"></span>
+                                <div *ngIf="itemForm.controls['hsn_sac_code'].hasError('required') && (itemForm.controls['hsn_sac_code'].dirty || itemForm.controls['hsn_sac_code'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+
+                            </div>
+                        </div>
+                    </ng-template>
+
+                </div>
+
+                <div class="modal-item-code">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label *ngIf="itemForm._value.type != '1'">Item Code / SKU Code</label>
+                                <label *ngIf="itemForm._value.type == '1'">Service Code / SKU Code</label>
+                                <input type="text" class="form-control" formControlName="item_code">
+                                <div *ngIf="itemForm.controls['item_code'].hasError('required') && (itemForm.controls['item_code'].dirty || itemForm.controls['item_code'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-description">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" name="" class="form-control" formControlName="desc">
+                                <div *ngIf="itemForm.controls['desc'].hasError('required') && (itemForm.controls['desc'].dirty || itemForm.controls['desc'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-Rate">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group rupees">
+                                <label>Rate</label>
+                                <input type="text" class="form-control" formControlName="rate" placeholder="">
+                                <div *ngIf="itemForm.controls['rate'].hasError('required') && (itemForm.controls['rate'].dirty || itemForm.controls['rate'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pl-zero">
+                            <div class="gst-percentage">
+                                <div class="form-group">
+                                    <label>GST(%)</label>
+                                    <p-dropdown [options]="gstrates" formControlName="gst">
+                                    </p-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-taxes">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group additinalTax">
+                                <label>Additional Taxes</label>
+                                <p-multiSelect [options]="tax_arr" formControlName="selecetedTaxes">
+                                    <!-- <ng-template let-tax pTemplate="item">
+                                        <div>{{tax.tax_name}}</div>
+                                    </ng-template> -->
+                                </p-multiSelect>
+                            <!-- <a class="grey-help-circle" style="position:absolute!important;">i</a> -->
+                            
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <ul>
+                    <li>
+                        <button type="submit" class="bttn bttn-theme">Add Item</button>
+                    </li>
+                    <li>
+                        <span (click)="closeAddNewItemModelfnReset()"></span>
+                        <button #closeAddNewItemModel class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="gstin=='0'" class="modal fade" id="newItemNonGst" role="dialog" data-backdrop="static" data-keyboard="false">
+    <form [formGroup]="itemFormNonGst" (ngSubmit)="addItemNonGst()" class="modal-dialog" style="max-height: 655px;overflow:auto">
+
+        <div class="modal-content  {{itemFormLoader}}">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Item</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-item-name">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Item name </label>
+                                <input type="text" class="form-control" formControlName="item_name">
+                                <div *ngIf="itemFormNonGst.controls['item_name'].hasError('required') && (itemFormNonGst.controls['item_name'].dirty || itemFormNonGst.controls['item_name'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-item-type">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Item Type</label>
+                                <input type="text" class="form-control" formControlName="custom_item_type">
+                                <div *ngIf="itemFormNonGst.controls['custom_item_type'].hasError('required') && (itemFormNonGst.controls['custom_item_type'].dirty || itemFormNonGst.controls['custom_item_type'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-item-code">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Item / SKU Code</label>
+                                <input type="text" class="form-control" formControlName="item_code">
+                                <div *ngIf="itemFormNonGst.controls['item_code'].hasError('required') && (itemFormNonGst.controls['item_code'].dirty || itemFormNonGst.controls['item_code'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-description">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" class="form-control" formControlName="description">
+                                <div *ngIf="itemFormNonGst.controls['description'].hasError('required') && (itemFormNonGst.controls['description'].dirty || itemFormNonGst.controls['description'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-Rate">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group rupees">
+                                <label>Rate</label>
+                                <input type="text" class="form-control" formControlName="price">
+                                <div *ngIf="itemFormNonGst.controls['price'].hasError('required') && (itemFormNonGst.controls['price'].dirty || itemFormNonGst.controls['price'].touched)"
+                                    class="error">
+                                    This Field is Required.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <ul>
+                    <li>
+                        <button type="submit" class="bttn bttn-theme">Add Item</button>
+                    </li>
+                    <li>
+                        <button #closeAddNewItemModel class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>

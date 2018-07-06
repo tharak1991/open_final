@@ -1,0 +1,712 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+	<p>{{warning_message}}</p>
+	<a (click)="hideWarning()" title="close" class="closeWarn">
+		<img src="assets/icons/cancel_white.svg" alt="">
+	</a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+	<span>
+		<em class="iconToast"></em>
+		<span class="toastMessage">{{http_message}}</span>
+	</span>
+</div>
+<section class="main-body inPartially">
+	<div class="content">
+		<div class="container-fluid">
+			<div class="wraper">
+				<div class="dashboardAccount {{InvoiceLoader}}">
+					<div class="dashboardAccountDetails">
+						<ul>
+							<li>
+								<a [routerLink]="['/invoices']">Invoices </a>
+							</li>
+							<li>
+								<span class="inNumber">#{{invoice_data.invoice_sequence_id}}</span>
+							</li>
+						</ul>
+						<h2>Invoice #{{invoice_data.invoice_sequence_id}}
+							<span *ngIf="invoice_data.invoice_statuses_id==1">Pending</span>
+							<span *ngIf="invoice_data.invoice_statuses_id==2">Payment Due</span>
+							<span *ngIf="invoice_data.invoice_statuses_id==3">Paid</span>
+							<span *ngIf="invoice_data.invoice_statuses_id==4">Partially Paid</span>
+							<span *ngIf="invoice_data.invoice_statuses_id==5">Overdue</span>
+							<span *ngIf="invoice_data.invoice_statuses_id==6">Cancelled</span>
+						</h2>
+					</div>
+					<div class="dashboardAccountBalance">
+						<div class="pageTips-dropdown" id="panel">
+							<!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+							<div class="white-Box {{toggle_class}}">
+								<h3>Page Tips</h3>
+								<span class="cross" (click)="toggleTips()">
+									<img src="assets/icons/close.png" alt="">
+								</span>
+								<div class="white-Box-Inner">
+									<ul class="pageTips-list">
+										<li>
+											<a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+										</li>
+										<li>
+											<a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a>
+										</li>
+										<li>
+											<a href="#">Nam condimentum vitae ligula vel ornare?</a>
+										</li>
+										<li>
+											<a href="#">Phasellus at semper turpis. Nunc eu tellus tortor. Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim
+												nunc?
+											</a>
+										</li>
+										<li>
+											<a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a>
+										</li>
+										<li>
+											<a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a>
+										</li>
+										<li>
+											<a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<ul class="pageTipslist">
+							<li>
+								<a href="{{inv_download_link}}" title="Download" download class="bttn bttn-default btn-custom-sm">
+									Download</a>
+							</li>
+							<li>
+								<a (click)="print_pdf(inv_download_link)" title="Print" class="bttn bttn-default btn-custom-xs">Print</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="secDashMain">
+					<div class="rightBtns">
+						<ul>
+							<li>
+								<a *ngIf="invoice_data.invoice_statuses_id!=4 && invoice_data.invoice_statuses_id!=3 && invoice_data.invoice_statuses_id!=6"
+								    [routerLink]="['/edit-invoice/',invoice_data.id]" title="Edit" class="bttn bttn-theme">Edit</a>
+							</li>
+							<li>
+								<a *ngIf="invoice_data.invoice_statuses_id!=6 && invoice_data.invoice_statuses_id!=3" title="Mark Payment" (click)="OnClickMarkPayment(invoice_data)"
+								    class="bttn bttn-theme">Mark Payment</a>
+							</li>
+							<li>
+								<a *ngIf="invoice_data.invoice_statuses_id!=6 && invoice_data.invoice_statuses_id!=3 && invoice_data.invoice_statuses_id!=1"
+                                 title="Send Reminder" data-toggle="modal" data-target="#sendReminder" class="bttn bttn-theme">Send Reminder</a>
+                                <a *ngIf="invoice_data.invoice_statuses_id==1" [routerLink]="['/send-invoice',invoice_data.id]" title="Send Invoice" class="bttn bttn-theme">Send Invoice</a>
+							</li>
+							<li>
+								<a *ngIf="invoice_data.invoice_statuses_id!=4 && invoice_data.invoice_statuses_id!=3 && invoice_data.invoice_statuses_id!=6"
+								    title="Cancel Invoice" data-toggle="modal" data-target="#cancelInvoice" class="bttn bttn-theme">Cancel Invoice</a>
+							</li>
+							<li>
+								<a *ngIf="invoice_data.invoice_types_id==3 && invoice_data.invoice_statuses_id!=6 && invoice_data.recurrence_pending!=0"
+								    title="Stop Recurrence" data-toggle="modal" data-target="#stopRecurringInvoice" class="bttn bttn-theme">Stop Recurrence</a>
+							</li>
+						</ul>
+					</div>
+					<div class="secLeftDashMain {{InvoiceLoader}}">
+						<div class="bill-address">
+							<ul>
+								<li>
+									<h5>Invoice To</h5>
+									<p>{{inv_contact_data.name}}</p>
+								</li>
+								<li>
+									<h5>Billing Address</h5>
+									<p>{{inv_contact_billing.address_line }},</p>
+									<p>{{inv_contact_billing.city}},</p>
+									<p>{{inv_contact_billing.state}}, {{inv_contact_billing.pincode}}</p>
+									<p class="mMail">{{inv_contact_data.email_id}}</p>
+								</li>
+								<li>
+									<div class="amountPaid">
+										<ul>
+											<li class="billPadding">
+												<div class="gry-box">
+													<span>Invoice Amount</span>
+													<p class="price">{{invoice_data.net_total_after_taxes|currency:'INR':true}}</p>
+												</div>
+											</li>
+											<li class="billPadding">
+												<div class="gry-box">
+													<span>Amount Paid</span>
+													<p class="price">{{invoice_data.net_total_after_taxes - invoice_data.total_amount_due | currency:'INR':true}}</p>
+												</div>
+											</li>
+											<li class="billPadding">
+												<div class="gry-box">
+													<span>Balance Amount</span>
+													<p class="price">{{invoice_data.total_amount_due|currency:'INR':true}}</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+									<div class="amountPaidzone">
+										<ul>
+											<li *ngIf="invoice_data.invoice_types_id==3" class="billPaddingzone">
+												<div class="wht-box">
+													<span>Frequency</span>
+													<p class="price">{{invoice_frequency.frequency_name}}</p>
+												</div>
+											</li>
+											<li *ngIf="invoice_data.invoice_types_id==3" class="billPaddingzone">
+												<div class="wht-box">
+													<span>Recurrence Completed</span>
+													<p class="price">{{invoice_data.recurrence_completed || '-'}}</p>
+												</div>
+											</li>
+											<li *ngIf="invoice_data.invoice_types_id==3" class="billPaddingzone">
+												<div class="wht-box">
+													<span>Recurrence Pending</span>
+													<p class="price">{{invoice_data.recurrence_pending || '-'}}</p>
+												</div>
+											</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+
+						<div class="secFive">
+							<div class="div5">
+								<p>Invoice Type</p>
+								<span *ngIf="invoice_data.invoice_types_id==1">One Time</span>
+								<span *ngIf="invoice_data.invoice_types_id==3">Recurring</span>
+
+							</div>
+
+							<div class="div5">
+								<p>Category</p>
+								<span>{{inv_category.category_name}}</span>
+							</div>
+
+							<div class="div5">
+								<p>Invoice Date</p>
+								<span>{{invoice_data.start_date | date:'d/MM/y'}}</span>
+							</div>
+
+							<div class="div5">
+								<p>Due Date</p>
+								<span>{{invoice_data.due_date | date:'d/MM/y'}}</span>
+							</div>
+
+							<div class="div5">
+								<p>Ref. ID</p>
+								<span *ngIf="invoice_data.invoice_user_input_reference_id!=null">{{invoice_data.invoice_user_input_reference_id}}</span>
+								<span *ngIf="invoice_data.invoice_user_input_reference_id==null">-</span>
+
+							</div>
+						</div>
+
+						<div class="table-content table-responsive">
+							<table class="table invoice-table">
+								<thead class="invoice-table-header">
+									<tr align="middle">
+										<th class="width-1">#</th>
+										<th class="width-15">Item Name</th>
+										<th class="width-15">Item Type</th>
+										<th class="width-7">Qty</th>
+										<th class="width-7">Unit</th>
+										<th class="width-7">Rate/unit</th>
+										<th class="width-7">Discount</th>
+										<th class="width-7">GST (%)</th>
+										<th class="width-7">Amount
+											<span class="sm-size">Excluding Tax</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr *ngFor="let it of inv_item_data; let i = index">
+										<td>{{i+1}}</td>
+										<td>{{it.item.data.item_name}}
+											<span>{{it.item.data.item_code}}</span>
+										</td>
+										<td>{{it.item.data.custom_item_type}}
+											<span *ngIf="it.item.data.hsn_sac_code!=''">HSN: {{it.item.data.hsn_sac_code}}</span>
+										</td>
+										<td>{{it.quantity}}</td>
+										<td>{{it.units}}</td>
+										<td>{{it.item.data.price | currency:'INR':true}}</td>
+										<td>{{it.discount_amount | currency:'INR':true}}</td>
+										<td>
+											<span *ngIf="it.item.data.gst_perc!=null">{{it.item.data.gst_perc}}%</span>
+											<span *ngIf="it.item.data.gst_perc==null">0%</span>
+										</td>
+										<td class="pull-right" width="120px" style="text-align:right; padding-right:45px!important;">{{it.net_amount | currency:'INR':true}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="lower-section">
+							<div class="row">
+								<div class="col-md-8">
+								</div>
+								<div class="col-md-4">
+									<div class="invoice-total">
+										<div class="sub-total">
+											<div class="row">
+												<div class="col-md-8">
+													<span>Sub Total</span>
+												</div>
+												<div class="col-md-4">
+													<span class="pull-right">
+														{{invoice_data.net_total|currency:'INR':true}}
+													</span>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-8">
+													<span>GST</span>
+												</div>
+												<div class="col-md-4">
+													<span class="pull-right">
+														{{invoice_data.gst_value|currency:'INR':true}}
+													</span>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-8">
+													<span>Additional Charges
+														<span>eg: Shipping/ Convenience etc.</span>
+													</span>
+												</div>
+												<div class="col-md-4">
+													<span class="pull-right">
+														{{invoice_data.additional_charge|currency:'INR':true}}
+													</span>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-8">
+													<span>Adjustments
+														<a class="grey-help-circle">i</a>
+													</span>
+												</div>
+												<div class="col-md-4">
+													<span class="pull-right">
+														{{invoice_data.adjustment_value|currency:'INR':true}}
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="amt-due">
+										<div class="row">
+											<div class="col-md-6">
+												<span>Total Amount</span>
+											</div>
+											<div class="col-md-6">
+												<span class="pull-right">
+													<strong>{{invoice_data.total_amount_due|currency:'INR':true}}</strong>
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="notesTags">
+							<div class="col-sm-6">
+								<h5>Notes</h5>
+								<p>{{invoice_data.note || '-'}}</p>
+							</div>
+							<div class="col-sm-6">
+								<div class="paymentDetailsTags" *ngIf="inv_tags.length > 0">
+									<h3>Tags &amp; Notes</h3>
+									<ul class="listTags">
+										<li *ngFor="let tag of inv_tags">
+											<span>{{tag.tags.data.tag_name}}</span>
+										</li>
+									</ul>
+								</div>
+								<div class="Attachments" *ngIf="inv_attachments.length > 0">
+									<h3>Attachments</h3>
+									<ul>
+										<li *ngFor="let af of inv_attachments">
+											<a title="" *ngIf="af.files.data.length > 0">
+												<img src="assets/icons/file.svg"> {{af.files.data[0].original_file_name}}
+											</a>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div class="modal fade" id="sendReminder" role="dialog">
+	<div class="modal-dialog sendReminderPopup">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">Send Reminder</h2>
+			</div>
+			<div class="modal-body">
+				<form [formGroup]="sendReminder" (ngSubmit)="onSubmitSendReminder()">
+					<div class="sendinvoice-rightsec">
+						<div class="company-id">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+										<input class="form-control" ngModel="{{inv_contact_data.email_id}}" formControlName="login" placeholder="To: " type="text">
+										<div *ngIf="sendReminder.controls['login'].hasError('required') && (sendReminder.controls['login'].dirty || sendReminder.controls['login'].touched)"
+										    class="error">
+											This Field is Required.
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="company-name">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+										<input class="form-control" formControlName="email_subject" placeholder="Subject: " ngModel="{{sendReminderSubj}}" type="text">
+										<div *ngIf="sendReminder.controls['email_subject'].hasError('required') && (sendReminder.controls['email_subject'].dirty || sendReminder.controls['email_subject'].touched)"
+										    class="error">
+											This Field is Required.
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="company-request">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+										<textarea formControlName="email_body" class="form-control"></textarea>
+										<div *ngIf="inv_reminder_attachments.length > 0" class="pAbsolute">
+											<span class="attachfileshowCase" *ngFor="let file of inv_reminder_attachments, let i = index">
+												<a *ngIf="file.files.data.length > 0" class="attachedLink" href="{{file.files.data[0].url}}" title="">{{file.files.data[0].url}}
+													<!--{{file.files.data[0].url}}-->
+												</a>
+												<a class="attachedRemove pull-right" (click)="delteOtherFiles(file)" title="Delete">
+													<img src="assets/icons/canel_icon.svg">
+												</a>
+											</span>
+										</div>
+										<div *ngIf="sendReminder.controls['email_body'].hasError('required') && (sendReminder.controls['email_body'].dirty || sendReminder.controls['email_body'].touched)"
+										    class="error">
+											This Field is Required.
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+						<div class="sendinvoice-footer">
+							<ul>
+								<li>
+									<input class="bttn bttn-theme" value="Send Reminder" type="submit">
+								</li>
+								<li>
+									<a class="bttn bttn-default" data-dismiss="modal" #sendreminderclose title="">Cancel</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div *ngIf="showMarkPopup">
+	<span data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#markPayment" #markPayment></span>
+	<div class="modal fade" id="markPayment" role="dialog">
+		<span data-dismiss="modal" #closeMarkPaymentModal></span>
+		<div class="modal-dialog markPopup {{loaderClassPopup}} {{toggle_classTips}}">
+			<div class="modal-content">
+
+				<div class="modal-body">
+
+					<div class="modalUnder">
+						<h2 class="modal-title text-left">Mark Payment</h2>
+						<a title="" (click)="toggleTipsMark()" class="toolTip">
+							<img src="assets/icons/tooltip.svg" alt="tooltip">
+						</a>
+						<div class="markInvoiceBox">
+							<div class="markInvoiceInfo">
+								<ul>
+									<li>
+										<span class="makInvoicelabel">Invoice #</span>
+										<span class="markInvoiceValue">{{invoice_data.invoice_sequence_id}}</span>
+									</li>
+									<li>
+										<span class="makInvoicelabel">Invoice Date</span>
+										<span class="markInvoiceValue">{{invoice_data.start_date|date:'d/MM/y'}}</span>
+									</li>
+									<li>
+										<span class="makInvoicelabel">Due Date</span>
+										<span class="markInvoiceValue">{{invoice_data.due_date|date:'d/MM/y'}}</span>
+									</li>
+									<li>
+										<span class="makInvoicelabel">Invoice To</span>
+										<span class="markInvoiceValue">{{invoice_data.contact.data.name}}</span>
+									</li>
+									<li>
+										<span class="makInvoicelabel">Ref. ID</span>
+										<span class="markInvoiceValue">{{invoice_data.invoice_user_input_reference_id}}</span>
+									</li>
+									<li>
+										<span class="makInvoicelabel">Invoice Amount</span>
+										<span class="markInvoiceValue price">
+											<strong>{{invoice_data.total_amount_due | currency:'INR':true}}</strong>
+										</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<ul class="markPaymentsTableNav">
+							<li [class]="(markPaymentType=='online')?'active':''">
+								<button (click)="changeMarkPaymentType('online')" class="bttn bttn-default">Online</button>
+							</li>
+							<li [class]="(markPaymentType=='offline')?'active':''">
+								<button (click)="changeMarkPaymentType('offline')" class="bttn bttn-default">Offline</button>
+							</li>
+						</ul>
+
+						<div class="markPaymentsTableBox" *ngIf="markPaymentType=='online'">
+							<form #f="ngForm" (ngSubmit)="onSubmitMarkPayment(f.value,f.valid)" novalidate>
+								<div class="markPaymentsTableButtons"></div>
+								<div class="markPaymentsTable">
+									<table>
+										<tr>
+											<th>Date</th>
+											<th>Txn Amount</th>
+											<th>Available Balance</th>
+											<th>Allocate Amount</th>
+										</tr>
+										<tr *ngFor="let mp of externalPaymentData; let i = index">
+											<td>{{mp.paid_at | date:'d/MM/y'}}</td>
+											<td>{{mp.amount | currency:'INR':true}}</td>
+											<td>{{mp.balance_amount_to_be_tagged | currency:'INR':true}}</td>
+											<td>
+												<div class="form-group">
+													<input type="number" (keyup)="calculateAllocatedAmt(invoice_data.total_amount_due,mp,allocated_amt_tagged.value)" min="0"
+													    class="form-control" name="allocated_amt_tagged_{{i}}" #allocated_amt_tagged="ngModel" [(ngModel)]="user.allocated_amt_tagged[i]"
+													    required>
+													<div [hidden]="!(allocated_amt_tagged.value > mp.balance_amount_to_be_tagged)" class="error" #hiddenError>
+														Enter an amount less than the available balance.
+													</div>
+													<div [hidden]="allocated_amt_tagged.valid || (allocated_amt_tagged.pristine && !f.submitted)" class="error">
+														Amount is required.
+													</div>
+												</div>
+											</td>
+										</tr>
+									</table>
+									<div class="markPaymentsTableTotal">
+										<div class="form-group" *ngIf="errorAmt==''">
+											<p>
+												<strong>{{totalAmtForMarkPayment | currency:'INR':true:'1.0-1'}}</strong>
+											</p>
+										</div>
+										<div class="form-group" *ngIf="errorAmt!=''">
+											<p>
+												<strong>{{errorAmt | currency:'INR':true:'1.0-1'}}</strong>
+											</p>
+											<div class="error">Allocated amount is more than the Invoice Amount</div>
+										</div>
+									</div>
+								</div>
+								<div class="markPaymentsTableFooter">
+									<a class="bttn bttn-default" (click)="closeModalMarkPayment()">Cancel</a>
+									<button class="bttn bttn-theme" [disabled]="!(f.valid) || (errorAmt!='') || (totalAmtForMarkPayment <= 0) || (allocatedAmtTagged)">Save Details</button>
+								</div>
+							</form>
+						</div>
+
+						<div class="markPaymentsTableBox" *ngIf="markPaymentType=='offline'">
+							<form [formGroup]="markPaymentOfflineForm" (ngSubmit)="onSubmitMarkPaymentOffline()" novalidate>
+								<div class="markPaymentsTableButtons"></div>
+								<div class="markPaymentsTable">
+									<table>
+										<tr>
+											<th>Date</th>
+											<th>Mode of Payment</th>
+											<th>Remarks</th>
+											<th>Amount</th>
+										</tr>
+										<tr>
+											<td>
+												<div class="form-group">
+													<p-calendar placeholder="yyyy/mm/dd" dateFormat="yy-mm-dd" formControlName="paid_at" [monthNavigator]="true" [yearNavigator]="true"
+													    yearRange="1970:2030"></p-calendar>
+												</div>
+											</td>
+											<td>
+												<div class="form-groupNew">
+													<p-dropdown [options]="modeofpayment" formControlName="mode_of_payment" [autoWidth]="false" placeholder="Select"></p-dropdown>
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<input type="text" class="form-control" formControlName="remarks" placeholder="Add Remarks" />
+												</div>
+											</td>
+											<td>
+												<div class="form-group">
+													<input type="number" class="form-control" formControlName="invoice_amount_tagged" min="0" #invoice_amount_tagged placeholder="Amount"
+													    (keyup)="calculateAllocatedAmtOffline(invoice_data.total_amount_due,invoice_amount_tagged.value)" />
+												</div>
+											</td>
+										</tr>
+									</table>
+									<div class="markPaymentsTableTotal">
+										<div class="form-group" *ngIf="errorAmtOffline==''">
+											<p>
+												<strong>{{totalAmtForMarkPaymentOffline | currency:'INR':true:'1.0-1'}}</strong>
+											</p>
+										</div>
+										<div class="form-group" *ngIf="errorAmtOffline!=''">
+											<p>
+												<strong style="color:red">{{errorAmtOffline | currency:'INR':true:'1.0-1'}}</strong>
+											</p>
+											<div class="error">Allocated amount is more than the Invoice Amount</div>
+										</div>
+									</div>
+								</div>
+								<div class="markPaymentsTableFooter">
+									<a class="bttn bttn-default" (click)="closeModalMarkPayment()">Cancel</a>
+									<button class="bttn bttn-theme" [disabled]="!(markPaymentOfflineForm.valid) || errorAmtOffline!=''">Save Details</button>
+								</div>
+							</form>
+						</div>
+
+					</div>
+					<div *ngIf="toggle_classTips!=''" class="toolTipbox">
+						<a (click)="toggleTipsMark()" title="cancel" class="closeTooltip">
+							<img src="assets/icons/cancel_black.svg" alt="close">
+						</a>
+						<p>
+							<b>Online Transactions</b> This will give you a view of all the fund in flow that has happened Online to your Open Account
+						</p>
+						<p>
+							<b>Offline Transactions</b> This will give you a view of all the fund in flow that has happened Offline to your Open
+							Account
+						</p>
+						<p>
+							<b>Allocate amount</b> You can allocate this specific amount in full or partially to the invoice that you have raised
+							to the specific customer. </p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="confirm_markpayment" role="dialog">
+	<span data-toggle="modal" data-target="#confirm_markpayment" #openmarkconfirm></span>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title text-center">Mark Payment</h2>
+			</div>
+			<div class="modal-body text-center">
+				<span class="p-d-0">Once invoice is marked paid, it cannot be reversed. Do you want to proceed ?</span>
+			</div>
+			<div class="sendinvoice-footer dib w-100 text-center m-b-30 m-t-35">
+				<ul class="dib">
+					<li>
+						<button (click)="confirmMarkpayment(markPaymentType)" class="bttn bttn-theme btn-custom-xs">Confirm</button>
+					</li>
+					<li>
+						<a class="bttn bttn-default btn-custom-xs" data-dismiss="modal" title="Cancel" #cancelmarkconfirm>Cancel</a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="cancelInvoice" role="dialog">
+	<div class="modal-dialog {{ popupLoader }}">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">Cancel Invoice</h2>
+			</div>
+			<div class="modal-body">
+				<span>
+					Are you sure to cancel the invoice #{{invoice_data.invoice_sequence_id}} to {{inv_contact_data.name}}
+				</span>
+			</div>
+			<div class="sendinvoice-footer">
+				<ul>
+					<li>
+						<button (click)="OnClickCancelInvoice()" class="bttn bttn-theme">Confirm</button>
+					</li>
+					<li>
+						<a class="bttn bttn-default" data-dismiss="modal" title="Cancel" #cancelInvoice>Cancel</a>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div *ngIf="invoice_data.invoice_types_id==3" class="modal fade" id="stopRecurringInvoice" role="dialog">
+	<div class="modal-dialog {{ popupLoader }}">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title text-center">Stop Recurrence</h2>
+			</div>
+			<div class="modal-body">
+				<div class="markInvoiceBox">
+					<div class="markInvoiceInfo">
+						<ul>
+							<li>
+								<span class="makInvoicelable">Invoice # </span>
+								<span class="markInvoiceValue">{{invoice_data.invoice_sequence_id}}</span>
+							</li>
+							<li>
+								<span class="makInvoicelable">Invoice Amount</span>
+								<span class="markInvoiceValue">{{invoice_data.total_amount_due | currency:'INR':true}}</span>
+							</li>
+							<li>
+								<span class="makInvoicelable">Frequency</span>
+								<span class="markInvoiceValue">{{invoice_frequency.frequency_name}}</span>
+							</li>
+							<li>
+								<span class="makInvoicelable">Start Date</span>
+								<span class="markInvoiceValue">{{invoice_data.start_date}}</span>
+							</li>
+							<li>
+								<span class="makInvoicelable">Completed</span>
+								<span class="markInvoiceValue">{{invoice_data.recurrence_completed}}</span>
+							</li>
+							<li>
+								<span class="makInvoicelable">Pending</span>
+								<span class="markInvoiceValue">{{invoice_data.recurrence_pending}}</span>
+							</li>
+
+						</ul>
+					</div>
+					<div class="form-group">
+						<p-checkbox (onChange)="toggleStopRecurrence($event)" binary="true"></p-checkbox>
+						<p class="after-checkbox">I confirm to stop the recurrence of this invoice</p>
+					</div>
+					<div class="markPaymentsTableFooter">
+						<button (click)="stopRecurring()" class="bttn bttn-theme" [disabled]="!stopRecurrence">Stop Recurrence</button>
+						<a data-dismiss="modal" class="bttn bttn-default" title="Close" #cancelStopRecurring>Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

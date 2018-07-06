@@ -1,0 +1,359 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+  <span>
+    <em class="iconToast"></em>
+    <span class="toastMessage">{{http_message}}</span>
+  </span>
+</div>
+<article>
+  <section class="main-body makePayment">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="dashboardAccount">
+
+            <ul class="default-breadcrumb">
+              <li>
+                <a [routerLink]="['/receive']">Receive</a>
+              </li>
+              <li>Quick Collect</li>
+            </ul>
+            <div class="pageTips-dropdown" id="panel">
+              <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()">
+                  <img src="assets/icons/close.png" alt="">
+                </span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a>
+                    </li>
+                    <li>
+                      <a href="#">Nam condimentum vitae ligula vel ornare?</a>
+                    </li>
+                    <li>
+                      <a href="#">Phasellus at semper turpis. Nunc eu tellus tortor. Etiam at condimentum nisl, vitae sagittis orci.Donec
+                        id dignissim nunc?</a>
+                    </li>
+                    <li>
+                      <a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                    <li>
+                      <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <h2 class="pageTitle">Quick Collect</h2>
+          </div>
+          <form [formGroup]="quick_collect" (ngSubmit)="onSubmitQuickCollect()">
+            <div class="boxFormCenter">
+              <ul class="{{image_loader}}">
+                <li>
+                  <div class="form-group">
+                    <label>Request To</label>
+                    <p-autoComplete [suggestions]="filteredCustomerSingle" field="name" formControlName="beneficiary_name" (onSelect)="getBeneficiaryDetail($event)"
+                      (completeMethod)="search($event)" placeholder="Enter Beneficiary Name" [dropdown]="true">
+                      <ng-template let-to pTemplate="item">
+
+                        <span *ngIf="to.beneficiary_account_number!='' && to.beneficiary_account_number != null">{{to.name}} - {{to.beneficiary_account_number}}</span>
+                        <span *ngIf="to.beneficiary_account_number!='' && to.beneficiary_account_number == null">{{to.name}} </span>
+
+                        <span *ngIf="to.beneficiary_account_number==''" class="{{to.class}}">{{to.name}}</span>
+                      </ng-template>
+                    </p-autoComplete>
+                    <input type="hidden" formControlName="contacts_id">
+                    <div *ngIf="quick_collect.controls['contacts_id'].hasError('required') && (quick_collect.controls['contacts_id'].dirty || quick_collect.controls['contacts_id'].touched)"
+                      class="error">
+                      Please select valid Customer
+                    </div>
+
+                    <span data-toggle="modal" data-target="#updateBeneficiary" #updateBeneficiarypop></span>
+                    <span data-toggle="modal" data-target="#addNewBeneficiary" #addBeneficiarypop></span>
+                    <span data-toggle="modal" data-target="#acceptonlineModal" #AddeMandate></span>
+
+
+                  </div>
+                </li>
+                <li>
+                  <div class="form-group">
+                    <label>Amount</label>
+                    <input type="text" formControlName="total_amount_due" class="form-control" placeholder="Enter Amount">
+                    <div *ngIf="quick_collect.controls['total_amount_due'].hasError('required') && (quick_collect.controls['total_amount_due'].dirty || quick_collect.controls['total_amount_due'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                    <div *ngIf="quick_collect.controls['total_amount_due'].hasError('pattern')" class="error">
+                      Amount is Not Valid
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="form-group">
+                    <label>Invoice ID (Optional)</label>
+                    <input type="text" formControlName="invoice_user_input_reference_id" class="form-control" placeholder="">
+                  </div>
+                </li>
+                <li>
+                  <div class="form-group">
+                    <label>Purpose (Optional)</label>
+                    <input type="text" formControlName="invoice_note" class="form-control" placeholder="">
+                  </div>
+                </li>
+                <li class="addRecurrence">
+                  <label>
+                    <p-checkbox (onChange)="check_recurrence($event)" formControlName="is_recurring" binary="true">
+                    </p-checkbox>
+                    Add Recurrence
+                    <span class="grey-help-circle">i
+                      <span class="tooltipShowcase" style="top:32px"></span>
+                    </span>
+                  </label>
+                </li>
+
+
+                <li *ngIf="quick_collect.value.is_recurring" class="listHalfthird" style="z-index:9">
+                  <div class="form-group">
+                    <label>Start Date</label>
+                    <p-calendar dateFormat="yy-mm-dd" formControlName="start_date" placeholder="dd/mm/yyyy"></p-calendar>
+                    <div *ngIf="quick_collect.controls['start_date'].hasError('required') && (quick_collect.controls['start_date'].dirty || quick_collect.controls['start_date'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                  </div>
+                </li>
+                <li *ngIf="quick_collect.value.is_recurring" class="listHalfthird" style="z-index:9">
+                  <div class="form-group">
+                    <label>Frequency</label>
+                    <p-dropdown [options]="frequnecy" formControlName="frequencies_id" [autoWidth]="false" placeholder="Select"></p-dropdown>
+                    <div *ngIf="quick_collect.controls['frequencies_id'].hasError('required') && (quick_collect.controls['frequencies_id'].dirty || quick_collect.controls['frequencies_id'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                  </div>
+                </li>
+                <li *ngIf="quick_collect.value.is_recurring" class="listHalfthird" style="z-index:9">
+                  <div class="form-group">
+                    <label>Repeat For</label>
+                    <input type="text" formControlName="repeat_for" class="form-control" placeholder="">
+                    <div *ngIf="quick_collect.controls['repeat_for'].hasError('required') && (quick_collect.controls['repeat_for'].dirty || quick_collect.controls['repeat_for'].touched)"
+                      class="error">
+                      This Field is Required.
+                    </div>
+                  </div>
+                </li>
+                <li *ngIf="quick_collect.value.is_recurring" class="addEmandate">
+                  <label>
+                    <p-checkbox binary="true" formControlName="is_emandate_requested">
+                    </p-checkbox>
+                    Add eMandate
+
+                    <span class="grey-help-circle">i
+                      <span class="tooltipShowcase">Choose this option to enable
+                        <br/> automatic collection of
+                        <br/> payments from your customer</span>
+                    </span>
+
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="footer-btn">
+              <div class="boxFormCenter">
+                <ul class="pull-left">
+                  <li>
+                    <input type="submit" [disabled]="!quick_collect.valid" title="Continue" class="bttn bttn-theme btn-md" value="Continue">
+                  </li>
+                  <li>
+                    <input class="bttn bttn-default" #cancelPayment type="reset" value="Cancel">
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+<div class="modal fade" id="addNewBeneficiary" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClassSubmitBeneficiery}}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Add Customer</h2>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addBeneficiary" (ngSubmit)="onSubmitAddBeneficiary()">
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" formControlName="name" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['name'].hasError('required')  && (addBeneficiary.controls['name'].dirty || addBeneficiary.controls['name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="text" formControlName="email_id" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['email_id'].hasError('required')  && (addBeneficiary.controls['email_id'].dirty || addBeneficiary.controls['email_id'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBeneficiary.controls.email_id.errors?.email" class="error">
+                  Please provide valid email id
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Mobile</label>
+                <input type="text" formControlName="mobile_number" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['mobile_number'].hasError('required')  && (addBeneficiary.controls['mobile_number'].dirty || addBeneficiary.controls['mobile_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBeneficiary.controls['mobile_number'].hasError('pattern')" class="error">
+                  Invalid Phone Number
+                </div>
+              </div>
+            </li>
+
+
+          </ul>
+          <div class="modal-footer">
+            <ul>
+              <li>
+                <input class="bttn bttn-theme" value="Add Beneficiary" [disabled]="!addBeneficiary.valid" type="submit">
+
+              </li>
+              <li>
+                <input #closeAddBeneficiery class="bttn bttn-default" type="reset" value="Cancel" data-dismiss="modal">
+              </li>
+            </ul>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="modal fade" id="updateBeneficiary" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog  {{loaderClassSubmitBeneficiery}}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Update Customer</h2>
+      </div>
+      <div class="modal-body" *ngIf="beneficiary_data">
+        <form [formGroup]="updateBeneficiary" (ngSubmit)="onSubmitUpdateBeneficiary()">
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" formControlName="name" class="form-control" ngModel="{{beneficiary_data.name}}" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['name'].hasError('required')  && (updateBeneficiary.controls['name'].dirty || updateBeneficiary.controls['name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="text" formControlName="email_id" class="form-control" ngModel="{{beneficiary_data.email_id}}" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['email_id'].hasError('required')  && (updateBeneficiary.controls['email_id'].dirty || updateBeneficiary.controls['email_id'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="updateBeneficiary.controls.email_id.errors?.email" class="error">
+                  Please provide valid email id
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Mobile</label>
+                <input type="text" formControlName="mobile_number" class="form-control" ngModel="{{beneficiary_data.mobile_number}}" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['mobile_number'].hasError('required')  && (updateBeneficiary.controls['mobile_number'].dirty || updateBeneficiary.controls['mobile_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="updateBeneficiary.controls['mobile_number'].hasError('pattern')" class="error">
+                  Invalid Phone Number
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div class="modal-footer">
+            <ul>
+              <li>
+                <input class="bttn bttn-theme" value="update Beneficiary" [disabled]="!updateBeneficiary.valid" type="submit">
+
+              </li>
+              <li>
+                <input #closeUpdateBeneficiery class="bttn bttn-default" type="reset" value="Cancel" data-dismiss="modal">
+              </li>
+            </ul>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="acceptonlineModal" class="modal fade" role="dialog">
+  <div class="modal-dialog acceptonline-popup">
+
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="text">
+          <h1>Accept Online Payment</h1>
+          <div class="row">
+            <div class="col-sm-5 pad-left-0">
+              <div class="accept-image">
+                <img src="assets/images/pay-now.svg" alt="">
+                <a title="Pay Now" class="bttn bttn-default">Pay Now</a>
+              </div>
+            </div>
+
+            <div class="col-sm-7 pad-left-0">
+              <p class="first-p">Enabling online payments will improve the chances of getting paid faster. </p>
+              <p class="second-p">By opting this your customers will get a Quick pay button in their mail which will help them to make instant
+                payments via Credit Car Debit Card, Netbanking or Wallets. </p>
+              <p class="third-p">Payment Gateway Charges (3%) are applicable.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div>
+          <input class="bttn bttn-theme" (click)="emandate_requested_submit('true')" type="submit" value="Add Online Payment">
+          <span #closeeMandate data-dismiss="modal"></span>
+          <button type="button" (click)="emandate_requested_submit('false')" class="bttn bttn-default" data-dismiss="modal">Not Now</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,253 @@
+<ng2-slim-loading-bar></ng2-slim-loading-bar>
+<article>
+  <div class="sec-signup">
+    <div class="signup-left">
+      <!-- <span>it work best when you</span>
+      <h1>OPEN UP</h1> -->
+      <div class="logo">
+        <img src="assets/images/logofullwhite.png" alt="logo" title="open-logo">
+      </div>
+    </div>
+    <div class="signup-right">
+      <div class="boxSignin">
+       <form class="signin-form signup-form" [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+          <h1>Sign Up</h1>
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" formControlName="first_name" class="form-control" placeholder="Full name" (blur)="checkLastName($event)"
+                  (keyup)="clearMsgForLastName()">
+                <div *ngIf="registrationForm.controls['first_name'].hasError('required') && (registrationForm.controls['first_name'].dirty || registrationForm.controls['first_name'].touched)"
+                  class="error">
+                  Please provide a valid full name
+                </div>
+                <div *ngIf="registrationForm.controls['first_name'].hasError('maxlength')" class="error">
+                  Please provide a valid full name
+                </div>
+                <div *ngIf="registrationForm.controls['first_name'].hasError('pattern')" class="error">
+                  Please provide a valid full name
+                </div>
+                <div *ngIf="!(last_name_check) && !registrationForm.controls['first_name'].hasError('maxlength') && !registrationForm.controls['first_name'].hasError('pattern')"
+                  class="error">
+                  Last name is required.
+                </div>
+
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" formControlName="email" class="form-control" placeholder="youremail@domain.com" (blur)="checkEmailAvailablity($event)"
+                  (keyup)="clearMsgForEmail()">
+                <div *ngIf="registrationForm.controls['email'].hasError('required') && (registrationForm.controls['email'].dirty || registrationForm.controls['email'].touched)"
+                  class="error">
+                  Please provide valid email id
+                </div>
+                <div *ngIf="registrationForm.controls.email.errors?.email" class="error">
+                  Please provide valid email id
+                </div>
+                <div *ngIf="!email_check" class="error">
+                  Already associated with a different account.
+                </div>
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text" maxlength ="10" formControlName="username" class="form-control inputMobile" placeholder="10 digit number" (blur)="checkMobileAvailablity($event)"
+                  (keyup)="clearMsgForUsername()">
+                <span class="country-code">+91</span>
+                <div *ngIf="registrationForm.controls['username'].hasError('required') && (registrationForm.controls['username'].dirty || registrationForm.controls['username'].touched)"
+                  class="error">
+                  Mobile number cannot be empty.
+                </div>
+                <div *ngIf="registrationForm.controls['username'].hasError('pattern')" class="error">
+                  Please enter a valid mobile number
+                </div>
+                <div *ngIf="!mobile_check" class="error">
+                  Already associated with a different account.
+                </div>
+              </div>
+            </li>
+            <li class="half pull-right">
+              <div>
+                <label>Business Type</label>
+                <p-dropdown [options]="businees" [autoWidth]="false" placeholder="Select Business" formControlName="business_type"></p-dropdown>
+              </div>
+            </li>
+            <li style="clear: both;">
+              <div class="form-group">
+                <label>Password</label>
+                <input type="{{pass_text}}" formControlName="password" class="form-control" placeholder="Min 8 char, 1 letter & 1 number">
+                <span (click)="viewPassword()" class="show-psw">
+                  <a title="show password">
+                    <img src="assets/icons/{{pass_image}}">
+                  </a>
+                </span>
+                <div *ngIf=" registrationForm.controls['password'].hasError('required') && (registrationForm.controls['password'].dirty || registrationForm.controls['password'].touched)"
+                  class="error">
+                  Please enter a password
+                </div>
+                <div *ngIf="registrationForm.controls['password'].hasError('pattern') && (registrationForm.controls['password'].dirty || registrationForm.controls['password'].touched)"
+                  class="error">
+                  Min 8 char, 1 letter &amp; 1 number
+                </div>
+                <div *ngIf="registrationForm.controls['password'].hasError('maxlength') && !(registrationForm.controls['password'].hasError('pattern'))"
+                  class="error">
+                  Password too long. Try one with maximum 20 characters.
+                </div>
+                <div class="error">{{error}}</div>
+              </div>
+            </li>
+          </ul>
+          <ul class="db-btn">
+            <li>
+              <button type="submit" [disabled]="!(registrationForm.valid) || !(email_check) || !(mobile_check) || !(last_name_check)" class="bttn bttn-theme btn-md">Sign Up</button>
+              <span data-toggle="modal" data-target="#otpverify" #sendotp></span>
+            </li>
+            <li>
+              <a class="pageLinkSign" [routerLink]="['/login']" title="Already Registered?">Already Registered?</a>
+            </li>
+          </ul>
+          <div class="terms-policy">
+            <p>By clicking 'Sign Up', you agree to the</p>
+            <p>
+              <a title="Terms of Service">Terms of Service</a> and
+              <a title="Privacy Policy">Privacy Policy</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</article>
+<!-- Modal -->
+<div class="modal fade" id="otpverify" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClass}}">
+    <span data-dismiss="modal" #closeBtn></span>
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="otp-left">
+          <div class="otp-left-inner">
+            <span>
+              <strong>Payments</strong>Collect payments online using bank transfer or online through GST compliant invoices.</span>
+            <span>
+              <strong>Automatic Accounting</strong> Say no to manual tracking of payments. Automated book-keeping and reconciliation
+              makes accounting seamless.</span>
+            <span>
+              <strong>AppStore</strong> Manage your business better, file GST returns, get access to credit, and many more services
+              in the OPEN AppStore.</span>
+          </div>
+        </div>
+        <div class="otp-right">
+          <div class="otp-right-inner">
+            <h2>OTP Verification</h2>
+            <span>Please enter the OTP that was sent to</span>
+            <span>your registered mobile number</span>
+            <span>{{mobile_number}}
+              <a title="Change" *ngIf="showOtpForm" (click)="hideOtpForm()">Change</a>
+            </span>
+            <div class="boxChangeNumber" *ngIf="!showOtpForm">
+              <form [formGroup]="changeNumberForm" (ngSubmit)="changeNumberFormSubmit()">
+                <div class="form-group">
+                  <input type="text" class="form-control inputMobile" formControlName="newNumber" placeholder="Your 10 digit mobile number"
+                    (keyup)="clearMsg()" (blur)="checkNewMobileAvailablity($event)">
+                  <span class="country-code">+91</span>
+                  <div *ngIf="changeNumberForm.controls['newNumber'].hasError('required') && (changeNumberForm.controls['newNumber'].dirty || changeNumberForm.controls['newNumber'].touched)"
+                    class="error">
+                    Mobile number cannot be empty
+                  </div>
+
+                  <div *ngIf="changeNumberForm.controls['newNumber'].hasError('pattern')" class="error">
+                    Please enter a valid mobile number
+                  </div>
+                  <div *ngIf="!new_mobile_check" class="error">
+                    Already associated with a different account
+                  </div>
+                </div>
+                <div class="form-group">
+                  <input type="submit" [disabled]="!(changeNumberForm.valid) || !(new_mobile_check)" class="bttn bttn-theme btn-xl" value="Update Number"
+                  />
+                </div>
+              </form>
+            </div>
+            <form [formGroup]="otpForm" (ngSubmit)="onSubmitOtp()" *ngIf="showOtpForm">
+              <div class="otpFieldBox">
+                <ul class="otp-number">
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp1 formControlName="otp1" class="form-control" (keyup)="next(otp2,$event)">
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp2 formControlName="otp2" class="form-control" (keyup)="next(otp3,$event)">
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp3 formControlName="otp3" class="form-control" (keyup)="next(otp4,$event)">
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp4 formControlName="otp4" class="form-control" (keyup)="next(otp5,$event)">
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp5 formControlName="otp5" class="form-control" (keyup)="next(otp6,$event)">
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="otp-number-box">
+                      <div class="form-group">
+                        <input type="number" #otp6 formControlName="otp6" class="form-control" (keyup)="next(sub,$event)">
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+
+                <div *ngIf="invalid_otp" class="error otpError">
+                  Invalid OTP.
+                </div>
+              </div>
+
+              <p>
+                <input type="submit" #sub [disabled]="!otpForm.valid" class="bttn bttn-theme btn-xl" value="Verify" />
+              </p>
+            </form>
+            <div *ngIf="showTimer">
+
+              <div class="loader-box" *ngIf="timer_status==0">
+                <figure class="chart" data-percent="100">
+                  <svg width="40" height="40">
+                    <circle class="outer" cx="170" cy="21" r="18" transform="rotate(-90, 95, 95)" />
+                  </svg>
+                </figure>
+                <span>{{timer}}</span>
+              </div>
+
+              <span class="received-otp" *ngIf="timer_status==1">
+                Haven't received the OTP?
+                <a (click)="resendOtp()" title="Receive OTP via Call">Receive OTP via Call</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- -->

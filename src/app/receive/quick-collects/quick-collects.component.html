@@ -1,0 +1,306 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<article>
+
+  <section class="main-body paymentListBody">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="m-t-20 c-place lollipopBiz">
+            <ul class="default-breadcrumb">
+              <li>
+                <a [routerLink]="['/receive']">Receive</a>
+              </li>
+              <li>Quick Collects</li>
+            </ul>
+          </div>
+          <div class="receivablesDetails border-left-0 border-bottom">
+            <div class="row">
+              <div class="col-sm-5 border-left-0">
+                <h2 class="r-title">Quick Collects</h2>
+              </div>
+              <div class="col-sm-7">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Total Requests (YTD-FY{{y}})</span>
+                    <h4 class="number">{{meta.total_billed_amount| currency:'INR':true}}</h4>
+                  </div>
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Total Received (YTD-FY{{y}})</span>
+                    <h4 class="number">{{meta.total_received_amount| currency:'INR':true}}</h4>
+                  </div>
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Outstanding (As on Today)</span>
+                    <h4 class="number">{{meta.total_outstanding_amount| currency:'INR':true}}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboardAccount border-bottom-0">
+            <!-- <h2 class="pageTitle headingPadding">Quick Collects</h2> -->
+            <ul class="listTopButtonRight">
+              <li class="benecficaryList">
+                <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                  <input type="text" class="form-control" formControlName="beneficiary_name" placeholder="Search by Customer Name" (keyup)="setRecepientName($event)">
+                  <div (click)="clickedInside($event)">
+                    <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down">
+                      <img alt="" src="assets/icons/opencaret.svg">
+                    </a>
+                    <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                    <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable(type)"></button>
+                    <div class="boxBeneficiarSearch new-box-shadow {{filter_toggle}}">
+                      <div class="boxBeneficiarSearchInner">
+                        <span class="clearAll">
+                          <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                        </span>
+                        <ul>
+                          <li>
+                            <ul class="radioBtnTick">
+
+                              <li>
+                                <p-radioButton name="groupname" value="1" formControlName="search_type"></p-radioButton>
+                                <span>Recieved Id</span>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname" value="2" formControlName="search_type"></p-radioButton>
+                                <span>Invoice Id</span>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <div class="form-group">
+                              <input type="text" formControlName="id" class="form-control">
+                            </div>
+                          </li>
+
+                          <li class="byAmountRadio">
+                            <ul class="radioBtnTick">
+                              <li>
+                                <h4>By Amount</h4>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname1" value="1" formControlName="amount_by"></p-radioButton>
+                                <span>Total Build</span>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname1" value="2" formControlName="amount_by"></p-radioButton>
+                                <span>Outstanding</span>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <div class="form-group half">
+                              <p-dropdown [options]="filter2" formControlName="amount_type" [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <input type="text" class="form-control" formControlName="amount" placeholder="Amount">
+
+                            </div>
+                          </li>
+                          <li>
+                            <ul>
+                              <li>
+                                <h4>By Status</h4>
+                              </li>
+                              <li>
+                                <div class="form-group">
+                                  <p-dropdown [options]="status" formControlName="invoice_statuses_id" [autoWidth]="false"></p-dropdown>
+
+                                </div>
+
+                              </li>
+                            </ul>
+                          </li>
+
+                          <li>
+                            <h4>By Due Date</h4>
+                            <div class="form-group half">
+                              <p-calendar formControlName="due_date_from" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <p-calendar formControlName="due_date_to" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Overdue Days</h4>
+                            <div class="form-group half">
+                              <p-dropdown [options]="filter2" formControlName="overdue_type" [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <input type="text" class="form-control" formControlName="overdue_days" placeholder="NO of days">
+                            </div>
+                          </li>
+                          <li class="formButtons">
+                            <input (click)="preventFn();submitName('2');" type="submit" [disabled]="!filter_form.valid" class="bttn bttn-theme btn-md"
+                              value="Search">
+                            <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </li>
+
+              <li>
+                <a (click)="download()" class="bttn bttn-default" (click)="hrefClick('quick-collects-listing-download-clicked')">Download</a>
+              </li>
+              <li>
+                <p-dropdown [options]="routes" (onChange)="changeRoute($event)" [autoWidth]="false" class="purple-dropdown"></p-dropdown>
+              </li>
+              <!-- <li>
+               <a [routerLink]="['/receive/quick_collect_request']" class="bttn bttn-theme" (click)="hrefClick('quick-collects-new-request-button-clicked')">New Request</a>
+             </li> -->
+
+            </ul>
+          </div>
+          <!-- <div class="pageTips-dropdown" id="panel">
+            <span title="page tips" (click)="toggleTips()">Page Tips</span>
+            <div class="white-Box {{toggle_class}}">
+              <h3>Page Tips</h3>
+              <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+              <div class="white-Box-Inner">
+                <ul class="pageTips-list">
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                  <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                  <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                    Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                  <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                </ul>
+              </div>
+            </div>
+          </div> -->
+          <div class="listTransferBox">
+            <div class="listTransferTable {{TableDataLoader}}">
+              <p-dataTable [value]="data" [responsive]="true">
+
+                <p-column field="id" header="Receive id" [style]="{'width':'17%', 'text-align': 'center'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.id}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="invoice_sequence_id" header="Invoice ID" [style]="{'width':'17%', 'text-align': 'center', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.invoice_sequence_id}}</span>
+                  </ng-template>
+                </p-column>
+
+
+                <p-column field="recepient_name" header="Receipient" [style]="{'width':'17%'}">
+                  <ng-template let-beneficiery="rowData" pTemplate="body">
+                    <span class="invoiceListToolTipOuter" *ngIf="beneficiery.contact">{{beneficiery.recepient_name}}
+                      <span class="invoiceListToolTip">
+                        <p>
+                          <strong>{{beneficiery.recepient_name}}</strong>
+                        </p>
+                        <p *ngIf="beneficiery.contact.data.email_id">{{beneficiery.contact.data.email_id}}</p>
+                        <p *ngIf="beneficiery.contact.data.mobile_number">+91 {{beneficiery.contact.data.mobile_number}}</p>
+                      </span>
+                    </span>
+                    <span class="invoiceListToolTipOuter" *ngIf="!beneficiery.contact">-</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column field="net_total_after_taxes" header="Amount" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.net_total_after_taxes| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column field="due_date" header="Due Date" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                </p-column>
+
+                <p-column field="invoice_statuses_id" header="Status" [style]="{'width':'17%'}">
+                  <ng-template let-col let-status="rowData" pTemplate="body">
+                    <span *ngIf="status[col.field]==1">Pending</span>
+                    <span *ngIf="status[col.field]==2" class="">Payment Due</span>
+                    <span *ngIf="status[col.field]==3" class="greenColor">Paid</span>
+                    <span *ngIf="status[col.field]==4" class="yellowColor">Partially Paid</span>
+                    <span *ngIf="status[col.field]==5" class="redColor">Overdue</span>
+                    <span *ngIf="status[col.field]==6" class="defaultColor">Cancelled</span>
+                    <span *ngIf="status[col.field]==7" class="defaultColor">Scheduled</span>
+                  </ng-template>
+                </p-column>
+
+
+                <p-column field="over_due_days" header="Overdue" [style]="{'width':'12%', 'text-align': 'left'}">
+                </p-column>
+
+                <p-column field="total_amount_due" header="Outstanding" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.total_amount_due| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="type!=1" styleClass="col-button" [style]="{'width':'5%'}">
+                  <ng-template pTemplate="header">
+                  </ng-template>
+                  <ng-template let-payment="rowData" pTemplate="body">
+                    <button class="iconoptionTable" type="button" pButton></button>
+                    <!-- <span class="invoiceListOption">
+                      <ul class="invoiceListOptionList">
+                        <li>
+                          <a (click)="paymentDetail(payment,1)" title="">
+                            <img src="assets/icons/greyeye-icon.svg" alt="">
+                            <span>View Details</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a (click)="paymentDetail(payment,2)" title="">
+                            <img src="assets/icons/greyedit-icon.svg" alt="">
+                            <span>Edit</span>
+                          </a>
+                        </li>
+                        <li *ngIf="type==2">
+                          <a (click)="paymentDetail(payment,3)" title="">
+                            <img src="assets/icons/greycancel-icon.svg" alt="">
+                            <span>Cancel Payment</span>
+                          </a>
+                        </li>
+                        <li *ngIf="type==3">
+                          <a (click)="paymentDetail(payment,4)" title="">
+                            <img src="assets/icons/greycancel-icon.svg" alt="">
+                            <span>Stop Recurring</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </span> -->
+                  </ng-template>
+                </p-column>
+
+                <ng-template pTemplate="emptymessage">
+                  <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                    <img src="assets/icons/no_payments.svg" alt="">
+                    <span>
+                      <em>Oops!</em> There's nothing 'ere yet!</span>
+                  </div>
+                </ng-template>
+
+              </p-dataTable>
+              <div class="showingPagination">
+                <span>showing page {{current_page}} of {{total_pages}}</span>
+                <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+                <button *ngIf="previous==''" disabled>Previous</button>
+                <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+                <button *ngIf="next==''" disabled>Next</button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</article>

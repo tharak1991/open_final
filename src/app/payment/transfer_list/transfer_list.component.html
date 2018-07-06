@@ -1,0 +1,544 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+  <!--toastFailed-->
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+
+<article>
+  <section class="main-body paymentListBody">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="dashboardAccount">
+            <!-- <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/payments']">Payments</a></li>
+              <li>Fund Transfer</li>
+            </ul> -->
+            <h2 class="pageTitle headingPadding">Payments</h2>
+            <ul class="listTopButtonRight">
+              <li class="benecficaryList">
+                <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+
+                  <!-- <p-autoComplete formControlName="beneficiary_name" [suggestions]="filteredCustomerSingle" placeholder="Beneficiary Name" field="name"
+                    (completeMethod)="search($event)"></p-autoComplete> -->
+                  <input type="text" class="form-control" formControlName="beneficiary_name" placeholder="Beneficiary Name" (keyup)="setRecepientName($event)">
+
+                  <div (click)="clickedInside($event)">
+                    <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down"><img alt="" src="assets/icons/opencaret.svg"></a>
+                    <!-- <button type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button> -->
+                    <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                    <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable(type)"></button>
+
+
+                    <div class="boxBeneficiarSearch {{filter_toggle}}">
+                      <div class="boxBeneficiarSearchInner">
+                          <span class="clearAll">
+                              <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                          </span>
+                        <ul>
+                          <li>
+                            <ul class="radioBtnTick">
+                              <li>
+                                <h4>By</h4>
+                              </li>
+                              <li>
+                                <p-radioButton (onClick)="check_email_mobile('1')" name="groupname" value="1" formControlName="email_phone" [(ngModel)]="is_email_mobile"></p-radioButton><span>Email</span>
+                              </li>
+                              <li>
+                                <p-radioButton (onClick)="check_email_mobile('2')" name="groupname" value="2" formControlName="email_phone" [(ngModel)]="is_email_mobile"></p-radioButton><span>Mobile</span>
+                              </li>
+                            </ul>
+                            <div class="form-group" *ngIf="is_email_mobile==1">
+                              <input type="text" class="form-control" formControlName="email_id">
+                              <div class="error" *ngIf="filter_form.controls['email_id'].hasError('email') && (filter_form.value.email_id!='')">
+                                  Invalid Email
+                              </div>
+                            </div>
+                            <div class="form-group" *ngIf="is_email_mobile==2">
+                              <input type="text" class="form-control" formControlName="mobile_number">
+                              <div *ngIf="filter_form.controls['mobile_number'].hasError('pattern')" class="error">
+                                Invalid Mobile Number
+                              </div>
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Category</h4>
+                            <div class="form-group">
+                                <p-autoComplete field="name" (onSelect)="preventFn()" formControlName="category_name" [suggestions]="filteredCategorySingle" field="category_name" (completeMethod)="searchCategory($event)"  placeholder="Category">
+                                  </p-autoComplete>
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Payment Date</h4>
+                            <div class="form-group half">
+                              <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                              <a class="search_down"><img alt="" src="assets/icons/opencaret.svg"></a>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                              <a class="search_down"><img alt="" src="assets/icons/opencaret.svg"></a>
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Payment value greater than</h4>
+                            <div class="form-group half rupees">
+                              <input type="text" formControlName="amount" class="form-control" />
+                            </div>
+                          </li>
+                          <li class="formButtons">
+                            <input (click)="preventFn();submitName('2');" type="submit" [disabled]="!filter_form.valid" class="bttn bttn-theme btn-md" value="Search">
+                            <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <li class="paymentAll">
+                <p-dropdown [options]="filter" (onChange)="filter_By_Month($event)" [autoWidth]="false" ></p-dropdown>
+              </li>
+              <li>
+                <a (click)="download()" class="bttn bttn-default" (click)="hrefClick('payment-listing-download-clicked')">Download</a>
+              </li>
+              <li>
+                <a class="bttn bttn-theme" [routerLink]="['/transfer-fund']" (click)="hrefClick('create-payment-btn-clicked')">New Payment</a>
+              </li>
+            </ul>
+          </div>
+          <!-- <div class="pageTips-dropdown" id="panel">
+            <span title="page tips" (click)="toggleTips()">Page Tips</span>
+            <div class="white-Box {{toggle_class}}">
+              <h3>Page Tips</h3>
+              <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+              <div class="white-Box-Inner">
+                <ul class="pageTips-list">
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                  <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                  <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                    Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                  <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                </ul>
+              </div>
+            </div>
+          </div> -->
+          <div class="listTransferBox">
+            <!-- <ul class="listTransferTab">
+              <li>
+                <button (click)="getPayments(1)" class="bttn bttn-default {{classActive1}}">Paid</button>
+              </li>
+              <li>
+                <button (click)="getPayments(2)" class="bttn bttn-default {{classActive2}}">Scheduled</button>
+              </li>
+              <li>
+                <button (click)="getPayments(3)" class="bttn bttn-default {{classActive3}}">Recurring</button>
+              </li>
+            </ul> -->
+            <div class="listTransferTable {{TableDataLoader}}">
+              <p-dataTable [value]="data"  [responsive]="true">
+
+                <p-column field="created_at" header="Date" [style]="{'width':'14%'}" sortable="custom" (sortFunction)="mysort($event)">
+                  <ng-template let-col let-payment="rowData" pTemplate="body">
+                    <span>{{payment[col.field]|date:'d/M/y'}}</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column field="internal_transaction_ref_id" *ngIf="type==1" header="Txn ID" [style]="{'width':'32%'}" sortable="custom" (sortFunction)="mysort($event)">
+                  <ng-template let-Payment_info="rowData" pTemplate="body">
+                    <span>{{Payment_info.internal_transaction_ref_id}}
+
+                    </span>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="type==2" field="start_date" header="Scheduled Date"  [style]="{'width':'20%'}"></p-column>
+                <p-column *ngIf="type==3" field="frequency.data.frequency_name" header="Frequency"  [style]="{'width':'15%'}"></p-column>
+                <p-column *ngIf="type==3" field="repeat_for" header="Installments"  [style]="{'width':'15%'}"></p-column>
+                <p-column field="contact.data.name" header="Beneficiary"  [style]="{'width':'25%'}" >
+                  <ng-template let-beneficiery="rowData" pTemplate="body">
+                    <span class="invoiceListToolTipOuter" *ngIf="beneficiery.contact">{{beneficiery.contact.data.name}}
+                        <span class="invoiceListToolTip">
+                            <p><strong>{{beneficiery.contact.data.name}}</strong></p>
+                            <p *ngIf="beneficiery.contact.data.email_id">{{beneficiery.contact.data.email_id}}</p>
+                            <p *ngIf="beneficiery.contact.data.mobile_number">+91 {{beneficiery.contact.data.mobile_number}}</p>
+                        </span>
+                    </span>
+                    <span class="invoiceListToolTipOuter" *ngIf="!beneficiery.contact">-</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column header="Category" [style]="{'width':'14%'}">
+                    <ng-template let-Payment_info="rowData" pTemplate="body">
+                        <span *ngIf="Payment_info.expense_categories">{{Payment_info.expense_categories.data.category_name}}
+                        </span>
+                        <span *ngIf="!Payment_info.expense_categories">-
+                          </span>
+                      </ng-template>
+                </p-column>
+                
+                <p-column field="amount" header="Amount" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}" sortable="custom" (sortFunction)="mysort($event)">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.amount| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+
+                <p-column  header="Status" [style]="{'width':'17%'}">
+                  <ng-template let-status_info="rowData" pTemplate="body">
+                    <span *ngIf="status_info.bank_transaction_status">{{status_info.bank_transaction_status.data.status}}</span>
+                    <span *ngIf="!status_info.bank_transaction_status">-</span>
+                    
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="type==1" styleClass="col-button" [style]="{'width':'3%'}">
+                  <ng-template pTemplate="header">
+                    <button type="button" pButton icon="fa-refresh"></button>
+                  </ng-template>
+                  <ng-template let-payment="rowData" pTemplate="body">
+                    <button class="iconArrowTable" type="button" (click)="paymentDetail(payment,1)" pButton icon="fa-search"></button>
+                    <span #getPaymentDetail data-toggle="modal" data-target="#payment-detail"></span>
+                  </ng-template>
+                </p-column>
+
+                <p-column *ngIf="type!=1" styleClass="col-button">
+                  <ng-template pTemplate="header">
+                    <!--<button type="button" pButton icon="fa-refresh"></button>-->
+                  </ng-template>
+                  <ng-template let-payment="rowData" pTemplate="body">
+                    <button class="iconoptionTable" type="button" pButton></button>
+                    <span class="invoiceListOption">
+                        <ul class="invoiceListOptionList">
+                            <li><a (click)="paymentDetail(payment,1)" title=""><img src="assets/icons/greyeye-icon.svg" alt=""><span>View Details</span></a>
+                    </li>
+                    <li><a (click)="paymentDetail(payment,2)" title=""><img src="assets/icons/greyedit-icon.svg" alt=""><span>Edit</span></a></li>
+                    <li *ngIf="type==2"><a (click)="paymentDetail(payment,3)" title=""><img src="assets/icons/greycancel-icon.svg" alt=""><span>Cancel Payment</span></a></li>
+                    <li *ngIf="type==3"><a (click)="paymentDetail(payment,4)" title=""><img src="assets/icons/greycancel-icon.svg" alt=""><span>Stop Recurring</span></a></li>
+
+                    </ul>
+                    </span>
+                    <span #getPaymentDetail data-toggle="modal" data-target="#payment-detail"></span>
+                    <span #cancelPaymentModel data-toggle="modal" data-target="#cancel-payment"></span>
+                    <span #stopRecurrenceModel data-toggle="modal" data-target="#stop-recurrence"></span>
+
+                  </ng-template>
+                </p-column>
+
+                <ng-template pTemplate="emptymessage" >
+                  <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                    <img src="assets/icons/no_payments.svg" alt="">
+                    <span><em>Oops!</em> There's nothing 'ere yet!</span>
+                  </div>
+                </ng-template>
+                
+              </p-dataTable>
+              <div class="showingPagination">
+                <span>showing page {{current_page}} of {{total_pages}}</span>
+                <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+                <button *ngIf="previous==''" disabled >Previous</button>
+                <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+                <button *ngIf="next==''" disabled>Next</button>
+              </div>
+              
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<div class="modal fade" id="payment-detail" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Payment Details</h2>
+      </div>
+      <div *ngIf="payment_detail" class="modal-body">
+        <div class="markInvoiceBox">
+          <div class="markInvoiceInfo">
+            <ul>
+              <li><span class="makInvoicelable">Beneficiary </span>
+                <span class="markInvoiceValue" *ngIf="payment_detail.contact">{{payment_detail.contact.data.name}}</span>
+                <span class="markInvoiceValue" *ngIf="!payment_detail.contact">-</span>
+              </li>
+              
+              <li *ngIf="type==1"><span class="makInvoicelable">Payment Date</span><span class="markInvoiceValue">{{payment_detail.created_at|date:'d/M/y'}}</span></li>
+
+
+              <li *ngIf="type==2 || type==3"><span class="makInvoicelable">Created Date</span><span class="markInvoiceValue">{{payment_detail.created_at|date:'d/M/y'}}</span></li>
+              <li *ngIf="type==3"><span class="makInvoicelable"></span><span class="markInvoiceValue"></span></li>
+
+              <li *ngIf="type==2"><span class="makInvoicelable">Scheduled Date</span><span class="markInvoiceValue">{{payment_detail.start_date|date:'d/M/y'}}</span></li>
+
+              <li *ngIf="type==1"><span class="makInvoicelable">Amount</span><span class="markInvoiceValue">&#8377;{{payment_detail.amount}}</span></li>
+
+              <li *ngIf="type==3"><span class="makInvoicelable">Start Date</span><span class="markInvoiceValue">{{payment_detail.start_date|date:'d/M/y'}}</span></li>
+              <li *ngIf="type==3 && payment_detail.frequency"><span class="makInvoicelable">Frequency</span><span class="markInvoiceValue">{{payment_detail.frequency.data.frequency_name}}</span></li>
+              <li *ngIf="type==3"><span class="makInvoicelable">Installments</span><span class="markInvoiceValue">{{payment_detail.repeat_for}}</span></li>
+
+
+
+              <li><span class="makInvoicelable">Category</span>
+                <span class="markInvoiceValue" *ngIf="payment_detail.expense_categories">{{payment_detail.expense_categories.data.category_name}}</span>
+                <span class="markInvoiceValue" *ngIf="!payment_detail.expense_categories">-</span>
+                
+              </li>
+              <li><span class="makInvoicelable">Purpose</span><span class="markInvoiceValue">{{payment_detail.purpose}}</span></li>
+              <li *ngIf="type!=1"><span class="makInvoicelable">Amount</span><span class="markInvoiceValue">&#8377;{{payment_detail.amount}}</span></li>
+
+            </ul>
+          </div>
+          <div class="paymentDetailsTags">
+            <h3 *ngIf="payment_detail.notes!='' && payment_detail.notes!=null">Notes</h3>
+            <!-- <ul *ngIf="payment_detail.tag_arr.length > 0" class="listTags">
+              <li *ngFor="let tag of payment_detail.tag_arr"><span>{{tag}}</span></li>
+            </ul> -->
+            <p>{{payment_detail.notes}}</p>
+          </div>
+          <div class="paymentDetailsTags paymentDetailsAtt">
+            <h3 *ngIf="payment_detail.document_proof_files.data.length > 0 || attachment_data.length > 0">Attachments</h3>
+            <p *ngFor="let file of attachment_data">{{file.original_file_name}}</p>
+            
+          </div>
+          <div class="markPaymentsTableFooter">
+            <a (click)="updatePayment()" class="bttn bttn-theme btn-custom-xs">Edit</a>
+            <span #updatePayments data-toggle="modal" data-target="#edit-detail"></span>
+
+            <a #closePaymentDetail data-dismiss="modal" class="bttn bttn-default btn-custom-xs" title="Close">Cancel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-detail" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{update_loader}}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-left">Edit Details</h2>
+      </div>
+      <div *ngIf="payment_detail" class="modal-body">
+        <form [formGroup]="updatePaymentForm" (ngSubmit)="onSubmitUpdatePayment()">
+          <div class="markInvoiceBox">
+            <div class="markInvoiceInfo">
+              <ul>
+                <li><span class="makInvoicelable">Beneficiary </span>
+                  <span class="markInvoiceValue" *ngIf="payment_detail.contact">{{payment_detail.contact.data.name}}</span>
+                  <span class="markInvoiceValue" *ngIf="!payment_detail.contact">-</span>
+                  
+                </li>
+                <li *ngIf="type==1"><span class="makInvoicelable">Payment Date</span><span class="markInvoiceValue">{{payment_detail.created_at|date:'d/M/y'}}</span></li>
+
+                <li *ngIf="type!=1"><span class="makInvoicelable">Created Date</span><span class="markInvoiceValue">{{payment_detail.created_at|date:'d/M/y'}}</span></li>
+                <li *ngIf="type==1"><span class="makInvoicelable">Amount</span><span class="markInvoiceValue">&#8377;{{payment_detail.amount}}</span></li>
+
+
+              </ul>
+            </div>
+            <div class="clearfix">
+            </div>
+
+            <div *ngIf="type==2" class="dateAmount">
+              <!-- <ul>
+                <li> -->
+              <div class="form-group half">
+                <label>Scheduled Date</label>
+                <p-calendar ngModel="{{payment_detail.start_date}}" dateFormat="yy-mm-dd" formControlName="start_date"
+                  placeholder="dd/mm/yyyy"></p-calendar>
+              </div>
+              <!-- </li>
+                <li> -->
+              <div class="form-group half">
+                <label>Amount</label>
+                <input type="text" formControlName="amount" ngModel="{{payment_detail.amount}}">
+              </div>
+              <!-- </li>
+              </ul> -->
+            </div>
+
+            <div *ngIf="type==3" class="dateAmount">
+              <ul class="formMarkInvoice">
+                <li class="listHalfthird">
+                  <div class="form-group">
+                    <label>
+                  Start Date
+                </label>
+                    <p-calendar ngModel="{{payment_detail.start_date}}" dateFormat="yy-mm-dd" formControlName="start_date"
+                      placeholder="dd/mm/yyyy"></p-calendar>
+                  </div>
+                </li>
+                <li *ngIf="payment_detail.frequency" class="listHalfthird">
+                  <div class="form-groupNew">
+                    <label>
+                  Frequency
+                </label>
+                    <p-dropdown [options]="frequnecy" formControlName="frequnecy_id" [(ngModel)]="payment_detail.frequency.data.frequencies_id"
+                      [autoWidth]="false" placeholder="Select"></p-dropdown>
+
+                  </div>
+                </li>
+                <li class="listHalfthird">
+                  <div class="form-group">
+                    <label>
+                  Installments
+                </label>
+                    <input type="text" formControlName="amount" ngModel="{{payment_detail.amount}}" class="form-control">
+
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+
+            <div *ngIf="type==3" class="choosePurpose half">
+              <div class="form-groupNew">
+                <label>Category</label>
+                <p-dropdown [options]="expense_category" formControlName="expense_categories_id" [(ngModel)]="payment_detail.expense_categories.data.id"
+                  inputId="category_name" [autoWidth]="false" placeholder="Select">
+                </p-dropdown>
+              </div>
+            </div>
+            <div *ngIf="type==3" class="choosePurpose half">
+              <div class="form-group">
+                <label>Purpose</label>
+                <input type="text" ngModel="{{payment_detail.purpose}}" formControlName="purpose" class="form-control">
+              </div>
+            </div>
+
+
+            <div *ngIf="type!=3" class="choosePurpose">
+              <div class="form-group" *ngIf="payment_detail.expense_categories">
+                <label>Category</label>
+                <p-dropdown  [options]="expense_category" formControlName="expense_categories_id" [(ngModel)]="payment_detail.expense_categories.data.id"
+                  inputId="category_name" [autoWidth]="false" placeholder="Select">
+                </p-dropdown>
+              </div>
+              <div class="form-group" *ngIf="!payment_detail.expense_categories">
+                  <label>Category</label>
+                  <p-dropdown  [options]="expense_category" formControlName="expense_categories_id" 
+                    inputId="category_name" [autoWidth]="false" placeholder="Select">
+                  </p-dropdown>
+              </div>
+            </div>
+            <div *ngIf="type!=3" class="choosePurpose">
+              <div class="form-group">
+                <label>Purpose</label>
+                <input type="text" ngModel="{{payment_detail.purpose}}" formControlName="purpose" class="form-control">
+              </div>
+            </div>
+
+
+            <div class="editTagsnote">
+              <div class="editTags">
+                <div class="form-group">
+                  <label>Notes</label>
+                  <!-- <p-chips formControlName="tags" [(ngModel)]="payment_detail.tag_arr">
+
+                  </p-chips> -->
+                </div>
+                <div class="editNotes">
+                  <div class="form-group">
+                    <textarea class="form-control" formControlName="notes" ngModel="{{payment_detail.notes}}" placeholder="Notes added here can be used for internal purpose and wont be shared to client"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="editAttachfile">
+              <div class="displayFile" *ngIf="payment_detail.document_proof_files.data">
+                <span *ngFor="let file of attachment_data, let i = index">
+                  <a class="attachedLink" href="{{file.url}}" title="">{{file.original_file_name}}<!--{{file.files.data[0].url}}--></a>
+                  <a class="attachedRemove" (click)="delteOtherFiles(file)" title="Cancel"><img src="../../assets/icons/canel_icon.svg"></a>
+                </span>
+
+              </div>
+              <!-- <div class="attachfile">
+                <label>
+                  <input class="bttn bttn-default bttn-file" (change)="onChangeOthers($event)" type="file" title="" value="Add Attachment"
+                        />
+                  <p class="file-select" data-js-label></p>
+              </label>
+              </div> -->
+              <div class="attach-file file-input">
+                <label>
+                      <input (change)="onChangeOthers($event)" type="file" name="" multiple="">
+                      <span><img src="assets/icons/attach.svg" alt="attach">  Attach Files</span>
+                      <p class="file-select" data-js-label></p>
+                  </label>
+              </div>
+            </div>
+            <div class="markPaymentsTableFooter">
+              <input type="submit" [disabled]="!updatePaymentForm.valid" class="bttn bttn-theme btn-custom" value="Save Details">
+              <a data-dismiss="modal" #closeUpdatePayment class="bttn bttn-default btn-custom-sm" title="Close">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- cancel payment -->
+<div class="modal fade" id="cancel-payment" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Cancel Payment</h2>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="payment_detail && type==2" class="cancelPaymenttext">
+          Are you sure to cancel the scheduled payment of &#8377; {{payment_detail.amount}} to {{payment_detail.contact.data.name}}
+          on {{payment_detail.start_date|date:'d/M/y'}} ?
+        </p>
+      </div>
+      <div class="modal-footer text-center">
+        <div class="markPaymentsTableFooter">
+          <button (click)="cancelPayment()" class="bttn bttn-theme" title="Confirm">Confirm</button>
+          <button #cancelSchedulPayment data-dismiss="modal" class="bttn bttn-default" title="Cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- stop-recurrence -->
+<div class="modal fade" id="stop-recurrence" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Stop Recurrence</h2>
+      </div>
+      <div class="modal-body">
+        <ul *ngIf="payment_detail && type==3" class="recurrenceDetails">
+          <li><span class="makInvoicelable">Beneficiary Name</span><span class="markInvoiceValue">{{payment_detail.contact.data.name}}</span></li>
+          <li><span class="makInvoicelable">Payment Amount</span><span class="markInvoiceValue">&#8377; {{payment_detail.amount}}</span></li>
+          <li *ngIf="payment_detail.frequency"><span class="makInvoicelable">Frequency</span><span class="markInvoiceValue">{{payment_detail.frequency.data.frequency_name}}</span></li>
+          <li><span class="makInvoicelable">Start Date</span><span class="markInvoiceValue">{{payment_detail.start_date|date:'d/M/y'}}</span></li>
+          <li><span class="makInvoicelable">Recurrence Completed</span><span class="markInvoiceValue">7</span></li>
+          <li><span class="makInvoicelable">Recurrence Pending</span><span class="markInvoiceValue">5</span></li>
+        </ul>
+        <div class="clearfix"></div>
+        <div class="recurrenceConfirm">
+          <p>checkbox</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="markPaymentsTableFooter">
+          <button (click)="cancelPayment()" class="bttn bttn-theme" title="Confirm">Stop Recurrence</button>
+          <button #cancelRecurringPayment data-dismiss="modal" class="bttn bttn-default" title="Cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

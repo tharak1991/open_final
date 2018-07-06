@@ -1,0 +1,91 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<section class="main-body">
+    <div class="content">
+        <div class="container-fluid">
+            <div class="wraper">
+                <div class="dashboardAccount">
+                    <h2 class="pageTitle headingPadding pt-20">Payments</h2>
+                    <ul class="listPaymentsBtns">
+                        <li><a [routerLink]="['/invoices']"><span><img src="../../assets/icons/invoices.svg" title="" alt="" /></span><span>Invoices</span></a></li>
+                        <li><a [routerLink]="['/payment-transfer']"><span><img src="../../assets/icons/wallet.svg" title="" alt="" /></span><span>Fund Transfer</span></a></li>
+                        <li><a [routerLink]="['/add-fund']"><span><img src="../../assets/icons/deposite.svg" title="" alt="" /></span><span>Deposits</span></a></li>
+                        <li><a [routerLink]="['/withdraw-money']"><span><img src="../../assets/icons/invoices.svg" title="" alt="" /></span><span>Withdraw</span></a></li>
+                        
+                    </ul>
+                </div>
+              
+                <div class="secDashMain">
+                    <div class="secLeftDashMain ">
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2>August 2017</h2>
+                                <p-dropdown (onChange)="GetData($event)" [options]="filter"  [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="dashWidgetMain">
+                                <ul>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Raised</span><span class="dashWidgetValue">{{dashboard_detail.invoice_raised_amount | currency:'INR':true}} <em>({{dashboard_detail.invoice_raised_count}})</em></span></a></li>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Paid</span><span class="dashWidgetValue">{{dashboard_detail.invoice_paid_amount | currency:'INR':true}} <em>({{dashboard_detail.invoiced_paid_count}})</em></span></a></li>
+                                    <li class="dashWidgetBlue {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Invoices Pending</span><span class="dashWidgetValue">{{dashboard_detail.invoice_pending_amount | currency:'INR':true}} <em>({{dashboard_detail.invoice_pending_count}})</em></span></a></li>
+                                    <li class="dashWidgetPink {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Transfer Completed</span><span class="dashWidgetValue">{{transfer_detail.transfer_completed | currency:'INR':true}}</span></a></li>
+                                    <li class="dashWidgetPink {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Transfer Scheduled</span><span class="dashWidgetValue">{{transfer_detail.transfer_scheduled | currency:'INR':true}}</span></a></li>
+                                    <li class="dashWidgetPink {{dashboardDataLoader}}"><a><span class="dashWidgetTtile">Added Funds</span><span class="dashWidgetValue">{{transfer_detail.total_deposits | currency:'INR':true}}</span></a></li>
+                                
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2>Invoices & Transfers (Feb-Jul 2016)</h2>
+                            </div>
+                            <div class="dashWidgetMain dashWidgetGraph  {{dashboardDataLoader}}">
+                                <p-chart type="bar" [data]="graph_data" [options]="graph_option"></p-chart>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="secRightDashMain">
+                        <div class="dashPanel">
+                            <div class="dashPaneltHead">
+                                <h2>Upcoming Transfers and Invoices</h2>                                
+                            </div>
+                            <div class="dashWidgetMain dashWidgetTab">
+                                <div>
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li (click)="getUpcoming('all')" role="presentation" class="active"><a href="#all" aria-controls="all" role="tab" data-toggle="tab">All</a></li>
+                                        <li (click)="getUpcoming('invoice')" role="presentation"><a href="#inflow" aria-controls="inflow" role="tab" data-toggle="tab"><span class="sm-circle sm-blue"></span>
+                                        Inflow</a></li>
+                                        <li (click)="getUpcoming('external_transfer')" role="presentation"><a href="#outflow" aria-controls="outflow" role="tab" data-toggle="tab"><span class="sm-circle sm-pink"></span>
+                                        Outflow</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="all">
+                                            <ul *ngIf="upcoming_details.length > 0" class="listTransitionsWidget {{submitLoader}}">
+                                                <li *ngFor="let upcoming of upcoming_details" class="listTransitionsOutflow">
+                                                    <span class="listTransitionsDate">
+                                                        <span>{{upcoming.date | date : 'd'}}</span>
+                                                    <span>{{upcoming.date | date : 'MMM'}}</span>
+                                                    </span>
+                                                    <span class="listTransitionsName">
+                                                        <span>{{upcoming.name}}</span>
+                                                    <span>{{upcoming.purpose}}</span>
+                                                    </span>
+                                                    <span class="listTransitionsAmount">{{upcoming.amount | currency:'INR':true}}</span>
+                                                </li>
+                                            </ul>
+                                            <div class="listTransitionsName center-align listTransitionsWidget {{submitLoader}}" *ngIf="upcoming_details.length== 0">
+                                                <img src="assets/images/cleanbook.svg" alt="cleanbook">
+                                                <span>It's a clean book.</span>
+                                                <span>Looks like you don’t have any upcoming transfers / invoices.</span>    
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

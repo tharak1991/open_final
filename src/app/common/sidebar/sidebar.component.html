@@ -1,0 +1,46 @@
+<div class="sidebar-wrapper">
+  <ul class="nav">
+    <li [routerLinkActive]="['active']">
+      <a [routerLink]="['/dashboard']" title="Dashboard" (click)="hrefClick('Dashboard')">
+      <img class="withouthover" src="assets/icons/dashboard_icon.svg" alt="Dashboard">
+      <img class="themehover" src="assets/icons/dashboard_icontheme.svg" alt="Dashboard">
+        <p>Dashboard</p>
+    </a>
+    </li>
+    <li [class.active]="router.isActive('/create-invoice',true) || router.isActive('/invoices',true) || router.isActive('/edit-invoice',true) || router.isActive('/send-invoice',true) || router.isActive('/receive',true) || router.isActive('/receive/quick_collects',true) || router.isActive('/receive/bulk_collects',true)">
+      <a [routerLink]="['/receive']" title="receive" (click)="hrefClick('receive-menu-clicked')">
+      <img class="withouthover" src="assets/icons/recieve-grey.svg" alt="Receive">
+      <img class="themehover" src="assets/icons/recieve-purple.svg" alt="Receive">
+        <p>Receive</p>
+    </a>
+    </li>
+    <li [class.active]="router.isActive('/payments',true) || router.isActive('/payment-transfer',true) || router.isActive('/transfer-fund',true)">
+      <a [routerLink]="['/payments']" title="payments" (click)="hrefClick('payments-menu-clicked')">
+      <img class="withouthover" src="assets/icons/payments_icon.svg" alt="Payments">
+      <img class="themehover" src="assets/icons/payments_icontheme.svg" alt="Payments">
+        <p>Payments</p>
+    </a>
+    </li>
+    <li  [class.active]="router.isActive('/book-keeping',true) || router.isActive('/book-keeping-uncategorised',true) ">
+      <a [routerLink]="['/book-keeping']" title="Accounting" (click)="hrefClick('bookkeeping-menu-clicked')">
+      <img class="withouthover" src="assets/icons/accounting_icon.svg" alt="Accounting">
+      <img class="themehover" src="assets/icons/accounting_icontheme.svg" alt="Accounting">
+        <p>Accounting</p>
+      </a>
+    </li>
+    <li [class.active]="router.isActive('/add-fund',true) || router.isActive('/withdraw-money',true) || router.isActive('/transactions',true)">
+      <a [routerLink]="['/transactions']" title="Bank Accounts" (click)="hrefClick('bankaccounts-menu-clicked')">
+      <img class="withouthover" src="assets/icons/bank_icon.svg" alt="Bank">
+      <img class="themehover" src="assets/icons/bank_icontheme.svg" alt="Bank">
+        <p>Bank Accounts</p>
+    </a>
+    </li>
+    <li [routerLinkActive]="['active']" >
+      <a [routerLink]="['/apps']" title="Apps" (click)="hrefClick('apps-menu-clicked')">
+      <img class="withouthover" src="assets/icons/apps_icon.svg" alt="Apps">
+      <img class="themehover" src="assets/icons/apps_icontheme.svg" alt="Apps">
+        <p>Apps</p>
+    </a>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,141 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast {{failed_class}}">
+  <!--toastFailed-->
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+<section class="main-body transitionSec">
+  <div class="content">
+    <div class="container-fluid">
+      <div class="wraper">
+        <div class="dashboardAccount">
+          <div class="breadcrumbBlock">
+            <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/book-keeping']">Book Keeping</a></li>
+              <li>Uncategorised</li>
+            </ul>
+            <div class="pageTips-dropdown" id="panel">
+              <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                      Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="pageTitle headingPadding">Uncategorised</h2>
+          <ul class="listTopButtonRight">
+            <li class="benecficaryList">
+              <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                <input type="text" formControlName="contacts_name" class="form-control" placeholder="Customer/Vendor">
+                <div>
+                  <button type="submit" class="greySearch"></button>
+                </div>
+            </form>
+            </li>
+
+            <li>
+              <a class="bttn bttn-default" (click)="download()">Download</a>
+
+            </li>
+
+          </ul>
+
+        </div>
+       
+        <div class="listTransferTable {{TableDataLoader}}">
+          <p-dataTable [value]="data" >
+
+            <p-column field="transaction_date" header="Date" sortable="custom" (sortFunction)="mysort($event)">
+              <ng-template let-col let-payment="rowData" pTemplate="body">
+                <span>{{payment[col.field]|date:'d/M/y'}}</span>
+              </ng-template>
+            </p-column>
+            <p-column field="contacts_name" header="Customer/Vendor"></p-column>
+            <p-column field="ref_no" header="Ref ID"></p-column>
+            <p-column field="type" header="Category Type"></p-column>
+            <p-column field="transaction_types_id" header="Transaction Mode"></p-column>
+            
+            
+
+            <p-column  header="Amount">
+              <ng-template let-amount_data="rowData" pTemplate="body">
+                <span *ngIf="amount_data.income_amount!=null">{{amount_data.income_amount| currency:'INR':true}}</span>
+                <span *ngIf="amount_data.expense_amount!=null">{{amount_data.expense_amount| currency:'INR':true}}</span>
+              </ng-template>
+            </p-column>
+
+            <p-column styleClass="col-button">
+              <ng-template pTemplate="header">
+              </ng-template>
+              <ng-template let-transdata="rowData" pTemplate="body">
+                <button class="iconoptionTable" (click)="transactionDetail(transdata)" type="button" pButton></button>
+                <span #openCategoryModel data-toggle="modal" data-target="#addCategory"></span>
+              </ng-template>
+            </p-column>
+
+            <ng-template pTemplate="emptymessage">
+              <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                <img src="assets/icons/no_transaction.svg" alt="">
+                <span><em>Oops!</em> There's nothing 'ere yet!</span>
+              </div>
+            </ng-template>
+
+          </p-dataTable>
+          <div class="showingPagination">
+            <span>showing page {{current_page}} of {{total_pages}}</span>
+            <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+            <button *ngIf="previous==''" disabled >Previous</button>
+            <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+            <button *ngIf="next==''" disabled>Next</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="addCategory" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog addCategoryPopup {{submitLoader}}">
+ 
+    <div class="modal-content">
+      <div class="modal-body">
+         <h4 class="modal-title">Link Category</h4>        
+        <p>Select Category</p>
+         <form [formGroup]="category_form" (ngSubmit)="updateCategory()">
+            <p-autoComplete formControlName="category_name" [suggestions]="filteredCategorySingle" (onSelect)="selectCategory($event)" field="category_name" (completeMethod)="searchCategory($event)" placeholder="Select" [dropdown]="true">
+              <ng-template let-cat pTemplate="item">
+                <span *ngIf="cat.id!='new'">{{cat.category_name}}</span>
+                <span *ngIf="cat.id=='new'" class="{{cat.class}}">{{cat.category_name}}</span>
+              </ng-template>
+            </p-autoComplete>
+           
+             <div class="cBttns">
+                 <button type="submit" [disabled]="!category_form.valid" class="bttn bttn-theme">Save Changes</button>
+                 <button #closeCategoryForm type="button" class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+             </div>
+         </form>
+      </div>
+    </div>
+ 
+  </div>
+ </div>

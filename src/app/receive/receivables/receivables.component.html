@@ -1,0 +1,321 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<article>
+  <section class="main-body" *ngIf="data.length==0 && page_show == true">
+    <div class="receiveHeading">
+      <h2 class="pageTitle headingPadding margin-top-20">Receive</h2>
+    </div>
+    <div class="reaceivable-main">
+      <div class="three-receive">
+        <div class="row">
+
+          <div class="col-sm-4">
+            <div class="receive-box">
+              <span class="r-image">
+                <img src="assets/images/create-invoice.svg" alt="">
+              </span>
+              <h4>Invoice</h4>
+              <p>Create an invoice on the spot, save, print or e-mail directly to your clients.</p>
+              <a class="bttn bttn-theme btn-custom-sm" [routerLink]="['/create-invoice']">New Invoice</a>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="receive-box">
+              <span class="r-image">
+                <img src="assets/images/quick-collect.svg" alt="">
+              </span>
+              <h4>Quick Collect</h4>
+              <p>Get paid faster and easier by an all-in-one payment link to instantly collect payments through NEFT/ RTGS/
+                IMPS/ e-mandate/Netbanking/ Wallets/ Credit/ Debit cards/UPI</p>
+              <a class="bttn bttn-theme btn-custom-sm" [routerLink]="['/receive/quick_collect_request']">Quick Collect</a>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="receive-box">
+              <span class="r-image">
+                <img src="assets/images/bulk-collect.svg" alt="">
+              </span>
+              <h4>Bulk Collect</h4>
+              <p>Send payment requests to a large group of Clients in one go by using the Open Bulk Collect feature.</p>
+              <a class="bttn bttn-theme btn-custom-sm" [routerLink]="['/receive/bulk_collects']">New Request</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <section class="main-body paymentListBody" *ngIf="(data.length!=0 && page_show == true) || page_always_show == true">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+
+          <div class="reaceivable-main">
+            <div class="row">
+              <div class="col-sm-9 pad-right-0 pad-left-0">
+                <div class="three-receive receive-v2">
+                  <div class="row">
+
+                    <div class="col-sm-4">
+                      <div class="receive-box">
+                        <span class="r-image">
+                          <img src="assets/images/create-invoice.svg" alt="">
+                        </span>
+                        <h4>
+                          <a [routerLink]="['/invoices']">invoices</a>
+                        </h4>
+                        <p>Create, Save, Print or Email invoices directly to your clients.</p>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                      <div class="receive-box">
+                        <span class="r-image">
+                          <img src="assets/images/quick-collect.svg" alt="">
+                        </span>
+                        <h4>
+                          <a [routerLink]="['/receive/quick_collects']">Quick Collect</a>
+                        </h4>
+                        <p>A fast and non-complicated process for payment collection </p>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                      <div class="receive-box">
+                        <span class="r-image">
+                          <img src="assets/images/bulk-collect.svg" alt="">
+                        </span>
+                        <h4>
+                          <a [routerLink]="['/receive/bulk_collects']">Bulk Collect</a>
+                        </h4>
+                        <p>Send payment requests to a large group of clients in one go.</p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-3 pad-left-0">
+                <div class="three-receive receive-v2">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div class="receive-box">
+                        <span class="r-image">
+                          <img src="assets/images/aging-analysis.svg" alt="">
+                        </span>
+                        <h4>Aging Analysis</h4>
+                        <p>Improve cash conversion cycle with timely action based on aging analysis</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="receivablesDetails border-top border-bottom">
+            <div class="row">
+              <div class="col-sm-5 pad-left-0">
+                <h2 class="r-title">Receivables</h2>
+              </div>
+              <div class="col-sm-7">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Total Billed ({{meta.current_fin_yr}})</span>
+                    <h4 class="number">{{meta.total_billed_amount| currency:'INR':true}}</h4>
+                  </div>
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Total Received ({{meta.current_fin_yr}})</span>
+                    <h4 class="number">{{meta.total_received_amount| currency:'INR':true}}</h4>
+                  </div>
+                  <div class="col-sm-4">
+                    <span class="rupee-title">Outstanding (As on Today)</span>
+                    <h4 class="number">{{meta.total_outstanding_amount| currency:'INR':true}}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="dashboardAccount border-bottom-0">
+            <!-- <h2 class="pageTitle headingPadding">Receivables</h2> -->
+            <ul class="listTopButtonRight">
+              <li class="benecficaryList">
+                <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                  <input type="text" class="form-control" formControlName="beneficiary_name" placeholder="Search by Customer Name" (keyup)="setRecepientName($event)">
+                  <div (click)="clickedInside($event)">
+                    <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down">
+                      <img alt="" src="assets/icons/opencaret.svg">
+                    </a>
+                    <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                    <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable(type)"></button>
+                    <div class="boxBeneficiarSearch customerName-drop new-box-shadow {{filter_toggle}}">
+                      <div class="boxBeneficiarSearchInner">
+                        <span class="clearAll">
+                          <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                        </span>
+                        <ul class="byCustomerName">
+                          <li>
+                            <ul class="radioBtnTick">
+                              <li>
+                                <h4>By</h4>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname" value="1" formControlName="amount_by"></p-radioButton>
+                                <span>Total Build</span>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname" value="2" formControlName="amount_by"></p-radioButton>
+                                <span>Total Recieved</span>
+                              </li>
+                              <li>
+                                <p-radioButton name="groupname" value="3" formControlName="amount_by"></p-radioButton>
+                                <span>Outstanding</span>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <!--<h4>By Payment Date</h4>-->
+                            <div class="form-group half">
+                              <p-dropdown [options]="filter2" formControlName="amount_type"  [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <input type="text" formControlName="amount" pInputText placeholder="Amount">
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By DSO</h4>
+                            <div class="form-group half">
+                              <p-dropdown [options]="filter2" formControlName="dso_type"  [autoWidth]="false"></p-dropdown>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <input type="text" pInputText placeholder="Days" formControlName="days">
+                            </div>
+                          </li>
+                          <li>
+                            <h4>By Date</h4>
+                            <div class="form-group half">
+                              <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                            <div class="form-group half pull-right">
+                              <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                              <a class="search_down">
+                                <img alt="" src="assets/icons/opencaret.svg">
+                              </a>
+                            </div>
+                          </li>
+                          <li class="formButtons">
+                            <input (click)="preventFn();submitName('2');" type="submit" [disabled]="!filter_form.valid" class="bttn bttn-theme btn-md"
+                              value="Submit Request">
+                            <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </li>
+              <li class="paymentAll">
+                <p-dropdown [options]="filter" (onChange)="filter_By_Month($event)" [autoWidth]="false"></p-dropdown>
+              </li>
+              <li>
+                <a class="bttn bttn-default" (click)="hrefClick('Receivables-listing-download-clicked');download()">Download</a>
+              </li>
+            </ul>
+          </div>
+          <!-- <div class="pageTips-dropdown" id="panel">
+            <span title="page tips" (click)="toggleTips()">Page Tips</span>
+            <div class="white-Box {{toggle_class}}">
+              <h3>Page Tips</h3>
+              <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+              <div class="white-Box-Inner">
+                <ul class="pageTips-list">
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                  <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                  <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                    Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                  <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                </ul>
+              </div>
+            </div>
+          </div> -->
+          <div class="listTransferBox">
+
+            <div class="receivables-table listTransferTable  {{TableDataLoader}}">
+              <p-dataTable [value]="data" [responsive]="true">
+
+                <p-column field="contact_name" header="Customer Name" [style]="{'width':'25%'}">
+                  <ng-template let-beneficiery="rowData" pTemplate="body">
+                    <span class="invoiceListToolTipOuter" *ngIf="beneficiery.contact_name">{{beneficiery.contact_name}}
+                      <span class="invoiceListToolTip">
+                        <p>
+                          <strong>{{beneficiery.contact_name}}</strong>
+                        </p>
+                        <p *ngIf="beneficiery.contact.data.email_id">{{beneficiery.contact.data.email_id}}</p>
+                        <p *ngIf="beneficiery.contact.data.mobile_number">+91 {{beneficiery.contact.data.mobile_number}}</p>
+                      </span>
+                    </span>
+                    <span class="invoiceListToolTipOuter" *ngIf="!beneficiery.contact_name">-</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="total_billed" header="Total Billed" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.total_billed| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="total_received" header="Total Received" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.total_received| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="total_outstanding" header="Outstanding" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}">
+                  <ng-template let-amount_data="rowData" pTemplate="body">
+                    <span>{{amount_data.total_outstanding| currency:'INR':true}}</span>
+                  </ng-template>
+                </p-column>
+                <p-column field="dso" header="DSO" [style]="{'width':'17%', 'text-align': 'right', 'padding-right': '35px'}" >
+                </p-column>
+
+
+                <p-column styleClass="col-button">
+                  <ng-template let-payment="rowData" pTemplate="body">
+                    <a [routerLink]="['/receive/contact/',payment.contacts_id]">
+                      <button class="iconArrowTable" type="button" pButton></button>
+                    </a>
+                  </ng-template>
+                </p-column>
+
+                <ng-template pTemplate="emptymessage">
+                  <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                    <img src="assets/icons/no_payments.svg" alt="">
+                    <span>
+                      <em>Oops!</em> There's nothing 'ere yet!</span>
+                  </div>
+                </ng-template>
+
+              </p-dataTable>
+              <div class="showingPagination">
+                <span>showing page {{current_page}} of {{total_pages}}</span>
+                <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+                <button *ngIf="previous==''" disabled>Previous</button>
+                <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+                <button *ngIf="next==''" disabled>Next</button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</article>

@@ -1,0 +1,196 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast {{failed_class}}">
+  <!--toastFailed-->
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+<article>
+  <section class="main-body bookKeeping">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="dashboardAccount">
+
+            <!-- <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/book-keeping']">Accounting </a></li>
+              <li>Book Keeping</li>
+            </ul> -->
+            <div class="pageTips-dropdown" id="panel">
+              <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                            Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="clearfix">
+              <h2 class="pageTitle">Accounting</h2>
+              <ul class="listTopButtonRight">
+                <li class="benecficaryList" >
+                  <form [formGroup]="filter_form" (ngSubmit)="getBookKeepingByFilter()">
+                    <!-- <p-autoComplete field="name" formControlName="category_name" [suggestions]="filteredCategorySingle" field="category_name" (completeMethod)="searchCategory($event)" placeholder="Category">
+                    </p-autoComplete> -->
+                    <input type="text" class="form-control" formControlName="category_name" placeholder="Category" (keyup)="setRecepientName($event)">
+                    <div (click)="clickedInside($event)">
+                      <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down"><img src="assets/icons/opencaret.svg" alt=""></a>
+                      <!-- <button type="submit" class="greySearch" (click)="preventFn()"></button> -->
+                      <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submit_name('1');"></button>
+                      <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable()"></button>
+
+                      <div class="boxBeneficiarSearch {{filter_toggle}}" >
+                          <div class="boxBeneficiarSearchInner">
+                              <span class="clearAll">
+                                  <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                              </span>
+                            <ul>
+                              <li>
+                                <h4><strong>By Date</strong></h4>
+                                <div class="form-group half">
+                                  <label>From</label>
+                                  <p-calendar formControlName="start_date" dateFormat="yy-mm-dd" placeholder="dd/mm/yy"></p-calendar>
+                                    <a class="search_down"><img alt="" src="assets/icons/opencaret.svg"></a>
+                                  <div *ngIf="filter_form.controls['start_date'].hasError('required') && (filter_form.controls['start_date'].dirty || filter_form.controls['start_date'].touched)"
+                                  class="error">
+                                  This Field is Required.
+                                  </div>
+                                </div>
+                                <div class="form-group half pull-right">
+                                  <label>To</label>
+                                  <p-calendar formControlName="end_date" dateFormat="yy-mm-dd" placeholder="dd/mm/yy"></p-calendar>
+                                  <a class="search_down"><img alt="" src="assets/icons/opencaret.svg"></a>
+                                  <div *ngIf="filter_form.controls['end_date'].hasError('required') && (filter_form.controls['end_date'].dirty || filter_form.controls['end_date'].touched)"
+                                  class="error">
+                                  This Field is Required.
+                                  </div>
+                                </div>
+                              </li>
+                              <li class="formButtons">
+                                <input (click)="preventFn();submit_name('2');" type="submit" [disabled]="!filter_form.valid"  class="bttn bttn-theme" value="Search">
+
+                                <a class="bttn bttn-default" title="close" (click)="toggleFilter()">Cancel</a>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                  </form>
+                </li>
+                <li>
+                  <a (click)="download()" class="bttn bttn-default" (click)="hrefClick('bookkeeping-download-clicked')">Download</a>
+                </li>
+                <li>
+                  <a class="bttn bttn-theme"  (click)="hrefClick('bookkeeping-add-category-clicked')" data-toggle="modal" data-target="#addCategory">Add Category</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+
+          <div class="keepingList {{TableDataLoader}}">
+            <table class="keepingTotal">
+              <tr class="customtr">
+              <td class="drop-down customtd text-left" width="35%" style="padding:0;">
+                <span class="custom-dropdown">
+                  <select class="upperCase form-control" (change)="selectMonth($event)">.
+                    <option *ngFor="let month of month_name" value="{{month.id}}" data-id="{{month.year}}" [selected]="month.id ==current_month">{{month.name}} {{month.year}}</option>
+                  </select>
+                </span>
+              </td>
+              <td class="customtd" width="22%">
+                Total Income
+                <span class="blueColor">{{data_total.total_income_amount | currency:'INR':true}}</span>
+              </td>
+              <td class="customtd" width="35%">
+                Total Expense
+                <span class="redColor">{{data_total.total_expense_amount | currency:'INR':true}}</span>
+              </td>
+              <td width="8%"></td>
+            </tr>
+            </table>
+            <p-dataTable [value]="data" >
+              <p-column header="Categories" [style]="{'width':'35%'}">
+                <ng-template let-category="rowData" pTemplate="body">
+                  <a *ngIf="category.categories_id==-1 && range_start!='' && range_end!=''" [routerLink]="['/book-keeping-uncategorised']" [queryParams]="{from:range_start,to:range_end}">{{category.category_name}}</a>
+                  <a *ngIf="category.categories_id==-1 && range_start=='' && range_end==''" [routerLink]="['/book-keeping-uncategorised']">{{category.category_name}}</a>
+                  <span *ngIf="category.categories_id!=-1">{{category.category_name}}</span>
+                </ng-template>
+              </p-column>
+              <p-column field="income_amount" header="Income" [sortable]="true" [style]="{'width':'22%', 'text-align': 'right'}">
+                <ng-template let-amount_income="rowData" pTemplate="body">
+                  <span *ngIf="amount_income.income_amount!=null">{{amount_income.income_amount| currency:'INR':true}}</span>
+                  <span *ngIf="amount_income.income_amount==null">{{ 0 | currency:'INR':true}}</span>
+
+                </ng-template>
+              </p-column>
+              <p-column header="Expense" [sortable]="true" [style]="{'width':'35%', 'text-align': 'right'}">
+                <ng-template let-amount_expense="rowData" pTemplate="body">
+                  <span *ngIf="amount_expense.expense_amount!=null">{{amount_expense.expense_amount| currency:'INR':true}}</span>
+                  <span *ngIf="amount_expense.expense_amount==null">{{ 0 | currency:'INR':true}}</span>
+
+                </ng-template>
+              </p-column>
+
+              <p-column  styleClass="col-button" [style]="{'width':'8%'}">
+                <ng-template let-category="rowData" pTemplate="body">
+                  
+                  <a *ngIf="category.categories_id==-1 && range_start!='' && range_end!=''" [routerLink]="['/book-keeping-uncategorised']" [queryParams]="{from:range_start,to:range_end}"><button class="iconArrowTable" type="button" pButton></button></a>
+                  <a *ngIf="category.categories_id==-1 && range_start=='' && range_end==''" [routerLink]="['/book-keeping-uncategorised']"><button class="iconoptionTable" type="button" pButton></button></a>
+                  
+                </ng-template>
+              </p-column>
+
+
+
+              <ng-template pTemplate="emptymessage">
+                <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                  <img src="assets/icons/no_payments.svg" alt="">
+                  <span><em>Oops!</em> There's nothing 'ere yet!</span>
+                </div>
+              </ng-template>
+
+            </p-dataTable>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<div id="addCategory" class="modal fade" role="dialog">
+    <div class="modal-dialog addCategoryPopup {{category_loader}}">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-body">
+           <h4 class="modal-title">Add Category</h4>
+          <p>Category Name</p>
+           <form [formGroup]="category_form" (ngSubmit)="createCategory()">
+               <input type="text" formControlName="category_name" placeholder="Add Category Name" class="form-control">
+
+               <div class="cBttns">
+                   <button type="submit" [disabled]="!category_form.valid" class="bttn bttn-theme">Save</button>
+                   <button #closeCategoryForm type="button" class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+               </div>
+           </form>
+        </div>
+      </div>
+
+    </div>
+   </div>

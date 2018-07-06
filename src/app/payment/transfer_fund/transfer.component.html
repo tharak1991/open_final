@@ -1,0 +1,558 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<div *ngIf="loader_status" class="topToast">
+  <span><em class="iconToast"></em><span class="toastMessage">{{http_message}}</span></span>
+</div>
+<article>
+  <section class="main-body makePayment">
+    <div class="content">
+      <div class="container-fluid">
+        <div class="wraper">
+          <div class="dashboardAccount">
+
+            <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/payments']">Payments</a></li>
+              <li>New Payment</li>
+            </ul>
+             <div class="pageTips-dropdown" id="panel">
+              <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                      Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div> 
+              <h2 class="pageTitle">New Payment</h2>
+          </div>
+        <form [formGroup]="transferFund" (ngSubmit)="onSubmitTransfer()">
+              <!--<a  class="pull-right bttn bttn-default" data-toggle="modal" data-target="#addNewBeneficiary">Add Beneficiary</a>-->
+                <div class="boxFormCenter">
+                  <ul class="{{image_loader}}">
+                    <li>
+                      <div class="form-group">
+                        <label>Beneficiary</label>
+                        <!--<input type="text" formControlName="beneficiary_name" value="" class="form-control" placeholder="search">-->
+                        <p-autoComplete [suggestions]="filteredCustomerSingle" field="name" formControlName="beneficiary_name" (onSelect)="getBeneficiaryDetail($event)"
+                          (completeMethod)="search($event)" placeholder="Enter Beneficiary Name" [dropdown]="true">
+                          <ng-template let-to pTemplate="item">
+                              
+                            <span *ngIf="to.beneficiary_account_number!='' && to.beneficiary_account_number != null">{{to.name}} - {{to.beneficiary_account_number}}</span>
+                            <span *ngIf="to.beneficiary_account_number!='' && to.beneficiary_account_number == null" >{{to.name}} </span>
+                            
+                            <span *ngIf="to.beneficiary_account_number==''" class="{{to.class}}">{{to.name}}</span>
+                          </ng-template>
+                        </p-autoComplete>
+                        <input type="hidden" formControlName="beneficiary_id">
+                        <div *ngIf="transferFund.controls['beneficiary_id'].hasError('required') && (transferFund.controls['beneficiary_id'].dirty || transferFund.controls['beneficiary_id'].touched)"
+                        class="error">
+                          Please select valid Beneficiary
+                        </div>
+
+                        <span data-toggle="modal" data-target="#updateBeneficiary" #updateBeneficiarypop></span>
+                        <span data-toggle="modal" data-target="#addNewBeneficiary" #addBeneficiarypop></span>
+                        <span data-toggle="modal" data-target="#confirm-payment" #confirmPayment></span>
+                        <span data-toggle="modal" data-target="#requestint" #requestInitiate></span>
+
+
+                      </div>
+                    </li>
+                    <li>
+                      <div class="form-group">
+                        <label>Amount</label>
+                        <input type="text" (keyup)="check_balance($event)" formControlName="amount" class="form-control" placeholder="Enter Amount">
+                        <div *ngIf="transferFund.controls['amount'].hasError('required') && (transferFund.controls['amount'].dirty || transferFund.controls['amount'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+                        <div *ngIf="transferFund.controls['amount'].hasError('pattern')" class="error">
+                          Amount is Not Valid
+                        </div>
+
+                        <div *ngIf="balance_error && !transferFund.controls['amount'].hasError('pattern')" class="error">
+                          Balance is Not sufficient
+                        </div>
+                        <span class="availableBalance">Available Balance: <span class="iconRupeeBalance">{{account_balance | currency:'INR':true}}</span></span>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="form-group">
+                        <label>Category</label>
+                        <p-autoComplete #cate_name [suggestions]="filteredCategory" field="category_name" formControlName="expense_categories_id" (onSelect)="selectCategory($event)"
+                          (completeMethod)="searchCategory($event)" placeholder="Enter Category Name">
+                          <ng-template let-cat pTemplate="item">
+                            <span *ngIf="cat.id!='new'">{{cat.category_name}}</span>
+                            <span *ngIf="cat.id=='new'" class="{{cat.class}}">{{cat.category_name}}</span>
+                          </ng-template>
+                        </p-autoComplete>
+
+                        <div *ngIf="transferFund.controls['expense_categories_id'].hasError('required') && (transferFund.controls['expense_categories_id'].dirty || transferFund.controls['expense_categories_id'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+
+                        <input type="hidden" formControlName="category_id">
+                        <div *ngIf="transferFund.controls['category_id'].hasError('required') && (transferFund.controls['category_id'].dirty || transferFund.controls['category_id'].touched)"
+                        class="error">
+                          Please select valid Category
+                        </div>
+
+                      </div>
+                    </li>
+                    <li>
+                      <div class="form-group">
+                        <label>Purpose</label>
+                        <input type="text" formControlName="purpose" class="form-control" placeholder="">
+                      </div>
+                    </li>
+                    <li>
+                      <div class="form-group form-group-inlineRadio">
+                        <ul>
+                          <!-- <li>
+                            <p-radioButton formControlName="payment_schedules_id" value="1" (onClick)="check_transfer('1')" name="transferFund" ngModel="{{payment_schedules_id}}"></p-radioButton><label>Pay Now</label></li> -->
+                          <!-- <li>
+                            <p-radioButton formControlName="payment_schedules_id" value="2" (onClick)="check_transfer('2')" name="transferFund" ngModel="{{payment_schedules_id}}"></p-radioButton><label>Pay Later</label>
+                          </li>
+                          <li>
+                            <p-radioButton formControlName="payment_schedules_id" value="3" (onClick)="check_transfer('3')" name="transferFund" ngModel="{{payment_schedules_id}}"></p-radioButton><label>Recurring Payment</label>
+                          </li> -->
+                          <div *ngIf="transferFund.controls['payment_schedules_id'].hasError('required') && (transferFund.controls['payment_schedules_id'].dirty || transferFund.controls['payment_schedules_id'].touched)"
+                            class="error">
+                            This Field is Required.
+                          </div>
+                        </ul>
+                      </div>
+                    </li>
+                    <li *ngIf="payment_schedules_id =='2'" class="listHalfthird">
+                      <div class="form-group">
+                        <label>Payment Date</label>
+                        <p-calendar dateFormat="yy-mm-dd" formControlName="payment_date" placeholder="dd/mm/yyyy" required></p-calendar>
+                        <div *ngIf="transferFund.controls['payment_date'].hasError('required') && (transferFund.controls['payment_date'].dirty || transferFund.controls['payment_date'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+                      </div>
+                    </li>
+                    <li *ngIf="payment_schedules_id =='3'" class="listHalfthird">
+                      <div class="form-group">
+                        <label>Start Date</label>
+                        <p-calendar dateFormat="yy-mm-dd" formControlName="start_date" placeholder="dd/mm/yyyy" required></p-calendar>
+                        <div *ngIf="transferFund.controls['start_date'].hasError('required') && (transferFund.controls['start_date'].dirty || transferFund.controls['start_date'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+                      </div>
+                    </li>
+                    <li *ngIf="payment_schedules_id =='3'" class="listHalfthird">
+                      <div class="form-group">
+                        <label>Frequency</label>
+                        <p-dropdown [options]="frequnecy" formControlName="frequencies_id" [autoWidth]="false" placeholder="Select" required></p-dropdown>
+                        <div *ngIf="transferFund.controls['frequencies_id'].hasError('required') && (transferFund.controls['frequencies_id'].dirty || transferFund.controls['frequencies_id'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+                      </div>
+                    </li>
+                    <li *ngIf="payment_schedules_id =='3'" class="listHalfthird">
+                      <div class="form-group">
+                        <label>Reapeat for</label>
+                        <input type="text" formControlName="repeat_for" value="" class="form-control" placeholder="Number" required>
+                        <span>installments</span>
+                        <div *ngIf="transferFund.controls['repeat_for'].hasError('required') && (transferFund.controls['repeat_for'].dirty || transferFund.controls['repeat_for'].touched)"
+                          class="error">
+                          This Field is Required.
+                        </div>
+                      </div>
+                    </li>
+                    <div class="purposeTransferBtns">
+                      <div class="attach-file file-input">
+                        <label>
+                              <input (change)="onChangeOthers($event)" type="file" name="" multiple="">
+                              <span>Attach Files</span>
+                              <p class="file-select" data-js-label></p>
+                          </label>
+                      </div>
+                      <a data-toggle="modal" data-target="#tags-notes" class="bttn bttn-default ">Add Notes</a>
+                    </div>
+
+                    <span class="attachfileshowCase bgGrey" *ngFor="let file of file_arr, let i = index">
+                        <a class="attachedLink" href="{{file.url}}" title="">{{file.original_file_name}}<!--{{file.files.data[0].url}}--></a>
+                        <a class="attachedRemove pull-right" (click)="delteOtherFiles(file)" title="Cancel"><img src="../../assets/icons/canel_icon.svg"></a>
+                    </span>
+
+
+                  </ul>
+                </div>
+
+                <div class="footer-btn">
+                  <div class="boxFormCenter">
+                    <ul class="pull-left">
+                      <li>
+                        <input type="submit" [disabled]="!transferFund.valid || balance_error" title="Continue" class="bttn bttn-theme btn-md" value="Continue">
+                      </li>
+                      <li>
+                        <input class="bttn bttn-default" #cancelPayment type="reset" value="Cancel">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+<div class="modal fade" id="addNewBeneficiary" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClassSubmitBeneficiery}}">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Add New Beneficiary</h2>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addBeneficiary" (ngSubmit)="onSubmitAddBeneficiary()">
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Beneficiary Name</label>
+                <input type="text" formControlName="name" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['name'].hasError('required')  && (addBeneficiary.controls['name'].dirty || addBeneficiary.controls['name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Email or Mobile Number</label>
+                <input type="text" formControlName="email_mobile" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['email_mobile'].hasError('required')  && (addBeneficiary.controls['email_mobile'].dirty || addBeneficiary.controls['email_mobile'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Account Number</label>
+                <input type="password" formControlName="beneficiary_account_number" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['beneficiary_account_number'].hasError('required')  && (addBeneficiary.controls['beneficiary_account_number'].dirty || addBeneficiary.controls['beneficiary_account_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBeneficiary.controls['beneficiary_account_number'].hasError('pattern')"
+                class="error">
+                Account Number is not valid.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Confirm Account Number</label>
+                <input type="text" formControlName="confirm_acc_number" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['confirm_acc_number'].hasError('required')  && (addBeneficiary.controls['confirm_acc_number'].dirty || addBeneficiary.controls['confirm_acc_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="addBeneficiary.controls.confirm_acc_number.errors?.equalTo  && (addBeneficiary.controls['confirm_acc_number'].dirty || addBeneficiary.controls['confirm_acc_number'].touched) && addBeneficiary.value.confirm_acc_number.length!=0"
+                  class="error">
+                  Account number is not matched
+                </div>
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>IFSC Code</label>
+                <input type="text" (keyup)="searchBank(1,$event)" formControlName="ifsc_code" class="form-control upperCase" placeholder="">
+                <div *ngIf="addBeneficiary.controls['ifsc_code'].hasError('required')  && (addBeneficiary.controls['ifsc_code'].dirty || addBeneficiary.controls['ifsc_code'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li class="half">
+
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Bank</label>
+                <input type="text" formControlName="bank_name" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['bank_name'].hasError('required')  && (addBeneficiary.controls['bank_name'].dirty || addBeneficiary.controls['bank_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Branch</label>
+                <input type="text" formControlName="branch_name" class="form-control" placeholder="">
+                <div *ngIf="addBeneficiary.controls['branch_name'].hasError('required')  && (addBeneficiary.controls['branch_name'].dirty || addBeneficiary.controls['branch_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+
+          </ul>
+          <div class="modal-footer">
+            <ul>
+              <li>
+                <input class="bttn bttn-theme" value="Add Beneficiary" [disabled]="!addBeneficiary.valid" type="submit">
+
+              </li>
+              <li>
+                <input #closeAddBeneficiery class="bttn bttn-default" type="reset" value="Cancel" data-dismiss="modal">
+              </li>
+            </ul>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="modal fade" id="updateBeneficiary" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog  {{loaderClassSubmitBeneficiery}}">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Update Beneficiary</h2>
+      </div>
+      <div class="modal-body" *ngIf="beneficiary_data">
+        <form [formGroup]="updateBeneficiary" (ngSubmit)="onSubmitUpdateBeneficiary()">
+          <ul>
+            <li>
+              <div class="form-group">
+                <label>Beneficiary Name</label>
+                <input type="text" formControlName="name" ngModel="{{beneficiary_data.name}}" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['name'].hasError('required')  && (updateBeneficiary.controls['name'].dirty || updateBeneficiary.controls['name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Email or Mobile Number</label>
+                <input type="text" formControlName="email_mobile" ngModel="{{beneficiary_data.mobile_number}}" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['email_mobile'].hasError('required')  && (updateBeneficiary.controls['email_mobile'].dirty || updateBeneficiary.controls['email_mobile'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Account Number</label>
+                <input type="password" formControlName="beneficiary_account_number" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['beneficiary_account_number'].hasError('required')  && (updateBeneficiary.controls['beneficiary_account_number'].dirty || updateBeneficiary.controls['beneficiary_account_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="updateBeneficiary.controls['beneficiary_account_number'].hasError('pattern')"
+                class="error">
+                Account Number is not valid.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="form-group">
+                <label>Confirm Account Number</label>
+                <input type="text" formControlName="confirm_acc_number" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['confirm_acc_number'].hasError('required')  && (updateBeneficiary.controls['confirm_acc_number'].dirty || updateBeneficiary.controls['confirm_acc_number'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+                <div *ngIf="updateBeneficiary.controls.confirm_acc_number.errors?.equalTo  && (updateBeneficiary.controls['confirm_acc_number'].dirty || updateBeneficiary.controls['confirm_acc_number'].touched) && updateBeneficiary.value.confirm_acc_number.length!=0"
+                  class="error">
+                  Account number is not matched
+                </div>
+              </div>
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>IFSC Code</label>
+                <input type="text" (keyup)="searchBank(2,$event)" formControlName="ifsc_code" class="form-control upperCase" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['ifsc_code'].hasError('required')  && (updateBeneficiary.controls['ifsc_code'].dirty || updateBeneficiary.controls['ifsc_code'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li class="half">
+
+            </li>
+            <li class="half">
+              <div class="form-group">
+                <label>Bank</label>
+                <input type="text" formControlName="bank_name" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['bank_name'].hasError('required')  && (updateBeneficiary.controls['bank_name'].dirty || updateBeneficiary.controls['bank_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li class="half pull-right">
+              <div class="form-group">
+                <label>Branch</label>
+                <input type="text" formControlName="branch_name" class="form-control" placeholder="">
+                <div *ngIf="updateBeneficiary.controls['branch_name'].hasError('required')  && (updateBeneficiary.controls['branch_name'].dirty || updateBeneficiary.controls['branch_name'].touched)"
+                  class="error">
+                  This field is required.
+                </div>
+              </div>
+            </li>
+            <li>
+              <div class="modal-footer">
+                <ul>
+                  <li>
+                    <input class="bttn bttn-theme" type="submit" value="Update Beneficiary" [disabled]="!updateBeneficiary.valid">
+    
+                  </li>
+                  <li>
+                    <input class="bttn bttn-default" #closeUpdateBeneficiery data-dismiss="modal" type="reset" value="Cancel">
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- third modal -->
+<div class="modal fade" id="tags-notes" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Notes</h2>
+      </div>
+      <form [formGroup]="tagTotes" (ngSubmit)="onSubmitTagTotes()">
+        <div class="modal-body">
+          <div class="row">
+            <!-- <div class="col-md-12">
+              <div class="form-group">
+                <label>
+                        Tags
+                        </label>
+                <p-chips formControlName="tags"></p-chips>
+              </div>
+            </div> -->
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>
+                        Notes
+                        </label>
+                <textarea class="form-control" formControlName="note" placeholder="Notes added here can be used for internal purpose and wont be shared to client"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <ul>
+            <li>
+              <button #closeTagNotes class="bttn bttn-default" data-dismiss="modal">Cancel</button>
+            </li>
+            <li *ngIf="tagTotes.value.note.length==0">
+              <input type="submit" [disabled]="!tagTotes.valid" value="Add" class="bttn bttn-theme">
+            </li>
+            <li *ngIf="tagTotes.value.note.length>0">
+              <input type="submit" [disabled]="!tagTotes.valid" value="Save Changes" class="bttn bttn-theme">
+            </li>
+          </ul>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+<!-- third modal end-->
+
+
+
+<div class="modal fade" id="confirm-payment" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog {{loaderClasssubmit}}">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-body" *ngIf="transfer_detail">
+        <div class="con-payment" *ngIf="payment_schedules_id =='1'">
+          <h2 class="popup-heading text-center">Confirm Payment</h2>
+          <p class="uwpay">You are paying</p>
+          <p class="confirm-payment-price">₹ {{transfer_detail.amount}}</p>
+          <p>to</p>
+          <span>{{transfer_detail.beneficiary_name.name}}</span>
+          <span>{{transfer_detail.beneficiary_name.beneficiary_account_number}}</span>
+          <span>{{transfer_detail.beneficiary_name.bank_name}}, {{transfer_detail.beneficiary_name.branch_name}}</span>
+        </div>
+        <div class="con-payment" *ngIf="payment_schedules_id =='2'">
+          <h2 class="popup-heading text-center">Confirm Payment</h2>
+          <p class="uwpay">You will be paying</p>
+          <p class="confirm-payment-price">₹ {{transfer_detail.amount}}</p>
+          <p>on {{transfer_detail.payment_date}} to</p>
+          <span>{{transfer_detail.beneficiary_name.name}}</span>
+          <span>{{transfer_detail.beneficiary_name.beneficiary_account_number}}</span>
+          <span>{{transfer_detail.beneficiary_name.bank_name}}, {{transfer_detail.beneficiary_name.branch_name}}</span>
+        </div>
+        <div class="con-payment" *ngIf="payment_schedules_id =='3'">
+          <h2 class="popup-heading text-center">Confirm Payment</h2>
+          <p class="uwpay">You will be paying</p>
+          <p class="confirm-payment-price">₹ {{transfer_detail.amount}}</p>
+          <p>for {{transfer_detail.repeat_for}} months starting from {{transfer_detail.start_date}} to</p>
+          <span>{{transfer_detail.beneficiary_name.name}}</span>
+          <span>{{transfer_detail.beneficiary_name.beneficiary_account_number}}</span>
+          <span>{{transfer_detail.beneficiary_name.bank_name}}, {{transfer_detail.beneficiary_name.branch_name}}</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <ul>
+          <li><button type="button" (click)="confirmTransfer()" class="bttn bttn-theme btn-sm">Confirm</button></li>
+          <li><button type="button" class="bttn bttn-default btn-sm" #closeConfirm data-dismiss="modal">Cancel</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="requestint" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="req-initiated">
+          <h2 class="popup-heading text-center">Request Initiated</h2>
+          <span class="tick-circle">
+	   			<img src="../../assets/icons/tick-icon-green.svg" alt="tick">
+	   		</span>
+          <span>The account will be credited in 2 hours.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <ul>
+          <li><button type="button" (click)="makeAnother()" #closeRequest class="bttn bttn-default btn-lg" data-dismiss="modal">Make another Payment</button></li>
+          <li><button type="button" (click)="makeAnother()" class="bttn bttn-theme btn-sm">OK</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

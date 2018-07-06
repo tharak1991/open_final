@@ -1,0 +1,1942 @@
+<app-header></app-header>
+<article (blur)="stotCapture()">
+  <div class="warnMessageTop {{hideWarningClass}}">
+    <p>{{warning_message}}</p>
+    <a (click)="hideWarning()" title="close" class="closeWarn">
+      <img src="assets/icons/cancel_white.svg" alt="">
+    </a>
+  </div>
+  <section class="onboard">
+    <div class="main-body">
+      <div class="onboard-bg">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="onboard-wizard-category">
+              <div class="wizard-category">
+                <ul *ngIf="onbord_flag!=0 && onbord_form_flag!=0">
+                  <li (click)="update_click(1,1,11)" [ngClass]="[onbord_flag==1 ? 'onBoardSteps active':'onBoardSteps stp-complete']">
+                    <span>1</span>
+                    <a title="business">Business</a>
+                  </li>
+                  <li (click)="update_click(2,3,23)" [ngClass]="[onbord_flag==2 ? 'onBoardSteps active':(onbord_flag > 2 ? 'onBoardSteps stp-complete':'onBoardSteps')]">
+                    <span>2</span>
+                    <a title="stakeholder">Stakeholders</a>
+                  </li>
+                  <li [ngClass]="[onbord_flag==3 ? 'onBoardSteps active':(onbord_flag > 3 ? 'onBoardSteps stp-complete':'onBoardSteps')]">
+                    <span>3</span>
+                    <a title="Address">Address</a>
+                  </li>
+                  <li [ngClass]="[onbord_flag==4 ? 'onBoardSteps active':'onBoardStep']">
+                    <span>4</span>
+                    <a title="contract">Contract</a>
+                  </li>
+                </ul>
+                <ul *ngIf="update_onbord_flag!=0 && update_onbord_form_flag!=0">
+                  <li (click)="update_click(1,1,11)" [ngClass]="[update_onbord_flag==1 ? 'onBoardSteps active':'onBoardSteps stp-complete']">
+                    <span>1</span>
+                    <a title="business">Business</a>
+                  </li>
+                  <li (click)="update_click(2,3,23)" [ngClass]="[update_onbord_flag==2 ? 'onBoardSteps active':(update_onbord_flag > 2 ? 'onBoardSteps stp-complete':'onBoardSteps')]">
+                    <span>2</span>
+                    <a title="stakeholder">Stakeholders</a>
+                  </li>
+                  <li [ngClass]="[update_onbord_flag==3 ? 'onBoardSteps active':(update_onbord_flag > 3 ? 'onBoardSteps stp-complete':'onBoardSteps')]">
+                    <span>3</span>
+                    <a title="Address">Address</a>
+                  </li>
+                  <li [ngClass]="[update_onbord_flag==4 ? 'onBoardSteps active':'onBoardStep']">
+                    <span>4</span>
+                    <a title="contract">Contract</a>
+                  </li>
+                </ul>
+              </div>
+              <div class="auto-saved text-center" *ngIf="onbord_flag==1">
+                <img alt="" src="assets/images/onboard-autosaved.png">
+                <p>Each step during activation is auto saved for your convenience and you can always continue from where you
+                  had stopped</p>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="onbord_flag!=0 && onbord_form_flag!=0" class="col-md-5">
+            <div *ngIf="onbord_flag==1 && onbord_form_flag==1" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="business_detail" (ngSubmit)="onSubmitBusinessDetail()">
+                <h2>Business Details</h2>
+                <ul>
+                  <li>
+                    <div class="form-groupNew">
+                      <label>Business Type</label>
+                      <p-dropdown ngModel="{{business}}" (onChange)="userTypeChange($event)" [options]="businees_type" formControlName="mob_business_types_id"
+                        [autoWidth]="false" placeholder="Select Business"></p-dropdown>
+                      <div *ngIf="business_detail.controls['mob_business_types_id'].hasError('required') && (business_detail.controls['mob_business_types_id'].dirty || business_detail.controls['mob_business_types_id'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Registered Business Name </label>
+                      <input type="text" formControlName="registered_business_name" class="form-control" placeholder="Enter Business Name">
+                      <div *ngIf="business_detail.controls['registered_business_name'].hasError('required') && (business_detail.controls['registered_business_name'].dirty || business_detail.controls['registered_business_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="business_detail.controls['registered_business_name'].hasError('pattern')" class="error">
+                        Should be alphanumeric value, must be less than 100 character
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Brand</label>
+                      <span>(optional)</span>
+                      <input type="text" formControlName="brand_name" class="form-control" placeholder="Enter Brand Name">
+                      <div *ngIf="business_detail.controls['brand_name'].hasError('maxlength')" class="error">
+                        Should be alphanumeric value, not more than 100 char
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Date of Incorporation</label>
+                      <span>(optional)</span>
+                      <p-calendar placeholder="dd/mm/yyyy" [maxDate]="maxDate" [readonlyInput]="true" dateFormat="yy-mm-dd" formControlName="date_of_incorporation"
+                        [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>GST Number</label>
+                      <span>(optional)</span>
+                      <input type="text" formControlName="gstin_number" class="form-control upperCase" placeholder="Enter your 15 digit GST number">
+                      <div *ngIf="business_detail.controls['gstin_number'].hasError('pattern')" class="error">
+                        Invalid GSTIN format
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-groupNew">
+                      <label>Business Category</label>
+                      <p-dropdown [options]="businees_category" formControlName="mob_business_categories_id" [autoWidth]="false" placeholder="Select"></p-dropdown>
+                      <div *ngIf="business_detail.controls['mob_business_categories_id'].hasError('required') && (business_detail.controls['mob_business_categories_id'].dirty || business_detail.controls['mob_business_categories_id'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="submitButton">
+                    <input class="bttn bttn-theme btn-custom-xl" value="Save and Proceed" [disabled]="!business_detail.valid" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==1 && !pan_data" class="form-wizard">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a class="active" [routerLink]="['/onboard-individual']"></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']"></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload PAN Card</h2>
+              <div class="upload-pan">
+                <div class="preview-pan {{loaderClassPan}}">
+                  <p>PAN Card</p>
+                  <ul class="from-upload">
+                    <li class="from-upload-local">
+                      <label class="fileContainer uploaderBig">
+                        <span>Upload from computer</span>
+                        <input (change)="onChangePan($event)" type="file" />
+                      </label>
+                    </li>
+                    <li class="from-upload-webcam">
+                      <a *ngIf="camStatus=='true'" title="" (click)="startCapture(1)" data-toggle="modal" data-target="#webcam-modal">
+                        <span>Take photo using webcam</span>
+                      </a>
+                      <button *ngIf="camStatus=='false'" disabled>
+                        <span>Take photo using webcam</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="submitButton">
+                <input class="bttn bttn-theme btn-custom-xl" value="Save and Proceed" disabled="" type="submit">
+              </div>
+            </div>
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==1 && pan_data" class="form-wizard">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a class="active" [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload PAN Card</h2>
+              <div class="upload-pan">
+                <div class="preview-pan uploaded-pan">
+                  <img *ngIf="adobeIconForPersonalPan==false" src="{{pan_data.url}}">
+                  <img *ngIf="adobeIconForPersonalPan==true" src="{{adobeIconUrl}}">
+                  <p>Uploaded PAN Card Image</p>
+                  <span (click)="delteFiles(pan_data.id,1)" class="delete-uploaded"></span>
+                </div>
+              </div>
+              <div class="submitButton">
+                <button #savepanBtn (click)="savePan()" class="bttn bttn-theme btn-md">Save and Proceed</button>
+              </div>
+            </div>
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==2" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_detail" (ngSubmit)="onSubmitStakeholerDetail()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" class="active" title=""></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per PAN Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>First Name</label>
+                      <input type="text" formControlName="individual_pan_first_name" ngModel="{{pan_data.meta.individual_pan_first_name}}" class="form-control"
+                        placeholder="First Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_first_name'].hasError('required') && (stakeholder_detail.controls['individual_pan_first_name'].dirty || stakeholder_detail.controls['individual_pan_first_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_first_name'].hasError('pattern')" class="error">
+                        Invalid first name.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Middle Name</label>
+                      <input type="text" formControlName="individual_pan_second_name" class="form-control" placeholder="Middle Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_second_name'].hasError('pattern')" class="error">
+                        Invalid Middle name.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Last Name</label>
+                      <input type="text" formControlName="individual_pan_last_name" ngModel="{{pan_data.meta.individual_pan_last_name}}" class="form-control"
+                        placeholder="Last Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_last_name'].hasError('required') && (stakeholder_detail.controls['individual_pan_last_name'].dirty || stakeholder_detail.controls['individual_pan_last_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_last_name'].hasError('pattern')" class="error">
+                        Invalid last name.
+                      </div>
+                    </div>
+                  </li>
+                  <!-- <li class="half">
+                    <div class="form-group">
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="individual_pan_gender" ngModel="{{pan_data.meta.individual_pan_gender}}"
+                        [autoWidth]="false" placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_gender'].hasError('required') && (stakeholder_detail.controls['individual_pan_gender'].dirty || stakeholder_detail.controls['individual_pan_gender'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li> -->
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar formControlName="individual_pan_dob" [maxDate]="maxDate" [readonlyInput]="true" dateFormat="yy-mm-dd" ngModel="{{pan_data.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-group">
+                      <label>PAN Number</label>
+                      <input type="text" formControlName="individual_pan_number" ngModel="{{pan_data.meta.number}}" class="form-control upperCase"
+                        placeholder="PAN Number">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_number'].hasError('required') && (stakeholder_detail.controls['individual_pan_number'].dirty || stakeholder_detail.controls['individual_pan_number'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_number'].hasError('pattern')" class="error">
+                        Invalid PAN format
+                      </div>
+                    </div>
+                  </li>
+                  <li class="submitButton">
+                    <input class="bttn bttn-theme btn-custom-xl" value="Save and Proceed" [disabled]="!stakeholder_detail.valid" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==3 && !aadhar_save" class="form-wizard {{loaderClasssubmit}}">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a (click)="set_files(2,1,'pancard')"></a>
+                  </li>
+                  <li>
+                    <a (click)="set_files(2,2,'pancard')"></a>
+                  </li>
+                  <li>
+                    <a class="active" [routerLink]="['/onboard-individual']"></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload Aadhar Card</h2>
+              <ul>
+                <li class="front-side" *ngIf="onbord_flag==2 && onbord_form_flag==3 && !aadhar_data_front">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan {{loaderClassFront}}">
+                      <p>FRONT SIDE
+                        <!-- <span pTooltip="it will help you " class="help-circle">?</span> -->
+                      </p>
+                      <ul class="from-upload">
+                        <li class="from-upload-local">
+                          <label class="fileContainer uploaderBig">
+                            <span>Upload from computer</span>
+                            <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,1)" type="file" />
+                          </label>
+                        </li>
+                        <li class="from-upload-webcam">
+                          <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" title="" (click)="startCapture(2)" data-toggle="modal" data-target="#webcam-modal">
+                            <span>Take photo using webcam</span>
+                          </a>
+                          <button *ngIf="camStatus=='false'" disabled>
+                            <span>Take photo using webcam</span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="front-side" *ngIf="onbord_flag==2 && onbord_form_flag==3 && aadhar_data_front">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan uploaded-pan">
+                      <img *ngIf="adobeIconForAadharFront==false" src="{{aadhar_data_front.url}}">
+                      <img *ngIf="adobeIconForAadharFront==true" src="{{adobeIconUrl}}">
+
+                      <p>Uploaded Aadhar Card Image</p>
+                      <span (click)="delteFiles(aadhar_data_front.id,2)" class="delete-uploaded"></span>
+                    </div>
+                  </div>
+                </li>
+                <li class="back-side" *ngIf="onbord_flag==2 && onbord_form_flag==3 && !aadhar_data_back">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan {{loaderClassBack}}">
+                      <p>BACK SIDE</p>
+                      <ul class="from-upload">
+                        <li class="from-upload-local">
+                          <label class="fileContainer uploaderBig">
+                            <span>Upload from computer</span>
+                            <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,2)" type="file" />
+                          </label>
+                        </li>
+                        <li class="from-upload-webcam">
+                          <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" title="" (click)="startCapture(3)" data-toggle="modal" data-target="#webcam-modal">
+                            <span>Take photo using webcam</span>
+                          </a>
+                          <button *ngIf="camStatus=='false'" disabled>
+                            <span>Take photo using webcam</span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="back-side" *ngIf="onbord_flag==2 && onbord_form_flag==3 && aadhar_data_back">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan uploaded-pan">
+                      <img *ngIf="adobeIconForAadharBack==false" src="{{aadhar_data_back.url}}">
+                      <img *ngIf="adobeIconForAadharBack==true" src="{{adobeIconUrl}}">
+                      <p>Uploaded Aadhar Card Image</p>
+                      <span (click)="delteFiles(aadhar_data_back.id,3)" class="delete-uploaded"></span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <div class="eAadhar" *ngIf="!(aadhar_data_front) && !(aadhar_data_back)">
+                <div class="yellowBox">
+                  <span *ngIf="aadhar_e_data_content==false">Incase if you have an e-Aadhaar,</span>
+                  <span *ngIf="aadhar_e_data_content==true">You have uploaded an e-Aadhaar</span>
+                  <span class="eAadhar-upload" *ngIf="aadhar_e_data_content==false">
+                    <label>
+                      <input (change)="onChangeEaadhaar($event)" type="file" />
+                      <a>Upload</a>
+                    </label>
+                  </span>
+                </div>
+                <span class="displayResult" *ngIf="aadhar_e_data_content==true">
+                  {{aadhar_e_data.original_file_name}}
+                  <a (click)="delteFiles(aadhar_e_data.id,5,'simple')">
+                    <img src="assets/icons/canel_icon.svg" alt="cancel">
+                  </a>
+                </span>
+              </div>
+              <div class="submitButton">
+                <input *ngIf="aadhar_e_data_content==false" (click)="saveAadhar()" class="bttn bttn-theme btn-custom-xl" value="Save and Proceed"
+                  [disabled]="!aadhar_data_front || !aadhar_data_back" type="submit">
+                <input *ngIf="aadhar_e_data_content==true" (click)="saveAadhar()" class="bttn bttn-theme btn-custom-xl" value="Save and Proceed"
+                  [disabled]="!aadhar_e_data" type="submit">
+              </div>
+            </div>
+            <!-- without E aadhaar -->
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==3 && aadhar_data_front && aadhar_data_back && aadhar_save" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_address" (ngSubmit)="onSubmitStakeholerAddress()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a (click)="set_files(2,2,'pancard')"></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" class="active" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per Aadhar Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input type="text" formControlName="aadhaar_first_name" ngModel="{{aadhar_data_front.meta.name}}" class="form-control" placeholder="Full Name">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_first_name'].hasError('required') && (stakeholder_address.controls['aadhaar_first_name'].dirty || stakeholder_address.controls['aadhaar_first_name'].touched)"
+                        class="error">
+                        Please provide a valid full name
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Aadhar Number</label>
+                      <input type="text" formControlName="aadhaar_number" ngModel="{{aadhar_data_front.meta.uid}}" class="form-control" placeholder="Aadhaar Number">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('required') && (stakeholder_address.controls['aadhaar_number'].dirty || stakeholder_address.controls['aadhaar_number'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('pattern') " class="error">
+                        Please provide a valid Aadhar Number
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar dateFormat="yy-mm-dd" [maxDate]="maxDate" [readonlyInput]="true" formControlName="aadhaar_dob" ngModel="{{aadhar_data_front.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_dob'].hasError('required') && (stakeholder_address.controls['aadhaar_dob'].dirty || stakeholder_address.controls['aadhaar_dob'].touched)"
+                        class="error">
+                        Please provide a valid DOB
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div>
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="aadhaar_gender" ngModel="{{aadhar_data_front.meta.gender}}" [autoWidth]="false"
+                        placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_gender'].hasError('required') && (stakeholder_address.controls['aadhaar_gender'].dirty || stakeholder_address.controls['aadhaar_gender'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Address</label>
+                      <input type="text" formControlName="aadhaar_address" ngModel="{{aadhar_data_back.meta.splitAddress.addressLine}}" class="form-control"
+                        placeholder="Address">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_address'].hasError('required') && (stakeholder_address.controls['aadhaar_address'].dirty || stakeholder_address.controls['aadhaar_address'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>City</label>
+                      <input type="text" formControlName="aadhaar_city" ngModel="{{aadhar_data_back.meta.splitAddress.city}}" class="form-control"
+                        placeholder="City">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_city'].hasError('required') && (stakeholder_address.controls['aadhaar_city'].dirty || stakeholder_address.controls['aadhaar_city'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==true">
+                    <div class="form-group">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="aadhaar_state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==false">
+                    <div class="form-group ">
+                      <label>State</label>
+                      <input type="text" formControlName="aadhaar_state" ngModel="{{aadhar_data_back.meta.splitAddress.state}}" class="form-control"
+                        placeholder="State">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Pin</label>
+                      <input type="text" formControlName="aadhaar_pin" ngModel="{{aadhar_data_back.meta.pincode}}" class="form-control" placeholder="Pin">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_pin'].hasError('required') && (stakeholder_address.controls['aadhaar_pin'].dirty || stakeholder_address.controls['aadhaar_pin'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <p-checkbox (onChange)="toggleCurrentAddressForm($event)" formControlName="is_current_address_different" binary="true"></p-checkbox>
+                      <p class="after-checkbox">Current address is different from the address in Aadhar</p>
+                    </div>
+                  </li>
+                </ul>
+                <ul *ngIf="showCurrnetAddressForm==true" [@myAnimation] style="width: 100%;">
+                  <span>Current Address</span>
+                  <li>
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Address</label>
+                      <input type="text" formControlName="address_line" class="form-control" placeholder="Number, Street">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_line'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_line'].dirty || stakeholder_address.controls.current_address.controls['address_line'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>City</label>
+                      <input type="text" formControlName="city" class="form-control" placeholder="City">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['city'].hasError('required') && (stakeholder_address.controls.current_address.controls['city'].dirty || stakeholder_address.controls.current_address.controls['city'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div formGroupName="current_address">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['state'].hasError('required') && (stakeholder_address.controls.current_address.controls['state'].dirty || stakeholder_address.controls.current_address.controls['state'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Pin</label>
+                      <input type="text" formControlName="pincode" class="form-control" placeholder="Pincode">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['pincode'].hasError('required') && (stakeholder_address.controls.current_address.controls['pincode'].dirty || stakeholder_address.controls.current_address.controls['pincode'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div formGroupName="current_address">
+                      <label>Address Proof</label>
+                      <p-dropdown [options]="address_proof_type" formControlName="address_proofs_id" [autoWidth]="false" placeholder="Select type of Proof"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_proofs_id'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_proofs_id'].dirty || stakeholder_address.controls.current_address.controls['address_proofs_id'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="uploadMultipleImages">
+                    <div class="form-group">
+                      <div class="uploadMulipleblock">
+                        <label class="fileContainer uploaderBig">
+                          <input (change)="onChangeOthers($event)" type="file" multiple/>
+                        </label>
+                      </div>
+                      <div class="uploadMulipleblock" *ngFor="let add of address_proof">
+                        <span>
+                          <img src="{{add.url}}" title="" alt="" />
+                          <a class="delete-uploaded" (click)="delteOtherFiles(add)" title="delete"></a>
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+
+                <ul>
+                  <li class="submitButton">
+                    <input *ngIf="showCurrnetAddressForm==false" class="bttn bttn-theme btn-custom-xl" value="Save and Proceed" type="submit">
+                    <input *ngIf="showCurrnetAddressForm==true" class="bttn bttn-theme btn-custom-xl" [disabled]="!(stakeholder_address.valid) || (current_address_proofs_files_id.length == 0)"
+                      value="Save and Proceed" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+
+            <!-- With E aadhaar -->
+            <div *ngIf="onbord_flag==2 && onbord_form_flag==3 && aadhar_e_data && aadhar_e_data_content && aadhar_save" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_address" (ngSubmit)="onSubmitStakeholerAddress()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a (click)="set_files(2,2,'pancard')"></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" class="active"></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per Aadhar Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input type="text" formControlName="aadhaar_first_name" ngModel="{{aadhar_e_data.meta.name}}" class="form-control" placeholder="Full Name">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_first_name'].hasError('required') && (stakeholder_address.controls['aadhaar_first_name'].dirty || stakeholder_address.controls['aadhaar_first_name'].touched)"
+                        class="error">
+                        Please provide a valid full name
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Aadhar Number</label>
+                      <input type="text" formControlName="aadhaar_number" ngModel="{{aadhar_e_data.meta.uid}}" class="form-control" placeholder="Aadhaar Number">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('required') && (stakeholder_address.controls['aadhaar_number'].dirty || stakeholder_address.controls['aadhaar_number'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('pattern') " class="error">
+                        Please provide a valid Aadhar Number
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar dateFormat="yy-mm-dd" [maxDate]="maxDate" [readonlyInput]="true" formControlName="aadhaar_dob" ngModel="{{aadhar_e_data.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_dob'].hasError('required') && (stakeholder_address.controls['aadhaar_dob'].dirty || stakeholder_address.controls['aadhaar_dob'].touched)"
+                        class="error">
+                        Please provide a valid DOB
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-group">
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="aadhaar_gender" ngModel="{{aadhar_e_data.meta.gender}}" [autoWidth]="false"
+                        placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_gender'].hasError('required') && (stakeholder_address.controls['aadhaar_gender'].dirty || stakeholder_address.controls['aadhaar_gender'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Address</label>
+                      <input type="text" formControlName="aadhaar_address" ngModel={{aadhar_e_data.meta.splitAddress.addressLine}} class="form-control"
+                        placeholder="Address">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_address'].hasError('required') && (stakeholder_address.controls['aadhaar_address'].dirty || stakeholder_address.controls['aadhaar_address'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>City</label>
+                      <input type="text" formControlName="aadhaar_city" ngModel="{{aadhar_e_data.meta.splitAddress.city}}" class="form-control"
+                        placeholder="City">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_city'].hasError('required') && (stakeholder_address.controls['aadhaar_city'].dirty || stakeholder_address.controls['aadhaar_city'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==true" class="half pull-right">
+                    <div class="form-group">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="aadhaar_state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==false" class="half pull-right">
+                    <div class="form-group ">
+                      <label>State</label>
+                      <input type="text" formControlName="aadhaar_state" ngModel="{{aadhar_e_data.meta.splitAddress.state}}" class="form-control"
+                        placeholder="State">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Pin</label>
+                      <input type="text" formControlName="aadhaar_pin" ngModel="{{aadhar_e_data.meta.pincode}}" class="form-control" placeholder="Pin">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_pin'].hasError('required') && (stakeholder_address.controls['aadhaar_pin'].dirty || stakeholder_address.controls['aadhaar_pin'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+
+                  <li>
+                    <div class="form-group">
+                      <p-checkbox (onChange)="toggleCurrentAddressForm($event)" formControlName="is_current_address_different" binary="true"></p-checkbox>
+                      <p class="after-checkbox">Current address is different from the address in Aadhar</p>
+                    </div>
+                  </li>
+                </ul>
+                <ul *ngIf="showCurrnetAddressForm" [@myAnimation] style="width: 100%;">
+                  <span>Current Address</span>
+                  <li>
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Address</label>
+                      <input type="text" formControlName="address_line" class="form-control" placeholder="Number, Street">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_line'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_line'].dirty || stakeholder_address.controls.current_address.controls['address_line'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>City</label>
+                      <input type="text" formControlName="city" class="form-control">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['city'].hasError('required') && (stakeholder_address.controls.current_address.controls['city'].dirty || stakeholder_address.controls.current_address.controls['city'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-group " formGroupName="current_address">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['state'].hasError('required') && (stakeholder_address.controls.current_address.controls['state'].dirty || stakeholder_address.controls.current_address.controls['state'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Pin</label>
+                      <input type="text" formControlName="pincode" class="form-control">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['pincode'].hasError('required') && (stakeholder_address.controls.current_address.controls['pincode'].dirty || stakeholder_address.controls.current_address.controls['pincode'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Address Proof</label>
+                      <p-dropdown [options]="address_proof_type" formControlName="address_proofs_id" [autoWidth]="false" placeholder="Select type of Proof"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_proofs_id'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_proofs_id'].dirty || stakeholder_address.controls.current_address.controls['address_proofs_id'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="uploadMultipleImages">
+                    <div class="form-group">
+                      <div class="uploadMulipleblock">
+                        <label class="fileContainer uploaderBig">
+                          <input (change)="onChangeOthers($event)" type="file" multiple/>
+                        </label>
+                      </div>
+                      <div class="uploadMulipleblock" *ngFor="let add of address_proof">
+                        <span>
+                          <img src="{{add.url}}" title="" alt="" />
+                          <a class="delete-uploaded" (click)="delteOtherFiles(add)" title="delete"></a>
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <ul>
+                  <li class="submitButton">
+                    <input *ngIf="showCurrnetAddressForm==false" class="bttn bttn-theme" value="Save and Proceed" type="submit">
+                    <input *ngIf="showCurrnetAddressForm==true" class="bttn bttn-theme" [disabled]="!(stakeholder_address.valid) || (current_address_proofs_files_id.length == 0)"
+                      value="Save and Proceed" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <!-- /With E aadhaar -->
+            <div *ngIf="onbord_flag==4 && onbord_form_flag==1" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="almostDone1" (ngSubmit)="onSubmitCertify()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" class="active" href="" title=""></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>You are almost done!</h2>
+                <div class="almost-done">
+                  <div class="form-group">
+                    <p-checkbox (onChange)="checkAlmost1($event)" formControlName="certify" binary="true"></p-checkbox>
+                    <p class="after-checkbox">I certify that I'm the signing authority of the company and all information shared are true to my knowledge
+                      and i'm borne to immediately notify OPEN of any changes in the same.</p>
+                  </div>
+                </div>
+                <div class="submitButton">
+                  <input [disabled]="!almostDone1.valid || check_almost==0" class="bttn bttn-theme btn-md mrl-30" value="Save and Proceed"
+                    type="submit">
+                </div>
+              </form>
+            </div>
+            <div *ngIf="onbord_flag==4 && onbord_form_flag==2" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="almostDone2" (ngSubmit)="onSubmitOtp()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a title="" [routerLink]="['/onboard-individual']"></a>
+                    </li>
+                    <li>
+                      <a class="active" title="" [routerLink]="['/onboard-individual']"></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>You are almost done!</h2>
+                <div class="last-otp">
+                  <h6>
+                    An OTP is sent to the mobile number linked with your Aadhar
+                  </h6>
+                  <div class="otp-amd">
+                    <ul>
+                      <li>
+                        <div class="form-group">
+                          <input type="number" formControlName="otp" class="form-control" (keyup)="clearMsg()">
+                          <div *ngIf="almostDone2.controls['otp'].hasError('required') && (almostDone2.controls['otp'].dirty || almostDone2.controls['otp'].touched)"
+                            class="error">
+                            This field is required
+                          </div>
+                          <div *ngIf="almostDone2.controls['otp'].hasError('pattern') " class="error">
+                            Please provide a valid Otp
+                          </div>
+                          <div *ngIf="invalid_otp" class="error">
+                            Invalid Otp try again.
+                          </div>
+                        </div>
+                        <span class="resend-otp">
+                          <a *ngIf="manualSignInBtnTimeStatus==false" style="cursor:default" title="resend OTP">Resend OTP</a>
+                          <a class="btnTextBlue" *ngIf="manualSignInBtnTimeStatus==true" (click)="resendOtp()" title="resend OTP">Resend OTP</a>
+                        </span>
+                      </li>
+                      <li>
+                        <div class="form-group">
+                          <input type="submit" [disabled]="!almostDone2.valid" class="bttn bttn-theme btn-xl pull-right" value="Submit" />
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="esign-doc">
+                    <span class="orsec">
+                      OR
+                    </span>
+                    <p>Complete without Aadhar OTP</p>
+                  </div>
+
+                </div>
+              </form>
+              <div class="signManually">
+                <p class="text-center">
+                  <button *ngIf="manualSignInBtnTimeStatus==false" class="bttn bttn-theme btn-md animateBtnTimer" disabled>
+                    <span>Sign Manually</span>
+                  </button>
+                  <a *ngIf="manualSignInBtnTimeStatus==true" class="bttn bttn-theme btn-md" (click)="manualySinging()">
+                    <span class="btnTextWhite">Sign Manually</span>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Update Form Start -->
+          <div *ngIf="update_onbord_flag!=0 && update_onbord_form_flag!=0" class="col-md-5">
+            <div *ngIf="update_onbord_flag==1 && update_onbord_form_flag==1" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="business_detail_update" (ngSubmit)="updateonSubmitBusinessDetail()">
+                <h2>Business Details</h2>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>Business Type</label>
+                      <p-dropdown disabled ngModel="{{business}}" [options]="businees_type" formControlName="mob_business_types_id" [autoWidth]="false"
+                        placeholder="Select Business"></p-dropdown>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Registered Business Name </label>
+                      <input type="text" ngModel="{{mob_data.mob_business_details.data.registered_business_name}}" formControlName="registered_business_name"
+                        class="form-control" placeholder="Enter Business Name">
+                      <div *ngIf="business_detail.controls['registered_business_name'].hasError('required') && (business_detail.controls['registered_business_name'].dirty || business_detail.controls['registered_business_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="business_detail.controls['registered_business_name'].hasError('pattern')" class="error">
+                        Should be alphanumeric value, must be less than 100 character
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Brand</label>
+                      <span>(optional)</span>
+                      <input type="text" ngModel="{{mob_data.mob_business_details.data.brand_name}}" formControlName="brand_name" class="form-control"
+                        placeholder="Enter Brand Name">
+                      <div *ngIf="business_detail.controls['brand_name'].hasError('maxlength')" class="error">
+                        Should be alphanumeric value, not more than 100 char
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Date of Incorporation</label>
+                      <span>(optional)</span>
+                      <p-calendar [maxDate]="maxDate" [readonlyInput]="true" ngModel="{{mob_data.mob_business_details.data.date_of_incorporation}}"
+                        placeholder="dd/mm/yyyy" dateFormat="yy-mm-dd" formControlName="date_of_incorporation" [monthNavigator]="true"
+                        [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>GST Number</label>
+                      <span>(optional)</span>
+                      <input type="text" ngModel="{{mob_data.mob_business_details.data.gstin_number}}" formControlName="gstin_number" class="form-control upperCase"
+                        placeholder="Enter your 15 digit GST number">
+                      <div *ngIf="business_detail.controls['gstin_number'].hasError('pattern')" class="error">
+                        Invalid GSTIN format
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-groupNew">
+                      <label>Business Category</label>
+                      <p-dropdown ngModel="{{ mob_data.mob_business_details.data.mob_business_categories_id }}" [options]="businees_category" formControlName="mob_business_categories_id"
+                        [autoWidth]="false" placeholder="Select"></p-dropdown>
+                      <div *ngIf="business_detail.controls['mob_business_categories_id'].hasError('required') && (business_detail.controls['mob_business_categories_id'].dirty || business_detail.controls['mob_business_categories_id'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="submitButton">
+                    <input class="bttn bttn-theme btn-custom-xl" value="Update and Proceed" [disabled]="!business_detail_update.valid" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==1 && (!pan_data || pan_data.url=='')" class="form-wizard">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" class="active" title=""></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload PAN Card</h2>
+              <div class="upload-pan">
+                <div class="preview-pan {{loaderClassPan}}">
+                  <p>PAN Card</p>
+                  <ul class="from-upload">
+                    <li class="from-upload-local">
+                      <label class="fileContainer uploaderBig">
+                        <span>Upload from computer</span>
+                        <input (change)="onChangePan($event)" type="file" />
+                      </label>
+                    </li>
+                    <li class="from-upload-webcam">
+                      <a *ngIf="camStatus=='true'" title="" (click)="startCapture(1)" data-toggle="modal" data-target="#webcam-modal">
+                        <span>Take photo using webcam</span>
+                      </a>
+                      <a title="" *ngIf="camStatus=='false'" class="not-active">
+                        <span>Take photo using webcam</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="submitButton">
+                <input class="bttn bttn-theme btn-custom-xl" value="Update and Proceed" disabled="" type="submit">
+              </div>
+            </div>
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==1 && pan_data && pan_data.url!=''" class="form-wizard">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" class="active"></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                  <li>
+                    <a [routerLink]="['/onboard-individual']" title=""></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload PAN Card</h2>
+              <div class="upload-pan">
+                <div class="preview-pan uploaded-pan">
+                  <img *ngIf="adobeIconForPersonalPan==false" src="{{pan_data.url}}">
+                  <img *ngIf="adobeIconForPersonalPan==true" src="{{adobeIconUrl}}">
+                  <p>Uploaded PAN Card Image</p>
+                  <span (click)="delteFiles(pan_data.id,1)" class="delete-uploaded"></span>
+                </div>
+              </div>
+              <div class="submitButton">
+                <button #savepanBtn (click)="savePan()" class="bttn bttn-theme btn-custom-xl">Update and Proceed</button>
+              </div>
+            </div>
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==2" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_detail" (ngSubmit)="updateonSubmitStakeholerDetail()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" class="active" title=""></a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/onboard-individual']" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per PAN Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>First Name</label>
+                      <input type="text" formControlName="individual_pan_first_name" ngModel="{{pan_data.meta.individual_pan_first_name}}" class="form-control"
+                        placeholder="First Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_first_name'].hasError('required') && (stakeholder_detail.controls['individual_pan_first_name'].dirty || stakeholder_detail.controls['individual_pan_first_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_first_name'].hasError('pattern')" class="error">
+                        Invalid first name.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Middle Name</label>
+                      <input type="text" ngModel="{{pan_data.meta.individual_pan_second_name}}" formControlName="individual_pan_second_name" class="form-control"
+                        placeholder="Middle Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_second_name'].hasError('pattern')" class="error">
+                        Invalid Middle name.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Last Name</label>
+                      <input type="text" formControlName="individual_pan_last_name" ngModel="{{pan_data.meta.individual_pan_last_name}}" class="form-control"
+                        placeholder="Last Name">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_last_name'].hasError('required') && (stakeholder_detail.controls['individual_pan_last_name'].dirty || stakeholder_detail.controls['individual_pan_last_name'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_last_name'].hasError('pattern')" class="error">
+                        Invalid last name.
+                      </div>
+                    </div>
+                  </li>
+                  <!-- <li class="half">
+                    <div class="form-group">
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="individual_pan_gender" ngModel="{{pan_data.meta.individual_pan_gender}}"
+                        [autoWidth]="false" placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_gender'].hasError('required') && (stakeholder_detail.controls['individual_pan_gender'].dirty || stakeholder_detail.controls['individual_pan_gender'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li> -->
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar [maxDate]="maxDate" [readonlyInput]="true" formControlName="individual_pan_dob" dateFormat="yy-mm-dd" ngModel="{{pan_data.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-group">
+                      <label>PAN Number</label>
+                      <input type="text" formControlName="individual_pan_number" ngModel="{{pan_data.meta.number}}" class="form-control upperCase"
+                        placeholder="PAN Number">
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_number'].hasError('required') && (stakeholder_detail.controls['individual_pan_number'].dirty || stakeholder_detail.controls['individual_pan_number'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                      <div *ngIf="stakeholder_detail.controls['individual_pan_number'].hasError('pattern')" class="error">
+                        Invalid PAN format
+                      </div>
+                    </div>
+                  </li>
+                  <li class="submitButton">
+                    <input class="bttn bttn-theme btn-custom-xl" value="Update and Proceed" [disabled]="!stakeholder_detail.valid" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && !aadhar_save" class="form-wizard {{loaderClasssubmit}}">
+              <div class="form-wizard-dots">
+                <ul>
+                  <li>
+                    <a (click)="set_files(2,1,'pancard')" title=""></a>
+                  </li>
+                  <li>
+                    <a (click)="set_files(2,2,'pancard')" title=""></a>
+                  </li>
+                  <li>
+                    <a class="active" title=""></a>
+                  </li>
+                </ul>
+              </div>
+              <h2>Upload Aadhar Card</h2>
+              <ul>
+                <li class="front-side" *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && !aadhar_data_front">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan {{loaderClassFront}}">
+                      <p>FRONT SIDE
+                        <!-- <span pTooltip="it will help you " class="help-circle">?</span> -->
+                      </p>
+                      <ul class="from-upload">
+                        <li class="from-upload-local">
+                          <label class="fileContainer uploaderBig">
+                            <span>Upload from computer</span>
+                            <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,1)" type="file" />
+                          </label>
+                        </li>
+                        <li class="from-upload-webcam">
+                          <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" title="" (click)="startCapture(2)" data-toggle="modal" data-target="#webcam-modal">
+                            <span>Take photo using webcam</span>
+                          </a>
+                          <button *ngIf="camStatus=='false'" disabled>
+                            <span>Take photo using webcam</span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="front-side" *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && aadhar_data_front">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan uploaded-pan">
+                      <img *ngIf="adobeIconForAadharFront==false" src="{{aadhar_data_front.url}}">
+                      <img *ngIf="adobeIconForAadharFront==true" src="{{adobeIconUrl}}">
+                      <p>Uploaded Aadhar Card Image</p>
+                      <span (click)="delteFiles(aadhar_data_front.id,2)" class="delete-uploaded"></span>
+                    </div>
+                  </div>
+                </li>
+                <li class="back-side" *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && !aadhar_data_back">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan {{loaderClassBack}}">
+                      <p>BACK SIDE</p>
+                      <ul class="from-upload">
+                        <li class="from-upload-local">
+                          <label class="fileContainer uploaderBig">
+                            <span>Upload from computer</span>
+                            <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,2)" type="file" />
+                          </label>
+                        </li>
+                        <li class="from-upload-webcam">
+                          <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" (click)="startCapture(3)" data-toggle="modal" data-target="#webcam-modal">
+                            <span>Take photo using webcam</span>
+                          </a>
+                          <button *ngIf="camStatus=='false'" disabled>
+                            <span>Take photo using webcam</span>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+                <li class="back-side" *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && aadhar_data_back">
+                  <div class="upload-aadhar">
+                    <div class="preview-pan uploaded-pan">
+                      <img *ngIf="adobeIconForAadharBack==false" src="{{aadhar_data_back.url}}">
+                      <img *ngIf="adobeIconForAadharBack==true" src="{{adobeIconUrl}}">
+                      <p>Uploaded Aadhar Card Image</p>
+                      <span (click)="delteFiles(aadhar_data_back.id,3)" class="delete-uploaded"></span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <div class="eAadhar" *ngIf="!(aadhar_data_front) && !(aadhar_data_back)">
+                <div class="yellowBox">
+                  <span *ngIf="aadhar_e_data_content==false">Incase if you have an e-Aadhaar,</span>
+                  <span *ngIf="aadhar_e_data_content==true">You have uploaded an e-Aadhaar</span>
+                  <span class="eAadhar-upload" *ngIf="aadhar_e_data_content==false">
+                    <label>
+                      <input (change)="onChangeEaadhaar($event)" type="file" />
+                      <a>Upload</a>
+                    </label>
+                  </span>
+                </div>
+                <span class="displayResult" *ngIf="aadhar_e_data_content==true">
+                  {{aadhar_e_data.original_file_name}}
+                  <a (click)="delteFiles(aadhar_e_data.id,5,'update')">
+                    <img src="assets/icons/canel_icon.svg" alt="cancel">
+                  </a>
+                </span>
+              </div>
+              <div class="submitButton">
+                <input *ngIf="aadhar_e_data_content==false" (click)="saveAadhar()" class="bttn bttn-theme btn-custom-xl" value="Update and Proceed"
+                  [disabled]="!aadhar_data_front || !aadhar_data_back" type="submit">
+                <input *ngIf="aadhar_e_data_content==true" (click)="saveAadhar()" class="bttn bttn-theme btn-custom-xl" value="Update and Proceed"
+                  [disabled]="!aadhar_e_data" type="submit">
+                <!-- <input (click)="saveAadhar()" class="bttn bttn-theme btn-md" value="Update and Proceed" [disabled]="!aadhar_data_front || !aadhar_data_back"
+                type="submit"> -->
+              </div>
+            </div>
+            <!-- without E aadhaar -->
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && aadhar_data_front && aadhar_data_back && aadhar_save"
+              class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_address" (ngSubmit)="updateonSubmitStakeholerAddress()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a (click)="set_files(2,2,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a class="active" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per Aadhar Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input type="text" formControlName="aadhaar_first_name" ngModel="{{aadhar_data_front.meta.name}}" class="form-control" placeholder="">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_first_name'].hasError('required') && (stakeholder_address.controls['aadhaar_first_name'].dirty || stakeholder_address.controls['aadhaar_first_name'].touched)"
+                        class="error">
+                        Please provide a valid full name
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Aadhar Number</label>
+                      <input type="text" formControlName="aadhaar_number" ngModel="{{aadhar_data_front.meta.uid}}" class="form-control" placeholder="">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('required') && (stakeholder_address.controls['aadhaar_number'].dirty || stakeholder_address.controls['aadhaar_number'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('pattern') " class="error">
+                        Please provide a valid Aadhar Number
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar dateFormat="yy-mm-dd" [maxDate]="maxDate" [readonlyInput]="true" formControlName="aadhaar_dob" ngModel="{{aadhar_data_front.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_dob'].hasError('required') && (stakeholder_address.controls['aadhaar_dob'].dirty || stakeholder_address.controls['aadhaar_dob'].touched)"
+                        class="error">
+                        Please provide a valid DOB
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-groupNew">
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="aadhaar_gender" ngModel="{{aadhar_data_front.meta.gender}}" [autoWidth]="false"
+                        placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_gender'].hasError('required') && (stakeholder_address.controls['aadhaar_gender'].dirty || stakeholder_address.controls['aadhaar_gender'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Address</label>
+                      <input type="text" formControlName="aadhaar_address" ngModel="{{aadhar_data_back.meta.splitAddress.addressLine}}" class="form-control"
+                        placeholder="Address" required>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_address'].hasError('required') && (stakeholder_address.controls['aadhaar_address'].dirty || stakeholder_address.controls['aadhaar_address'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>City</label>
+                      <input type="text" formControlName="aadhaar_city" ngModel="{{aadhar_data_back.meta.splitAddress.city}}" class="form-control"
+                        placeholder="City" required>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_city'].hasError('required') && (stakeholder_address.controls['aadhaar_city'].dirty || stakeholder_address.controls['aadhaar_city'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-group">
+                      <label>State</label>
+                      <input type="text" formControlName="aadhaar_state" ngModel="{{aadhar_data_back.meta.splitAddress.state}}" class="form-control"
+                        placeholder="State" required>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Pin</label>
+                      <input type="text" formControlName="aadhaar_pin" ngModel="{{aadhar_data_back.meta.pincode}}" class="form-control" placeholder="Pin"
+                        required>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_pin'].hasError('required') && (stakeholder_address.controls['aadhaar_pin'].dirty || stakeholder_address.controls['aadhaar_pin'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <p-checkbox (onChange)="toggleCurrentAddressForm($event)" [(ngModel)]="mob_data.mob_stakeholder_details.data.is_current_address_different"
+                        formControlName="is_current_address_different" binary="true"></p-checkbox>
+                      <p class="after-checkbox">Current address is different from the address in Aadhar</p>
+                    </div>
+                  </li>
+                </ul>
+                <ul *ngIf="showCurrnetAddressForm" [@myAnimation] style="width: 100%;">
+                  <span>Current Address</span>
+                  <li>
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Address</label>
+                      <input type="text" formControlName="address_line" ngModel="{{mob_data.mob_stakeholder_details.data.addresses.data.address_line}}"
+                        class="form-control" placeholder="Number, Street" required>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_line'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_line'].dirty || stakeholder_address.controls.current_address.controls['address_line'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>City</label>
+                      <input type="text" formControlName="city" placeholder="City" ngModel="{{mob_data.mob_stakeholder_details.data.addresses.data.city}}"
+                        class="form-control" required>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['city'].hasError('required') && (stakeholder_address.controls.current_address.controls['city'].dirty || stakeholder_address.controls.current_address.controls['city'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-groupNew" formGroupName="current_address">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="state" ngModel="{{mob_data.mob_stakeholder_details.data.addresses.data.state}}"
+                        [autoWidth]="false" placeholder="Select State" required></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['state'].hasError('required') && (stakeholder_address.controls.current_address.controls['state'].dirty || stakeholder_address.controls.current_address.controls['state'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Pin</label>
+                      <input type="text" formControlName="pincode" ngModel="{{mob_data.mob_stakeholder_details.data.addresses.data.pincode}}" placeholder="Pincode"
+                        class="form-control" required>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['pincode'].hasError('required') && (stakeholder_address.controls.current_address.controls['pincode'].dirty || stakeholder_address.controls.current_address.controls['pincode'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-groupNew" formGroupName="current_address">
+                      <label>Address Proof</label>
+                      <p-dropdown [options]="address_proof_type" formControlName="address_proofs_id" ngModel="{{address_proofs_id}}" [autoWidth]="false"
+                        placeholder="Select type of Proof" required></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_proofs_id'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_proofs_id'].dirty || stakeholder_address.controls.current_address.controls['address_proofs_id'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="uploadMultipleImages">
+                    <div class="form-group">
+                      <div class="uploadMulipleblock">
+                        <label class="fileContainer uploaderBig">
+                          <input (change)="onChangeOthers($event)" type="file" multiple/>
+                        </label>
+                      </div>
+                      <div class="uploadMulipleblock" *ngFor="let add of address_proof">
+                        <span>
+                          <img src="{{add.url}}" title="" alt="" />
+                          <a class="delete-uploaded" (click)="delteOtherFiles(add)" title="delete"></a>
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <ul>
+                  <li class="submitButton">
+                    <input *ngIf="showCurrnetAddressForm==false" class="bttn bttn-theme btn-custom-xl" [disabled]="!(stakeholder_address.valid) && (showCurrnetAddressForm)"
+                      value="Update and Proceed" type="submit">
+                    <input *ngIf="showCurrnetAddressForm==true" class="bttn bttn-theme btn-custom-xl" [disabled]="!(stakeholder_address.valid) || (current_address_proofs_files_id.length == 0)"
+                      value="Update and Proceed" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <!--/ without E aadhaar -->
+            <!-- With E aadhaar -->
+            <div *ngIf="update_onbord_flag==2 && update_onbord_form_flag==3 && aadhar_e_data && aadhar_e_data_content && aadhar_save"
+              class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="stakeholder_address" (ngSubmit)="updateonSubmitStakeholerAddress()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a (click)="set_files(2,1,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a (click)="set_files(2,2,'pancard')" title=""></a>
+                    </li>
+                    <li>
+                      <a class="active" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>Stakeholder Details</h2>
+                <h3>As per Aadhar Card</h3>
+                <ul>
+                  <li>
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input type="text" formControlName="aadhaar_first_name" ngModel="{{aadhar_e_data.meta.name}}" class="form-control" placeholder="">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_first_name'].hasError('required') && (stakeholder_address.controls['aadhaar_first_name'].dirty || stakeholder_address.controls['aadhaar_first_name'].touched)"
+                        class="error">
+                        Please provide a valid full name
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <label>Aadhar Number</label>
+                      <input type="text" formControlName="aadhaar_number" ngModel="{{aadhar_e_data.meta.uid}}" class="form-control" placeholder="">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('required') && (stakeholder_address.controls['aadhaar_number'].dirty || stakeholder_address.controls['aadhaar_number'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_number'].hasError('pattern') " class="error">
+                        Please provide a valid Aadhar Number
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Date of Birth</label>
+                      <p-calendar dateFormat="yy-mm-dd" [maxDate]="maxDate" [readonlyInput]="true" formControlName="aadhaar_dob" ngModel="{{aadhar_e_data.meta.dob}}"
+                        placeholder="" [monthNavigator]="true" [yearNavigator]="true" yearRange="1930:2030"></p-calendar>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_dob'].hasError('required') && (stakeholder_address.controls['aadhaar_dob'].dirty || stakeholder_address.controls['aadhaar_dob'].touched)"
+                        class="error">
+                        Please provide a valid DOB
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-groupNew">
+                      <label>Gender</label>
+                      <p-dropdown [options]="gender" formControlName="aadhaar_gender" ngModel="{{aadhar_e_data.meta.gender}}" [autoWidth]="false"
+                        placeholder="Select"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_gender'].hasError('required') && (stakeholder_address.controls['aadhaar_gender'].dirty || stakeholder_address.controls['aadhaar_gender'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li style="display: inline-block;width: 100%;">
+                    <div class="form-group">
+                      <label>Address</label>
+                      <input type="text" formControlName="aadhaar_address" ngModel={{aadhar_e_data.meta.splitAddress.addressLine}} class="form-control"
+                        placeholder="Address">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_address'].hasError('required') && (stakeholder_address.controls['aadhaar_address'].dirty || stakeholder_address.controls['aadhaar_address'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>City</label>
+                      <input type="text" formControlName="aadhaar_city" ngModel="{{aadhar_e_data.meta.splitAddress.city}}" class="form-control"
+                        placeholder="City">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_city'].hasError('required') && (stakeholder_address.controls['aadhaar_city'].dirty || stakeholder_address.controls['aadhaar_city'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==true" class="half pull-right">
+                    <div class="form-groupNew">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="aadhaar_state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li *ngIf="showSTHStateDropDown==false" class="half pull-right">
+                    <div class="form-group">
+                      <label>State</label>
+                      <input type="text" formControlName="aadhaar_state" ngModel="{{aadhar_e_data.meta.splitAddress.state}}" class="form-control"
+                        placeholder="State">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_state'].hasError('required') && (stakeholder_address.controls['aadhaar_state'].dirty || stakeholder_address.controls['aadhaar_state'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group">
+                      <label>Pin</label>
+                      <input type="text" formControlName="aadhaar_pin" ngModel="{{aadhar_e_data.meta.pincode}}" class="form-control" placeholder="Pin">
+                      <div *ngIf="stakeholder_address.controls['aadhaar_pin'].hasError('required') && (stakeholder_address.controls['aadhaar_pin'].dirty || stakeholder_address.controls['aadhaar_pin'].touched)"
+                        class="error">
+                        This field is required
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-group">
+                      <p-checkbox (onChange)="toggleCurrentAddressForm($event)" formControlName="is_current_address_different" binary="true"></p-checkbox>
+                      <p class="after-checkbox">Current address is different from the address in Aadhar</p>
+                    </div>
+                  </li>
+                </ul>
+                <ul *ngIf="showCurrnetAddressForm" [@myAnimation] style="width: 100%;">
+                  <span>Current Address</span>
+                  <li>
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Address</label>
+                      <input type="text" formControlName="address_line" class="form-control" placeholder="Number,Street">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_line'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_line'].dirty || stakeholder_address.controls.current_address.controls['address_line'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>City</label>
+                      <input type="text" formControlName="city" class="form-control">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['city'].hasError('required') && (stakeholder_address.controls.current_address.controls['city'].dirty || stakeholder_address.controls.current_address.controls['city'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half pull-right">
+                    <div class="form-groupNew" formGroupName="current_address">
+                      <label>State</label>
+                      <p-dropdown [options]="state_list" formControlName="state" [autoWidth]="false" placeholder="Select State"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['state'].hasError('required') && (stakeholder_address.controls.current_address.controls['state'].dirty || stakeholder_address.controls.current_address.controls['state'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="half">
+                    <div class="form-group" formGroupName="current_address">
+                      <label>Pin</label>
+                      <input type="text" formControlName="pincode" class="form-control">
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['pincode'].hasError('required') && (stakeholder_address.controls.current_address.controls['pincode'].dirty || stakeholder_address.controls.current_address.controls['pincode'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="form-groupNew" formGroupName="current_address">
+                      <label>Address Proof</label>
+                      <p-dropdown [options]="address_proof_type" formControlName="address_proofs_id" [autoWidth]="false" placeholder="Select type of Proof"></p-dropdown>
+                      <div *ngIf="stakeholder_address.controls.current_address.controls['address_proofs_id'].hasError('required') && (stakeholder_address.controls.current_address.controls['address_proofs_id'].dirty || stakeholder_address.controls.current_address.controls['address_proofs_id'].touched)"
+                        class="error">
+                        This field is required.
+                      </div>
+                    </div>
+                  </li>
+                  <li class="uploadMultipleImages">
+                    <div class="form-group">
+                      <div class="uploadMulipleblock">
+                        <label class="fileContainer uploaderBig">
+                          <input (change)="onChangeOthers($event)" type="file" multiple/>
+                        </label>
+                      </div>
+                      <div class="uploadMulipleblock" *ngFor="let add of address_proof">
+                        <span>
+                          <img src="{{add.url}}" title="" alt="" />
+                          <a class="delete-uploaded" (click)="delteOtherFiles(add)" title="delete"></a>
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <ul>
+                  <li class="submitButton">
+                    <input *ngIf="showCurrnetAddressForm==false" class="bttn bttn-theme btn-custom-xl" [disabled]="!(stakeholder_address.valid) && (showCurrnetAddressForm)"
+                      value="Update and Proceed" type="submit">
+                    <input *ngIf="showCurrnetAddressForm==true" class="bttn bttn-theme btn-custom-xl" [disabled]="!(stakeholder_address.valid) || (current_address_proofs_files_id.length == 0)"
+                      value="Update and Proceed" type="submit">
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <!-- /With E aadhaar -->
+            <div *ngIf="update_onbord_flag==4 && update_onbord_form_flag==1" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="almostDone1" (ngSubmit)="onSubmitCertify()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a class="active" href="" title=""></a>
+                    </li>
+                    <li>
+                      <a title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>You are almost done!</h2>
+                <div class="almost-done">
+                  <div class="form-group">
+                    <p-checkbox (onChange)="checkAlmost1($event)" formControlName="certify" binary="true"></p-checkbox>
+                    <p class="after-checkbox">I certify that I'm the signing authority of the company and all information shared are true to my knowledge
+                      and i'm borne to immediately notify OPEN of any changes in the same.</p>
+                  </div>
+                </div>
+                <div class="submitButton">
+                  <input [disabled]="!almostDone1.valid || check_almost==0" class="bttn bttn-theme btn-md mrl-30" value="Save and Proceed"
+                    type="submit">
+                </div>
+              </form>
+            </div>
+            <div *ngIf="update_onbord_flag==4 && update_onbord_form_flag==2" class="form-wizard {{loaderClasssubmit}}">
+              <form [formGroup]="almostDone2" (ngSubmit)="onSubmitOtp()">
+                <div class="form-wizard-dots">
+                  <ul>
+                    <li>
+                      <a title=""></a>
+                    </li>
+                    <li>
+                      <a class="active" title=""></a>
+                    </li>
+                  </ul>
+                </div>
+                <h2>You are almost done!</h2>
+                <div class="last-otp">
+                  <h6>
+                    An OTP is sent to the mobile number linked with your Aadhar
+                  </h6>
+                  <div class="otp-amd">
+                    <ul>
+                      <li>
+                        <div class="form-group">
+                          <input type="number" formControlName="otp" class="form-control">
+                          <div *ngIf="almostDone2.controls['otp'].hasError('required') && (almostDone2.controls['otp'].dirty || almostDone2.controls['otp'].touched)"
+                            class="error">
+                            This field is required
+                          </div>
+                          <div *ngIf="almostDone2.controls['otp'].hasError('pattern') " class="error">
+                            Please provide a valid Otp
+                          </div>
+
+                        </div>
+                        <span class="resend-otp">
+                          <a *ngIf="manualSignInBtnTimeStatus==false" style="cursor:default" title="resend OTP">Resend OTP</a>
+                          <a class="btnTextBlue" *ngIf="manualSignInBtnTimeStatus==true" (click)="resendOtp()" title="resend OTP">Resend OTP</a>
+                        </span>
+                      </li>
+                      <li>
+                        <div class="form-group">
+                          <input type="submit" [disabled]="!almostDone2.valid" class="bttn bttn-theme btn-xl pull-right" value="Submit" />
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="esign-doc">
+                    <span class="orsec">
+                      OR
+                    </span>
+                    <p>Complete without Aadhar OTP</p>
+                  </div>
+
+                </div>
+              </form>
+              <div class="signManually">
+                <p class="text-center">
+                  <button *ngIf="manualSignInBtnTimeStatus==false" class="bttn bttn-theme btn-md animateBtnTimer" disabled>
+                    <span>Sign Manually</span>
+                  </button>
+                  <a *ngIf="manualSignInBtnTimeStatus==true" class="bttn bttn-theme btn-md" (click)="manualySinging()">
+                    <span class="btnTextWhite">Sign Manually</span>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Update Form End -->
+          <div class="col-md-4">
+            <div class="verified-sec">
+              <ul>
+                <!-- <li><a href="#" title="activate later"> Activate Later</a></li> -->
+                <li class="pageTips-dropdown" id="panel">
+                  <!-- <span title="page tips" (click)="toggleTips()">Page Tips</span> -->
+                  <div class="white-Box {{toggle_class}}">
+                    <h3>Page Tips</h3>
+                    <span class="cross" (click)="toggleTips()">
+                      <img src="assets/icons/close.png" alt="">
+                    </span>
+                    <div class="white-Box-Inner">
+                      <ul class="pageTips-list">
+                        <li>
+                          <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                        </li>
+                        <li>
+                          <a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a>
+                        </li>
+                        <li>
+                          <a href="#">Nam condimentum vitae ligula vel ornare?</a>
+                        </li>
+                        <li>
+                          <a href="#">Phasellus at semper turpis. Nunc eu tellus tortor. Etiam at condimentum nisl, vitae sagittis orci.Donec
+                            id dignissim nunc?</a>
+                        </li>
+                        <li>
+                          <a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a>
+                        </li>
+                        <li>
+                          <a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a>
+                        </li>
+                        <li>
+                          <a href="#">Cras quis nulla commodo, aliquam lectus sed?</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <p>cool..!</p>
+              <p>You need only the below documents to create your bank account.</p>
+              <div class="doc-uploads-box">
+                <div class="uploading-onboard">
+                  <img src="../../assets/images/onboard-uploadingdocs-img.png" alt="">
+                  <p>Uploading the docs upfront will help us to prefill the forms and onboard you faster by 40%</p>
+                </div>
+                <ul class="verfication-steps">
+                  <li class="stakeholder-pan {{statusUploadPan}}">
+                    <span class="numberz">1</span>
+                    <figure class="uploadNumberStatus chart" data-percent="100">
+                      <svg height="40" width="40">
+                        <circle class="outer" cx="177" cy="12" r="10" transform="rotate(-90, 95, 95)" />
+                      </svg>
+                    </figure>
+
+                    <a *ngIf="stakeholder_pan_file_url!=''" class="afterColor" href="{{stakeholder_pan_file_url}}" target="_blank" title="stakeholder pan">Stakeholder PAN</a>
+                    <a *ngIf="stakeholder_pan_file_url==''" [routerLink]="['/onboard-individual']" title="stakeholder pan">Stakeholder PAN</a>
+
+                    <ul class="upload-webcamp pull-right">
+                      <li>
+                        <!--<a href="#" (click)="startCapture()" title="" data-toggle="modal" data-target="#webcam-modal"><img src="../../assets/icons/webcam-icon.svg" alt=""></a>-->
+
+                        <a *ngIf="camStatus=='true'" (click)="startCapture(1)" title="Upload by webcam" data-toggle="modal" data-target="#webcam-modal">
+                          <img src="assets/icons/webcam-icon.svg" alt="">
+                        </a>
+                        <a *ngIf="camStatus=='false'" class="not-active" disabled>
+                          <img src="assets/icons/webcam-icon.svg">
+                        </a>
+                      </li>
+                      <li>
+                        <label class="fileContainer">
+                          <input (change)="onChangePan($event)" type="file" />
+                        </label>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="adhar-card-front {{statusUploadFront}}">
+                    <span class="numberz">2</span>
+                    <figure class="uploadNumberStatus chart" data-percent="100">
+                      <svg height="40" width="40">
+                        <circle class="outer" cx="177" cy="12" r="10" transform="rotate(-90, 95, 95)" />
+                      </svg>
+                    </figure>
+                    <a *ngIf="aadhaarcard_front_file_url!=''" class="afterColor" href="{{aadhaarcard_front_file_url}}" target="_blank" title="business pan">Aadhar Card-Front</a>
+                    <a *ngIf="aadhaarcard_front_file_url==''" [routerLink]="['/onboard-individual']" title="stakeholder pan">Aadhar Card-Front</a>
+
+                    <ul class="upload-webcamp pull-right">
+                      <li>
+                        <!--<a href="#" (click)="startCapture()" title="" data-toggle="modal" data-target="#webcam-modal"><img src="../../assets/icons/webcam-icon.svg" alt=""></a>-->
+
+                        <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" (click)="startCapture(2)" title="Upload by webcam" data-toggle="modal"
+                          data-target="#webcam-modal">
+                          <img src="assets/icons/webcam-icon.svg" alt="">
+                        </a>
+                        <a *ngIf="camStatus=='false'" class="not-active" disabled>
+                          <img src="assets/icons/webcam-icon.svg">
+                        </a>
+                      </li>
+                      <li>
+                        <label class="fileContainer">
+                          <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,1)" type="file" />
+                        </label>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="adhar-card-back {{statusUploadBack}}">
+                    <span class="numberz">3</span>
+                    <figure class="uploadNumberStatus chart" data-percent="100">
+                      <svg height="40" width="40">
+                        <circle class="outer" cx="177" cy="12" r="10" transform="rotate(-90, 95, 95)" />
+                      </svg>
+                    </figure>
+                    <a *ngIf="aadhaarcard_back_file_url!=''" class="afterColor" href="{{aadhaarcard_back_file_url}}" target="_blank" title="business pan">Aadhar Card-Back</a>
+                    <a *ngIf="aadhaarcard_back_file_url==''" [routerLink]="['/onboard-individual']" title="stakeholder pan">Aadhar Card-Back</a>
+                    <ul class="upload-webcamp pull-right">
+                      <li>
+                        <!--<a href="#" (click)="startCapture()" title="" data-toggle="modal" data-target="#webcam-modal"><img src="../../assets/icons/webcam-icon.svg" alt=""></a>-->
+
+                        <a *ngIf="camStatus=='true' && aadhar_e_data_content==false" (click)="startCapture(3)" title="Upload by webcam" data-toggle="modal"
+                          data-target="#webcam-modal">
+                          <img src="assets/icons/webcam-icon.svg" alt="">
+                        </a>
+                        <a *ngIf="camStatus=='false'" class="not-active" disabled>
+                          <img src="assets/icons/webcam-icon.svg" alt="">
+                        </a>
+                      </li>
+                      <li>
+                        <label class="fileContainer">
+                          <input *ngIf="aadhar_e_data_content==false" (change)="onChangeAadhar($event,2)" type="file" />
+                        </label>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <div class="eAadhar" *ngIf="!(aadhar_data_front) && !(aadhar_data_back)">
+                  <div class="greyBox">
+                    <span>
+                      <img src="assets/icons/bulbicon.svg" alt="icon">
+                    </span>
+                    <span *ngIf="aadhar_e_data_content==false">Incase if you have an e-Aadhaar</span>
+                    <span *ngIf="aadhar_e_data_content==true">You have uploaded an e-Aadhaar</span>
+                    <span class="eAadhar-upload" *ngIf="aadhar_e_data_content==false">
+                      <label>
+                        <input (change)="onChangeEaadhaar($event)" type="file" />
+                        <a>Upload</a>
+                      </label>
+                    </span>
+                  </div>
+                  <span class="displayResult pad-38" *ngIf="aadhar_e_data_content==true">
+                    {{aadhar_e_data.original_file_name}}
+                    <!-- <a (click)="delteFiles(aadhar_e_data.id,6)">
+                      <img src="assets/icons/canel_icon.svg" alt="cancel">
+                    </a> -->
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="onboard-dot-image">
+              <img src="assets/images/signin-bg2.png" alt="signin">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+<div class="modal fade" id="webcam-modal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title text-center">Capture {{ pan_aadhar==1?'Pan':pan_aadhar==2?'Aadhaar':'Aadhaar' }} here!</h2>
+      </div>
+      <div class="modal-body">
+        <div class="webCamBox" *ngIf="camStart">
+          <ack-webcam [(ref)]="webcam" [options]="options" (onSuccess)="onSuccess($event)"></ack-webcam>
+        </div>
+        <img src="{{uploadImg}}" *ngIf="uploadImg!=''">
+        <ul class="popup-btns">
+          <li>
+            <button class="bttn bttn-theme btn-large" *ngIf="uploadImg=='' && pan_aadhar==1" (click)="startCapture()" (click)="captureMultipartPan()">Capture</button>
+            <button class="bttn bttn-theme btn-large" *ngIf="uploadImg=='' && pan_aadhar==2" (click)="startCapture()" (click)="captureMultipartAadharFront()">Capture</button>
+            <button class="bttn bttn-theme btn-large" *ngIf="uploadImg=='' && pan_aadhar==3" (click)="startCapture()" (click)="captureMultipartAadharBack()">Capture</button>
+            <button class="bttn bttn-theme btn-large" *ngIf="uploadImg!=''" (click)="stotCapture()" data-dismiss="modal">save</button>
+          </li>
+          <li>
+            <button class="bttn bttn-default btn-large" (click)="stotCapture()" data-dismiss="modal" #closeBtn>Cancel</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>

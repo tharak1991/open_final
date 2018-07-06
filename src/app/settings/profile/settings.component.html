@@ -1,0 +1,258 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<article>
+	<section class="main-body pSettingPage invoiceListPage">
+		<div class="content">
+			<div class="container-fluid">
+				<div class="wraper">
+					<div class="dashboardAccount">
+						<div class="clearfix">
+							<h2 class="pageTitle">Profile Settings</h2>
+						</div>
+					</div>
+
+					<div class="profileDetail">
+						<ul>
+							<li>Name
+								<span>{{profile_setting.first_name}} {{profile_setting.last_name }}</span>
+							</li>
+							<li>Email
+								<span>{{profile_setting.email || "N/A"}}</span>
+							</li>
+							<li>Mobile
+								<span>{{profile_setting.mobile || "N/A"}}</span>
+							</li>
+							<li>
+								<a title="Change password" data-toggle="modal" data-target="#addCategory" class="bttn bttn-default">Change password</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="pDetails">
+						<ul>
+							<li>
+								<span class="pLogo {{loaderClassLogo}}">
+									<label *ngIf="profile_setting.logo_url==null" class="addlogoImage">
+										<input style="display:none" (change)="onChangeLogo($event)" type="file" />
+										<span>Add logo</span>
+									</label>
+									<img *ngIf="profile_setting.logo_url!=null" src="{{profile_setting.logo_url}}" />
+									<a *ngIf="profile_setting.logo_url!=null" class="addLogoedit">
+										<label>
+											<input type="file" style="display: none;" (change)="onChangeLogo($event)" />
+										</label>
+									</a>
+								</span>
+								<span style="font-size: 10px;">Upload logo of size 165px * 67px to fit best in your invoice</span>
+							</li>
+
+							<li>
+								<p>Company/Org name
+									<span>{{profile_setting.company_name || "N/A"}}</span>
+								</p>
+								<!-- <p>Phone (LL)
+									<span>{{profile_setting.company_phone}}</span>
+								</p> -->
+							</li>
+							<li>
+								<p class="pWidth">Company ID
+									<span>{{profile_setting.company_id || "N/A" }}</span>
+								</p>
+								<!-- <p class="pWidth">Website
+									<span>www.skipper.work</span>
+								</p> -->
+							</li>
+						</ul>
+						<span class="floatAddress pWidth">
+							<span>Address</span>
+							<span>{{profile_setting_address.address_line || "N/A"}}</span>
+
+						</span>
+					</div>
+
+					<div class="taxCompliance invoicetaxType {{loaderClassT}}">
+						<h2>Tax & Compliance
+							<button *ngIf="tax_and_compliance==true" (click)="saveTax()" class="bttn bttn-default btn-custom-sm">Save Details</button>
+							<button *ngIf="tax_and_compliance==false" (click)="editTax()" class="bttn bttn-default btn-custom-sm">Edit Details</button>
+						</h2>
+						<ul>
+							<li>PAN
+								<span>{{profile_setting.pan || "N/A"}}</span>
+							</li>
+							<li>CIN
+								<span>{{profile_setting.cin || "N/A"}}</span>
+							</li>
+						</ul>
+						<ul *ngIf="tax_and_compliance==false">
+							<li>VAT / TIN
+								<span>{{profile_setting.vat_tin_number || "N/A"}}</span>
+
+							</li>
+							<li>GSTIN
+								<span>{{profile_setting.company_gstin || "N/A"}}</span>
+
+							</li>
+							<li>Service Tax No
+								<span>{{profile_setting.service_tax_number || "N/A"}}</span>
+
+							</li>
+						</ul>
+						<ul *ngIf="tax_and_compliance==true" class="taxInputs">
+							<li class="form-group">
+								<label>VAT / TIN</label>
+								<input type="text" pattern="^[0-9]$" placeholder="Add VAT/ TIN No" [value]="profile_setting.vat_tin_number" (input)="profile_setting.vat_tin_number = $event.target.value;"
+								    ngModel="{{profile_setting.vat_tin_number}}" class="form-control" name="vat_tin_number" #vat_tin_number="ngModel">
+								<div [hidden]="vat_tin_number.valid" class="error">
+									Invalid VAT/TIN format
+								</div>
+
+							</li>
+							<li class="form-group">
+								<label>GSTIN</label>
+								<input pattern="^[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}[1-9A-Za-z]{1}[Z-z]{1}[0-9A-Za-z]{1}$" type="text" placeholder="Add GSTIN"
+								    [value]="profile_setting.company_gstin" (input)="profile_setting.company_gstin = $event.target.value;" ngModel="{{profile_setting.company_gstin}}"
+								    class="form-control upperCase" name="company_gstin" #company_gstin="ngModel">
+								<div [hidden]="company_gstin.valid" class="error">
+									Invalid GSTIN format
+								</div>
+							</li>
+							<li class="form-group">
+								<label>Service Tax No</label>
+								<input pattern="^[0-9]$" type="text" placeholder="Add Service Tax No." [value]="profile_setting.service_tax_number" (input)="profile_setting.service_tax_number = $event.target.value;"
+								    ngModel="{{profile_setting.service_tax_number}}" class="form-control" name="service_tax_number" #service_tax_number="ngModel">
+								<div [hidden]="service_tax_number.valid" class="error">
+									Invalid Service Tax format
+								</div>
+							</li>
+						</ul>
+					</div>
+
+					<div class="taxCompliance invoicedetailType boderNone {{loaderClassI}}">
+						<h2>Invoice Details
+							<button *ngIf="invoice_detail==true" (click)="saveInvoice()" class="bttn bttn-default btn-custom-sm">Save Details</button>
+							<button *ngIf="invoice_detail==false" (click)="editInvoice()" class="bttn bttn-default btn-custom-sm">Edit Details</button>
+						</h2>
+
+						<ul *ngIf="invoice_detail==false">
+							<li>Invoice Prefix
+								<span>{{profile_setting.invoice_prefix || "N/A"}}</span>
+							</li>
+							<li>Current invoice number
+								<span>{{profile_setting.number_sequence_initial_value || "N/A"}}</span>
+							</li>
+						</ul>
+
+						<ul *ngIf="invoice_detail==true" class="taxInputs ">
+							<li>
+								<span>Invoice Prefix</span>
+								<input type="text" placeholder="Add Prefix" [value]="profile_setting.invoice_prefix" (input)="profile_setting.invoice_prefix = $event.target.value;"
+								    ngModel="{{profile_setting.invoice_prefix}}" class="form-control">
+							</li>
+							<li>
+								<span>Current invoice number</span>
+								<input type="text" placeholder="Invoice starting No." [value]="profile_setting.number_sequence_initial_value" (input)="profile_setting.number_sequence_initial_value = $event.target.value;"
+								    ngModel="{{profile_setting.number_sequence_initial_value}}" class="form-control">
+							</li>
+						</ul>
+						<div class="tandc-tooltip" style="position:relative;">
+							<h3>Terms & Conditions
+								<span class="grey-help-circle">i
+									<span class="tooltipShowcase" style="top:32px">Add your company specific T&C to be attached with the invoice</span>
+								</span>
+							</h3>
+						</div>
+						<textarea [class]="(invoice_detail==false)?'inputDisabled':''" [disabled]="invoice_detail==false" [value]="profile_setting.terms_and_conditions || ''"
+						    (input)="profile_setting.terms_and_conditions = $event.target.value;">{{profile_setting.terms_and_conditions || " "}}</textarea>
+					</div>
+
+
+				</div>
+			</div>
+		</div>
+	</section>
+</article>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="requestint" role="dialog">
+	<span data-target="#requestint" data-toggle="modal" #changedPasswordModal></span>
+	<span data-dismiss="modal" #closeChangedPasswordModal></span>
+	<div class="modal-dialog">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="req-initiated">
+					<h2 class="popup-heading text-center">Password Changed</h2>
+					<span class="tick-circle">
+						<img src="assets/icons/tick-icon-green.svg" alt="tick">
+					</span>
+					<span>Your password has been changed. Please use the new password to login</span>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<ul class="text-center">
+					<li>
+						<button (click)="gotoLogin()" class="bttn bttn-theme btn-md">Login</button>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="addCategory" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
+	<span data-dismiss="modal" #closePasswordChangeForm></span>
+	<div class="modal-dialog addCategoryPopup">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-body">
+				<h4 class="modal-title">Change Password</h4>
+				<form [formGroup]="password_changed" (ngSubmit)="onSubmitChangePassword()">
+					<div class="form-group">
+						<label>Current Password</label>
+						<input type="password" formControlName="old_password" class="form-control">
+						<div *ngIf="password_changed.controls['old_password'].hasError('required') && (password_changed.controls['old_password'].dirty || password_changed.controls['old_password'].touched)"
+						    class="error">
+							Enter current password.
+						</div>
+					</div>
+					<div class="form-group">
+						<label>New Password</label>
+						<input type="password" formControlName="new_password" class="form-control" (keyup)="check_login()">
+						<div *ngIf="password_changed.controls['new_password'].hasError('required') && (password_changed.controls['new_password'].dirty || password_changed.controls['new_password'].touched)"
+						    class="error">
+							Enter new password.
+						</div>
+						<div *ngIf="password_changed.controls['new_password'].hasError('pattern') && (password_changed.controls['new_password'].dirty || password_changed.controls['new_password'].touched)"
+						    class="error">
+							Min 8 char, atleast 1 letter &amp; 1 number, 1 Uppercase, &amp; 1 special
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label>Confirm New Password</label>
+						<input type="password" formControlName="c_password" class="form-control" (keyup)="check_login()">
+						<div class="error" *ngIf="password_changed.controls['c_password'].hasError('required') && (password_changed.controls['c_password'].dirty || password_changed.controls['c_password'].touched); else elsepart">
+							Enter confirm password.
+						</div>
+						<ng-template #elsepart>
+							<div *ngIf="password_changed.controls.c_password.errors?.equalTo" class="error">
+								New Password and confirm password not matched
+							</div>
+						</ng-template>
+						<div class="error">{{error}}</div>
+					</div>
+
+					<div class="modal-footer">
+						<ul>
+							<li>
+								<button class="bttn bttn-theme btn-md" [disabled]="!password_changed.valid">Change Password</button>
+							</li>
+							<li>
+								<button type="button" (click)="closePasswordModal()" class="bttn bttn-default">Cancel</button>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</div>

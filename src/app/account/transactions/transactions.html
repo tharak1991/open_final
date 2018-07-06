@@ -1,0 +1,253 @@
+<app-header></app-header>
+<sidebar></sidebar>
+<div class="warnMessageTop {{hideWarningClass}}">
+  <p>{{warning_message}}</p>
+  <a (click)="hideWarning()" title="close" class="closeWarn">
+    <img src="assets/icons/cancel_white.svg" alt="">
+  </a>
+</div>
+<section class="main-body transitionSec">
+  <div class="content">
+    <div class="container-fluid">
+      <div class="wraper">
+        <div class="dashboardAccount">
+          <div class="breadcrumbBlock">
+            <!-- <ul class="default-breadcrumb">
+              <li><a [routerLink]="['/payments']">Bank Accounts</a></li>
+              <li>Transactions</li>
+            </ul> -->
+            <!-- <div class="pageTips-dropdown" id="panel">
+              <span title="page tips" (click)="toggleTips()">Page Tips</span>
+              <div class="white-Box {{toggle_class}}">
+                <h3>Page Tips</h3>
+                <span class="cross" (click)="toggleTips()"><img src="assets/icons/close.png" alt=""></span>
+                <div class="white-Box-Inner">
+                  <ul class="pageTips-list">
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras ullamcorper bibendum bibendum. Duistincidunt urna non pretium porta?</a></li>
+                    <li><a href="#">Nam condimentum vitae ligula vel ornare?</a></li>
+                    <li><a href="#">Phasellus at semper turpis. Nunc eu tellus tortor.
+                      Etiam at condimentum nisl, vitae sagittis orci.Donec id dignissim nunc?</a></li>
+                    <li><a href="#">Donec elit ante, eleifend a dolor et, venenatis facilisis dolor?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                    <li><a href="#">Cras quis nulla commodo, aliquam lectus sed?</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div> -->
+          </div>
+
+          <h2 class="pageTitle headingPadding">{{fname}} {{lname}}</h2>
+          <ul class="listTopButtonRight">
+            <li class="benecficaryList">
+              <form [formGroup]="filter_form" (ngSubmit)="submitFilter()">
+                <div class="form-group">
+                  <input type="text" formControlName="amount" class="form-control" placeholder="Amount" (keyup)="setRecepientName($event)">
+                </div>
+                <div (click)="clickedInside($event)">
+                  <a *ngIf="filter_toggle==''" (click)="toggleFilter()" class="search_down">
+                    <img alt="" src="assets/icons/opencaret.svg">
+                  </a>
+                  <!-- <button type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button> -->
+                  <button *ngIf="crossButton==false" type="submit" class="greySearch" (click)="preventFn();submitName('1');"></button>
+                  <button *ngIf="crossButton==true" type="button" class="cancelCross" (click)="refresh_local_variable()"></button>
+
+                  <div class="boxBeneficiarSearch {{filter_toggle}}">
+                    <div class="boxBeneficiarSearchInner">
+                      <span class="clearAll">
+                        <a title="Clear All" (click)="refresh_local_variable_form()">Clear All</a>
+                      </span>
+                      <ul>
+                        <li>
+                          <h4>By Reference No</h4>
+                          <div class="form-group">
+                            <input type="text" formControlName="ref_no" class="form-control">
+                          </div>
+                        </li>
+                        <li>
+                          <ul class="radioBtnCircle">
+                            <li style="display:block">
+                              <h4>By Transaction Type</h4>
+                            </li>
+                            <li>
+                              <p-radioButton formControlName="transaction_type" name="groupname" value="CR"></p-radioButton>
+                              <span>Credit</span>
+                            </li>
+                            <li>
+                              <p-radioButton formControlName="transaction_type" name="groupname" value="DR"></p-radioButton>
+                              <span>Debit</span>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <h4>By Payment Date</h4>
+                          <div class="form-group half openCaret">
+                            <p-calendar formControlName="transaction_date_from" dateFormat="yy-mm-dd" placeholder="From"></p-calendar>
+                            <a class="search_down">
+                              <img alt="" src="assets/icons/opencaret.svg">
+                            </a>
+                          </div>
+                          <div class="form-group half pull-right">
+                            <p-calendar formControlName="transaction_date_to" dateFormat="yy-mm-dd" placeholder="To"></p-calendar>
+                            <a class="search_down">
+                              <img alt="" src="assets/icons/opencaret.svg">
+                            </a>
+                          </div>
+                        </li>
+                        <li>
+                          <h4>By Payment value greater than</h4>
+                          <div class="form-group half rupees">
+                            <input type="text" formControlName="amount_greater" class="form-control" placeholder="" />
+                          </div>
+                        </li>
+                        <li class="formButtons">
+                          <input (click)="preventFn();submitName('2');" [disabled]="!filter_form.valid" type="submit" class="bttn bttn-theme btn-md"
+                            value="Search">
+                          <a class="bttn bttn-default" title="Close" (click)="toggleFilter()">Cancel</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </li>
+
+            <li>
+              <a class="bttn bttn-default" data-toggle="modal" data-target="#downloadStatement">Download Statement</a>
+            </li>
+
+          </ul>
+
+        </div>
+        <div class="transitionStatus">
+          <ul class="accountStatus">
+            <li>
+              <p>Account No
+                <em>{{account_detail.open_bank_account_number}}</em>
+              </p>
+            </li>
+            <li>
+              <p>IFSC Code
+                <em>{{account_detail.open_bank_ifsc}}</em>
+              </p>
+            </li>
+            <li>
+              <p>Branch
+                <em>{{account_detail.open_bank_branch}}</em>
+              </p>
+            </li>
+          </ul>
+          <ul class="accountBalance">
+            <li class="dashboardAccountBalance">
+              <span>Current Account Balance </span>
+              <em>{{account_balance| currency:'INR':true}}</em>
+            </li>
+            <li>
+              <a [routerLink]="['/add-fund']" title="Add Fund" class="bttn bttn-theme" (click)="hrefClick('bankaccounts-add-fund-clicked')">Add Fund</a>
+            </li>
+            <li>
+              <a [routerLink]="['/withdraw-money']" title="Withdraw" class="bttn bttn-theme" (click)="hrefClick('bankaccounts-withdraw-clicked')">Withdraw</a>
+            </li>
+          </ul>
+        </div>
+        <div class="listTransferTable {{TableDataLoader}}">
+          <p-dataTable [value]="data">
+
+            <p-column field="transaction_date" header="Date" sortable="custom" (sortFunction)="mysort($event)">
+              <ng-template let-col let-payment="rowData" pTemplate="body">
+                <span>{{payment[col.field]|date:'d/M/y'}}</span>
+              </ng-template>
+            </p-column>
+            <p-column field="description" header="Description"></p-column>
+            <p-column field="ref_no" header="Ref No"></p-column>
+
+            <p-column field="amount" header="Amount" sortable="custom" (sortFunction)="mysort($event)" [style]="{'text-align':'right', 'padding-right': '50px'}">
+              <ng-template let-amount_data="rowData" pTemplate="body">
+                <span *ngIf="amount_data.transaction_mode=='DR'" class="redColor textRight">{{amount_data.amount| currency:'INR':true}} {{amount_data.transaction_mode}}</span>
+                <span *ngIf="amount_data.transaction_mode=='CR'" class="textRight">{{amount_data.amount| currency:'INR':true}} {{amount_data.transaction_mode}}</span>
+
+              </ng-template>
+            </p-column>
+
+            <p-column field="balance" header="Balance" sortable="custom" (sortFunction)="mysort($event)" [style]="{'width':'22%', 'text-align': 'right','padding-right': '50px'}">
+              <ng-template let-col let-bal="rowData" pTemplate="body">
+                <span>{{bal[col.field]| currency:'INR':true}}</span>
+              </ng-template>
+            </p-column>
+
+            <ng-template pTemplate="emptymessage">
+              <div class="noInvoiceOuter" *ngIf="TableDataLoader==''">
+                <img src="assets/icons/no_transaction.svg" alt="">
+                <span>
+                  <em>Oops!</em> There's nothing 'ere yet!</span>
+              </div>
+            </ng-template>
+
+          </p-dataTable>
+          <div class="showingPagination">
+            <span>showing page {{current_page}} of {{total_pages}}</span>
+            <button *ngIf="previous!=''" (click)="change_page(previous)">Previous</button>
+            <button *ngIf="previous==''" disabled>Previous</button>
+            <button *ngIf="next!=''" (click)="change_page(next)">Next</button>
+            <button *ngIf="next==''" disabled>Next</button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="downloadStatement" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h2>Download Statement</h2>
+        <form [formGroup]="filter_form_date" (ngSubmit)="filter_By_date()">
+          <ul class="radioBtnCircle">
+            <li>
+              <p-radioButton formControlName="transaction_date_type" name="groupname" value="1" [(ngModel)]="transaction_type"></p-radioButton>
+              <span>Last Month</span>
+            </li>
+            <li>
+              <p-radioButton formControlName="transaction_date_type" name="groupname" value="2" [(ngModel)]="transaction_type"></p-radioButton>
+              <span>Last 3 Month</span>
+            </li>
+            <li>
+              <p-radioButton formControlName="transaction_date_type" name="groupname" value="3" [(ngModel)]="transaction_type"></p-radioButton>
+              <span>Last 6 Month</span>
+            </li>
+            <li>
+              <p-radioButton formControlName="transaction_date_type" name="groupname" value="4" [(ngModel)]="transaction_type"></p-radioButton>
+              <span>Last 1 Year</span>
+            </li>
+          </ul>
+          <div class="fromTo">
+            <div class="form-group half openCaret">
+              <label>From</label>
+              <p-calendar formControlName="transaction_date_from" dateFormat="yy-mm-dd" placeholder="dd/mm/yyyy"></p-calendar>
+              <a class="search_down">
+                <img alt="" src="assets/icons/opencaret.svg">
+              </a>
+            </div>
+            <div class="form-group half pull-right">
+              <label>To</label>
+              <p-calendar formControlName="transaction_date_to" dateFormat="yy-mm-dd" placeholder="dd/mm/yyyy"></p-calendar>
+              <a class="search_down">
+                <img alt="" src="assets/icons/opencaret.svg">
+              </a>
+            </div>
+          </div>
+          <div class="footer-btn">
+            <div class="formButtons">
+              <input type="submit" class="bttn bttn-theme" value="Download Report">
+              <a #closeDownloadPop class="bttn bttn-default" title="Close" data-dismiss="modal">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
